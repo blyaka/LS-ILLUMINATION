@@ -1,3 +1,5 @@
+@import url(variables.css);
+
 * {
     padding: 0;
     margin: 0;
@@ -17,6 +19,132 @@ html {
 }
 
 body {
+    font-family: Helvetica, sans-serif;
     font-family: var(--font-sans);
     background-color: var(--bg);
+}
+
+
+
+
+.ls-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: linear-gradient(to bottom,
+            rgba(3, 8, 23, .95) 0%,
+            rgba(3, 8, 23, .75) 55%,
+            rgba(3, 8, 23, 0) 100%);
+    position: sticky;
+}
+
+.ls-header::after {
+    content: "";
+    position: absolute;
+    inset: 1;
+    pointer-events: none;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 100%);
+    mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+}
+
+.ls-header__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 32px;
+    padding: 14px 96px;
+}
+
+.ls-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.ls-logo img {
+    height: 24px;
+    width: auto;
+    display: block;
+}
+
+.ls-logo__brand {
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+.ls-logo__sep {
+    width: 1px;
+    height: 16px;
+    opacity: .4;
+    background: #fff;
+}
+
+.ls-logo__ru {
+    font-weight: 500;
+    opacity: .9;
+}
+
+.ls-nav {
+    display: flex;
+    gap: 32px;
+}
+
+.ls-nav a {
+    color: var(--text);
+    text-decoration: none;
+    padding: 0 12px;
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+.ls-nav a:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.ls-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text);
+    background-clip: padding-box, border-box;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .08) inset,
+        0 6px 20px rgba(188, 66, 133, .25);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.ls-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .12) inset,
+        0 10px 28px rgba(188, 66, 133, .35);
+}
+
+
+
+
+
+
+.ls-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 400;
+    font-size: var(--font-small);
+    padding: 153px 96px 66px 96px;
+}
+
+.ls-footer a {
+    color: var(--text);
+    text-decoration: none;
 }

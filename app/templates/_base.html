@@ -1,0 +1,61 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% block title %}
+    <title>LS-ILLIMINATOIN</title>
+    {% endblock title %}
+
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+
+    {% block styles %}
+
+    {% endblock styles %}
+
+</head>
+
+<body>
+
+    <header class="ls-header">
+        <div class="ls-header__inner">
+            <a class="ls-logo" href="/">
+                <img src="{% static 'images/logo.png' %}" alt="LS Illumination">
+                <span class="ls-logo__brand">LS ILLUMINATION</span>
+                <i class="ls-logo__sep"></i>
+                <span class="ls-logo__ru">СВЕТОВЫЕ РЕШЕНИЯ</span>
+            </a>
+
+            <nav class="ls-nav">
+                <a href="#">Портфолио</a>
+                <a href="#">Контакты</a>
+                <a href="#">О нас</a>
+            </nav>
+
+            <a class="ls-cta" href="#request">Оставить заявку</a>
+        </div>
+    </header>
+
+
+
+    {% block content %}
+
+    {% endblock content %}
+
+
+    <footer class="ls-footer">
+        <a href="">Пользовательское соглашение</a>
+        <a href="">Политика конфиденциальности</a>
+        <a href="">© LS illumination, 2009-2025</a>
+        <a href="">by</a>
+    </footer>
+
+</body>
+
+</html>
