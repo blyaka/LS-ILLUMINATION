@@ -1,0 +1,16 @@
+:root {
+
+    --bg: #030817;
+    --text: #FFFFFF;
+    --muted: #9C9A9A;
+    --accent: #BC4285;
+    --accent2: #C80570;
+    --cookie-color: #FB19C3;
+    --grad: linear-gradient(90deg, #FB19C3 0.01%, #FF45F3 50.01%, #602BFF 100%);
+
+    --radius: 25px;
+    --raduis2: 20px;
+
+
+    
+}
