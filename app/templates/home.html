@@ -235,6 +235,132 @@
 </section>
 
 
+
+
+<section class="cw-split" id="sd-section">
+    <div class="cw-split__media">
+        <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
+            poster="{% static 'images/hero-bg.png' %}">
+            <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
+        </video>
+    </div>
+
+    <aside class="cw-split__aside">
+        <h2 class="cw-split__title">Светодинамическая конструкция</h2>
+        <p class="cw-split__desc">
+            Световые конструкции с программируемыми эффектами: смена цвета,
+            движение света, мигание. Для яркого оформления городских пространств.
+        </p>
+        <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
+    </aside>
+
+    <!-- Модалка-плеер -->
+    <div class="sv-modal" id="sdModal" hidden>
+        <div class="sv-backdrop" data-close></div>
+        <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
+            <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
+            <div class="sv-frame">
+                <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
+                    <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="cw-split right" id="sd-section">
+
+    <aside class="cw-split__aside">
+        <h2 class="cw-split__title">Светодинамическая конструкция</h2>
+        <p class="cw-split__desc">
+            Световые конструкции с программируемыми эффектами: смена цвета,
+            движение света, мигание. Для яркого оформления городских пространств.
+        </p>
+        <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
+    </aside>
+
+
+    <div class="cw-split__media">
+        <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
+            poster="{% static 'images/hero-bg.png' %}">
+            <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- Модалка-плеер -->
+    <div class="sv-modal" id="sdModal" hidden>
+        <div class="sv-backdrop" data-close></div>
+        <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
+            <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
+            <div class="sv-frame">
+                <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
+                    <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+<script>
+    (() => {
+        const open = (sel) => {
+            const m = document.querySelector(sel);
+            if (!m) return;
+            // пауза превью
+            const prev = document.getElementById('sdPreview');
+            prev && prev.pause();
+            // открыть модалку
+            m.hidden = false;
+            document.body.style.overflow = 'hidden';
+            const full = document.getElementById('sdFull');
+            full && full.play().catch(() => { });
+        };
+
+        const close = (m) => {
+            const full = document.getElementById('sdFull');
+            if (full) { full.pause(); /* full.currentTime = 0; */ }
+            m.hidden = true;
+            document.body.style.overflow = '';
+            // возобновим превью
+            const prev = document.getElementById('sdPreview');
+            prev && prev.play().catch(() => { });
+        };
+
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-open]');
+            if (btn) { open(btn.dataset.open); }
+            if (e.target.matches('[data-close]')) { close(e.target.closest('.sv-modal')); }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            const m = document.getElementById('sdModal');
+            if (e.key === 'Escape' && m && !m.hidden) close(m);
+        });
+
+        // пауза превью, когда секция вне вьюпорта
+        const io = new IntersectionObserver(([ent]) => {
+            const v = document.getElementById('sdPreview');
+            if (!v) return;
+            if (ent.isIntersecting) v.play().catch(() => { });
+            else v.pause();
+        }, { threshold: 0.2 });
+        io.observe(document.getElementById('sd-section'));
+    })();
+</script>
+
+
+
+
+
+
 <script>
     (() => {
         const s = document.getElementById('seq');
@@ -327,14 +453,6 @@
         addEventListener('scroll', progressFromScroll, { passive: true });
     })();
 </script>
-
-
-
-
-
-
-
-
 
 
 <script>
