@@ -206,8 +206,34 @@
 <section class="cw-seq" id="seq">
     <div class="cw-seq__sticky">
         <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
+
+        <!-- Overlay -->
+        <div class="seq-ov">
+            <div class="seq-copy" id="seqCopy">
+                <span class="seq-kicker">Фонтан</span>
+                <h2 class="seq-title">«ТЕАТРАЛЬНЫЙ»</h2>
+                <p class="seq-desc">
+                    Где дети считают звёзды.<br>
+                    Где взрослые снова верят в чудо.<br>
+                    Где вместе — теплее.
+                </p>
+            </div>
+
+            <!-- Артикул: слева гаснет -->
+            <div class="seq-art seq-art--right" id="artL">
+                <span class="dot"></span> <span>Арт. 1337</span>
+            </div>
+            <!-- Артикул: справа появляется -->
+            <div class="seq-art seq-art--left" id="artR">
+                <span class="dot"></span> <span>Арт. 1337</span>
+            </div>
+
+            <!-- Схема: появляется на финальных кадрах -->
+            <img class="seq-scheme" id="seqScheme" src="{% static 'images/scheme.png' %}" alt="Схема">
+        </div>
     </div>
 </section>
+
 
 <script>
     (() => {
@@ -216,64 +242,92 @@
         const x = c.getContext('2d', { alpha: false });
         const d = Math.min(2, window.devicePixelRatio || 1);
 
+        const copy = document.getElementById('seqCopy');
+        const artL = document.getElementById('artL');
+        const artR = document.getElementById('artR');
+        const scheme = document.getElementById('seqScheme');
+        const desc = document.querySelector('.seq-desc');
+
         const N = 60;
         const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5, '0')}.webp`;
-
         const G = new Array(N);
         let tgt = 0, cur = 0, raf = 0, last = -1;
 
-        function R() {
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;      // easeInOut
+        const smooth = (a, b, t) => clamp((t - a) / (b - a), 0, 1);           // smoothstep 0..1
+
+        function resize() {
             c.width = Math.floor(innerWidth * d);
             c.height = Math.floor(innerHeight * d);
-            c.style.width = '100vw';
-            c.style.height = '100vh';
+            c.style.width = '100vw'; c.style.height = '100vh';
             x.setTransform(d, 0, 0, d, 0, 0);
-            S(cur);
+            snap(cur);
         }
 
         function draw(img) {
             const cw = c.width / d, ch = c.height / d;
             const iw = img.naturalWidth, ih = img.naturalHeight;
-            const s = Math.max(cw / iw, ch / ih);   // cover
-            const w = iw * s, h = ih * s;
+            const s = Math.max(cw / iw, ch / ih), w = iw * s, h = ih * s;
             x.clearRect(0, 0, cw, ch);
-            x.globalAlpha = 1;                  // на всякий
             x.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
         }
 
-        function S(f) {                        // snap к одному кадру
-            const idx = Math.max(0, Math.min(N - 1, Math.round(f)));
+        function snap(f) {
+            const idx = clamp(Math.round(f), 0, N - 1);
             if (idx === last) return;
             const im = G[idx];
             if (!im || !im.complete) return;
-            last = idx;
-            draw(im);
+            last = idx; draw(im);
         }
 
-        function P() {                         // обновляем цель по скроллу
+        function progressFromScroll() {
             const r = s.getBoundingClientRect();
             const m = s.offsetHeight - innerHeight;
             const y = Math.min(m, Math.max(0, -r.top));
             tgt = m ? (y / m) * (N - 1) : 0;
-            if (!raf) raf = requestAnimationFrame(T);
+            if (!raf) raf = requestAnimationFrame(loop);
         }
 
-        function T() {                         // плавно догоняем без бленда
+        function updateOverlay(p) {
+            // движение текста: вправо + вверх
+            const t = ease(p);
+            const moveX = innerWidth * 0.66;   // насколько уедет по X
+            const moveY = innerHeight * 0.32;  // насколько поднимется по Y
+            copy.style.transform = `translate(${moveX * t}px, ${-moveY * t}px)`;
+
+            // артикул: слева гаснет 40–55%, справа появляется 55–70%
+            artL.style.opacity = 1 - smooth(0.40, 0.55, p);
+            artR.style.opacity = smooth(0.55, 0.70, p);
+
+            // схема: появляется внизу справа на 80–95%
+            const vis = smooth(0.80, 0.95, p);
+            scheme.style.opacity = vis;
+            scheme.style.transform = `translateY(${16 * (1 - vis)}px)`;
+
+            // абзац к финалу выравниваем по правому краю
+            <!-- desc.style.textAlign = p > 0.88 ? 'right' : 'left'; -->
+        }
+
+
+        function loop() {
             raf = 0;
-            cur += (tgt - cur) * 0.2;          // 0.12–0.2 — настройка плавности
-            S(cur);
-            if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(T);
+            cur += (tgt - cur) * 0.2;     // плавное, но без «мыла»
+            snap(cur);
+            updateOverlay(cur / (N - 1));
+            if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(loop);
         }
 
         // preload
-        G[0] = new Image(); G[0].src = U(0); G[0].onload = () => S(0);
+        G[0] = new Image(); G[0].src = U(0); G[0].onload = () => { snap(0); updateOverlay(0); };
         for (let i = 1; i < N; i++) { G[i] = new Image(); G[i].decoding = 'async'; G[i].src = U(i); }
 
-        R();
-        addEventListener('resize', () => { R(); P(); });
-        addEventListener('scroll', P, { passive: true });
+        resize();
+        addEventListener('resize', () => { resize(); progressFromScroll(); });
+        addEventListener('scroll', progressFromScroll, { passive: true });
     })();
 </script>
+
 
 
 
