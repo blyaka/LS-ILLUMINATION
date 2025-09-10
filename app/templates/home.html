@@ -1,9 +1,348 @@
 {% extends '_base.html' %}
+{% load static %}
 
-
-
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock styles %}
 
 {% block content %}
+
+
+<section class="ls-hero">
+    <video id="heroVideo" class="ls-hero__media" poster="{% static 'images/video_preload.jpg' %}" muted loop playsinline
+        preload="metadata">
+        <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
+    </video>
+
+    <div class="ls-hero__overlay-top"></div>
+    <div class="ls-hero__overlay-bottom"></div>
+
+    <div class="ls-hero__content">
+        <h1 class="ls-hero__title">Москва</h1>
+        <p class="ls-hero__subtitle">Новогоднее оформление всей России</p>
+    </div>
+
+    <div class="ls-hero__stats">
+        <div class="ls-hero__stat"><span>16</span><small>лет работы</small></div>
+        <div class="ls-hero__stat"><span>250+</span><small>проектов</small></div>
+        <div class="ls-hero__stat"><span>300+</span><small>человек</small></div>
+    </div>
+
+    <button class="ls-hero__pp" id="ppBtn" aria-label="Воспроизвести/Пауза">
+        <svg class="pp-icon pp-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path d="M8 5v14l11-7-11-7z" fill="currentColor" />
+        </svg>
+        <svg class="pp-icon pp-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" />
+        </svg>
+    </button>
+</section>
+
+
+<section class="cw-portfolio" id="portfolio">
+    <h2 class="cw-portfolio__title">Портфолио</h2>
+
+    <div class="cw-portfolio__grid">
+        <!-- Карточка -->
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+
+        <!-- продублируй/сгенерируй 9 шт. -->
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+        <a class="p-card" href="#">
+            <figure class="p-card__inner">
+                <div class="p-card__photo">
+                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
+                </div>
+                <figcaption class="p-card__cap">
+                    <span>Оформление</span>
+                    <small>городских пространств</small>
+                </figcaption>
+            </figure>
+        </a>
+    </div>
+</section>
+
+
+
+
+<section class="cw-videos" id="videos">
+    <h2 class="cw-videos__title">Видеогалерея</h2>
+
+    <div class="cw-videos__grid">
+        <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
+            <div class="v-card__thumb">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Москва" loading="lazy">
+                <span class="v-card__play" aria-hidden="true"></span>
+            </div>
+            <span class="v-card__title">Москва</span>
+        </button>
+
+        <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
+            <div class="v-card__thumb">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Клин" loading="lazy">
+                <span class="v-card__play" aria-hidden="true"></span>
+            </div>
+            <span class="v-card__title">Клин</span>
+        </button>
+
+        <button class="v-card" type="button" data-src="https://player.vimeo.com/video/76979871?autoplay=1">
+            <div class="v-card__thumb">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Лабытнанги" loading="lazy">
+                <span class="v-card__play" aria-hidden="true"></span>
+            </div>
+            <span class="v-card__title">Лабытнанги</span>
+        </button>
+
+        <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
+            <div class="v-card__thumb">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Надым" loading="lazy">
+                <span class="v-card__play" aria-hidden="true"></span>
+            </div>
+            <span class="v-card__title">Надым</span>
+        </button>
+    </div>
+
+    <!-- Модалка-плеер -->
+    <div class="v-modal" id="vModal" hidden>
+        <div class="v-modal__backdrop" data-close></div>
+        <div class="v-modal__dialog" role="dialog" aria-modal="true" aria-label="Видеоплеер">
+            <button class="v-modal__close" type="button" data-close aria-label="Закрыть">×</button>
+            <div class="v-modal__frame">
+                <iframe id="vFrame" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen
+                    loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<section class="cw-seq" id="seq">
+    <div class="cw-seq__sticky">
+        <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
+    </div>
+</section>
+
+<script>
+    (() => {
+        const s = document.getElementById('seq');
+        const c = document.getElementById('seqCanvas');
+        const x = c.getContext('2d', { alpha: false });
+        const d = Math.min(2, window.devicePixelRatio || 1);
+
+        const N = 60;
+        const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5, '0')}.webp`;
+
+        const G = new Array(N);
+        let tgt = 0, cur = 0, raf = 0, last = -1;
+
+        function R() {
+            c.width = Math.floor(innerWidth * d);
+            c.height = Math.floor(innerHeight * d);
+            c.style.width = '100vw';
+            c.style.height = '100vh';
+            x.setTransform(d, 0, 0, d, 0, 0);
+            S(cur);
+        }
+
+        function draw(img) {
+            const cw = c.width / d, ch = c.height / d;
+            const iw = img.naturalWidth, ih = img.naturalHeight;
+            const s = Math.max(cw / iw, ch / ih);   // cover
+            const w = iw * s, h = ih * s;
+            x.clearRect(0, 0, cw, ch);
+            x.globalAlpha = 1;                  // на всякий
+            x.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+        }
+
+        function S(f) {                        // snap к одному кадру
+            const idx = Math.max(0, Math.min(N - 1, Math.round(f)));
+            if (idx === last) return;
+            const im = G[idx];
+            if (!im || !im.complete) return;
+            last = idx;
+            draw(im);
+        }
+
+        function P() {                         // обновляем цель по скроллу
+            const r = s.getBoundingClientRect();
+            const m = s.offsetHeight - innerHeight;
+            const y = Math.min(m, Math.max(0, -r.top));
+            tgt = m ? (y / m) * (N - 1) : 0;
+            if (!raf) raf = requestAnimationFrame(T);
+        }
+
+        function T() {                         // плавно догоняем без бленда
+            raf = 0;
+            cur += (tgt - cur) * 0.2;          // 0.12–0.2 — настройка плавности
+            S(cur);
+            if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(T);
+        }
+
+        // preload
+        G[0] = new Image(); G[0].src = U(0); G[0].onload = () => S(0);
+        for (let i = 1; i < N; i++) { G[i] = new Image(); G[i].decoding = 'async'; G[i].src = U(i); }
+
+        R();
+        addEventListener('resize', () => { R(); P(); });
+        addEventListener('scroll', P, { passive: true });
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+<script>
+    (() => {
+        const modal = document.getElementById('vModal');
+        const frame = document.getElementById('vFrame');
+        const openBtns = document.querySelectorAll('.v-card');
+
+        openBtns.forEach(b => b.addEventListener('click', () => {
+            frame.src = b.dataset.src;
+            modal.hidden = false;
+            document.body.style.overflow = 'hidden';
+        }));
+
+        modal.addEventListener('click', e => {
+            if (e.target.hasAttribute('data-close')) {
+                frame.src = '';
+                modal.hidden = true;
+                document.body.style.overflow = '';
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && !modal.hidden) {
+                modal.querySelector('[data-close]').click();
+            }
+        });
+    })();
+</script>
+
+
+<script>
+    (function () {
+        const v = document.getElementById('heroVideo');
+        const btn = document.getElementById('ppBtn');
+        const hasSource = v.currentSrc || v.querySelector('source');
+
+        if (!hasSource) {
+            btn.disabled = true;
+            btn.classList.add('is-disabled');
+            return;
+        }
+
+        v.muted = true;
+
+        const setState = playing => {
+            btn.classList.toggle('is-playing', playing);
+        };
+
+        btn.addEventListener('click', () => {
+            if (v.paused) {
+                v.play().then(() => setState(true)).catch(() => { });
+            } else {
+                v.pause();
+                setState(false);
+            }
+        });
+
+        v.addEventListener('play', () => setState(true));
+        v.addEventListener('pause', () => setState(false));
+    })();
+</script>
 
 
 {% endblock %}
