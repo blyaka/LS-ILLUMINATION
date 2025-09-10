@@ -2,366 +2,468 @@
 {% load static %}
 
 {% block styles %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
-{% endblock styles %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+{% endblock %}
 
 {% block content %}
-
-
-<section class="ls-hero">
-    <video id="heroVideo" class="ls-hero__media" poster="{% static 'images/video_preload.jpg' %}" muted loop playsinline
-        preload="metadata">
-        <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
+  <section class="ls-hero">
+    <video id="heroVideo" class="ls-hero__media" poster="{% static 'images/video_preload.jpg' %}" muted loop playsinline preload="metadata">
+      <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
     </video>
 
     <div class="ls-hero__overlay-top"></div>
     <div class="ls-hero__overlay-bottom"></div>
 
     <div class="ls-hero__content">
-        <h1 class="ls-hero__title">Москва</h1>
-        <p class="ls-hero__subtitle">Новогоднее оформление всей России</p>
+      <h1 class="ls-hero__title">Москва</h1>
+      <p class="ls-hero__subtitle">Новогоднее оформление всей России</p>
     </div>
 
     <div class="ls-hero__stats">
-        <div class="ls-hero__stat"><span>16</span><small>лет работы</small></div>
-        <div class="ls-hero__stat"><span>250+</span><small>проектов</small></div>
-        <div class="ls-hero__stat"><span>300+</span><small>человек</small></div>
+      <div class="ls-hero__stat">
+        <span>16</span><small>лет работы</small>
+      </div>
+      <div class="ls-hero__stat">
+        <span>250+</span><small>проектов</small>
+      </div>
+      <div class="ls-hero__stat">
+        <span>300+</span><small>человек</small>
+      </div>
     </div>
 
     <button class="ls-hero__pp" id="ppBtn" aria-label="Воспроизвести/Пауза">
-        <svg class="pp-icon pp-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-            <path d="M8 5v14l11-7-11-7z" fill="currentColor" />
-        </svg>
-        <svg class="pp-icon pp-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-            <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" />
-        </svg>
+      <svg class="pp-icon pp-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M8 5v14l11-7-11-7z" fill="currentColor" />
+      </svg>
+      <svg class="pp-icon pp-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" />
+      </svg>
     </button>
-</section>
+  </section>
 
-
-<section class="cw-portfolio" id="portfolio">
+  <section class="cw-portfolio" id="portfolio">
     <h2 class="cw-portfolio__title">Портфолио</h2>
 
     <div class="cw-portfolio__grid">
-        <!-- Карточка -->
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
+      <!-- Карточка -->
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
 
-        <!-- продублируй/сгенерируй 9 шт. -->
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
-        <a class="p-card" href="#">
-            <figure class="p-card__inner">
-                <div class="p-card__photo">
-                    <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств">
-                </div>
-                <figcaption class="p-card__cap">
-                    <span>Оформление</span>
-                    <small>городских пространств</small>
-                </figcaption>
-            </figure>
-        </a>
+      <!-- продублируй/сгенерируй 9 шт. -->
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
+      <a class="p-card" href="#">
+        <figure class="p-card__inner">
+          <div class="p-card__photo">
+            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+          </div>
+          <figcaption class="p-card__cap">
+            <span>Оформление</span>
+            <small>городских пространств</small>
+          </figcaption>
+        </figure>
+      </a>
     </div>
-</section>
+  </section>
 
-
-
-
-<section class="cw-videos" id="videos">
+  <section class="cw-videos" id="videos">
     <h2 class="cw-videos__title">Видеогалерея</h2>
 
     <div class="cw-videos__grid">
-        <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
-            <div class="v-card__thumb">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Москва" loading="lazy">
-                <span class="v-card__play" aria-hidden="true"></span>
-            </div>
-            <span class="v-card__title">Москва</span>
-        </button>
+      <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
+        <div class="v-card__thumb">
+          <img src="{% static 'images/portfolio.jpg' %}" alt="Москва" loading="lazy" />
+          <span class="v-card__play" aria-hidden="true"></span>
+        </div>
+        <span class="v-card__title">Москва</span>
+      </button>
 
-        <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
-            <div class="v-card__thumb">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Клин" loading="lazy">
-                <span class="v-card__play" aria-hidden="true"></span>
-            </div>
-            <span class="v-card__title">Клин</span>
-        </button>
+      <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
+        <div class="v-card__thumb">
+          <img src="{% static 'images/portfolio.jpg' %}" alt="Клин" loading="lazy" />
+          <span class="v-card__play" aria-hidden="true"></span>
+        </div>
+        <span class="v-card__title">Клин</span>
+      </button>
 
-        <button class="v-card" type="button" data-src="https://player.vimeo.com/video/76979871?autoplay=1">
-            <div class="v-card__thumb">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Лабытнанги" loading="lazy">
-                <span class="v-card__play" aria-hidden="true"></span>
-            </div>
-            <span class="v-card__title">Лабытнанги</span>
-        </button>
+      <button class="v-card" type="button" data-src="https://player.vimeo.com/video/76979871?autoplay=1">
+        <div class="v-card__thumb">
+          <img src="{% static 'images/portfolio.jpg' %}" alt="Лабытнанги" loading="lazy" />
+          <span class="v-card__play" aria-hidden="true"></span>
+        </div>
+        <span class="v-card__title">Лабытнанги</span>
+      </button>
 
-        <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
-            <div class="v-card__thumb">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Надым" loading="lazy">
-                <span class="v-card__play" aria-hidden="true"></span>
-            </div>
-            <span class="v-card__title">Надым</span>
-        </button>
+      <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
+        <div class="v-card__thumb">
+          <img src="{% static 'images/portfolio.jpg' %}" alt="Надым" loading="lazy" />
+          <span class="v-card__play" aria-hidden="true"></span>
+        </div>
+        <span class="v-card__title">Надым</span>
+      </button>
     </div>
 
     <!-- Модалка-плеер -->
     <div class="v-modal" id="vModal" hidden>
-        <div class="v-modal__backdrop" data-close></div>
-        <div class="v-modal__dialog" role="dialog" aria-modal="true" aria-label="Видеоплеер">
-            <button class="v-modal__close" type="button" data-close aria-label="Закрыть">×</button>
-            <div class="v-modal__frame">
-                <iframe id="vFrame" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen
-                    loading="lazy"></iframe>
-            </div>
+      <div class="v-modal__backdrop" data-close></div>
+      <div class="v-modal__dialog" role="dialog" aria-modal="true" aria-label="Видеоплеер">
+        <button class="v-modal__close" type="button" data-close aria-label="Закрыть">×</button>
+        <div class="v-modal__frame">
+          <iframe id="vFrame" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-
-
-<section class="cw-seq" id="seq">
+  <section class="cw-seq" id="seq">
     <div class="cw-seq__sticky">
-        <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
+      <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
 
-        <!-- Overlay -->
-        <div class="seq-ov">
-            <div class="seq-copy" id="seqCopy">
-                <span class="seq-kicker">Фонтан</span>
-                <h2 class="seq-title">«ТЕАТРАЛЬНЫЙ»</h2>
-                <p class="seq-desc">
-                    Где дети считают звёзды.<br>
-                    Где взрослые снова верят в чудо.<br>
-                    Где вместе — теплее.
-                </p>
-            </div>
-
-            <!-- Артикул: слева гаснет -->
-            <div class="seq-art seq-art--right" id="artL">
-                <span class="dot"></span> <span>Арт. 1337</span>
-            </div>
-            <!-- Артикул: справа появляется -->
-            <div class="seq-art seq-art--left" id="artR">
-                <span class="dot"></span> <span>Арт. 1337</span>
-            </div>
-
-            <!-- Схема: появляется на финальных кадрах -->
-            <img class="seq-scheme" id="seqScheme" src="{% static 'images/scheme.png' %}" alt="Схема">
+      <!-- Overlay -->
+      <div class="seq-ov">
+        <div class="seq-copy" id="seqCopy">
+          <span class="seq-kicker">Фонтан</span>
+          <h2 class="seq-title">«ТЕАТРАЛЬНЫЙ»</h2>
+          <p class="seq-desc">
+            Где дети считают звёзды.<br />
+            Где взрослые снова верят в чудо.<br />
+            Где вместе — теплее.
+          </p>
         </div>
+
+        <!-- Артикул: слева гаснет -->
+        <div class="seq-art seq-art--right" id="artL">
+          <span class="dot"></span> <span>Арт. 1337</span>
+        </div>
+        <!-- Артикул: справа появляется -->
+        <div class="seq-art seq-art--left" id="artR">
+          <span class="dot"></span> <span>Арт. 1337</span>
+        </div>
+
+        <!-- Схема: появляется на финальных кадрах -->
+        <img class="seq-scheme" id="seqScheme" src="{% static 'images/scheme.png' %}" alt="Схема" />
+      </div>
     </div>
-</section>
+  </section>
 
-
-
-
-<section class="cw-split" id="sd-section">
+  <section class="cw-split" id="sd-section">
     <div class="cw-split__media">
-        <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
-            poster="{% static 'images/hero-bg.png' %}">
-            <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
-        </video>
+      <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata" poster="{% static 'images/hero-bg.png' %}">
+        <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+      </video>
     </div>
 
     <aside class="cw-split__aside">
-        <h2 class="cw-split__title">Светодинамическая конструкция</h2>
-        <p class="cw-split__desc">
-            Световые конструкции с программируемыми эффектами: смена цвета,
-            движение света, мигание. Для яркого оформления городских пространств.
-        </p>
-        <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
+      <h2 class="cw-split__title">Светодинамическая конструкция</h2>
+      <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание. Для яркого оформления городских пространств.</p>
+      <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
     </aside>
 
     <!-- Модалка-плеер -->
     <div class="sv-modal" id="sdModal" hidden>
-        <div class="sv-backdrop" data-close></div>
-        <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
-            <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
-            <div class="sv-frame">
-                <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
-                    <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
-                </video>
-            </div>
+      <div class="sv-backdrop" data-close></div>
+      <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
+        <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
+        <div class="sv-frame">
+          <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
+            <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+          </video>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-
-<section class="cw-split right" id="sd-section">
-
+  <section class="cw-split right" id="sd-section">
     <aside class="cw-split__aside">
-        <h2 class="cw-split__title">Светодинамическая конструкция</h2>
-        <p class="cw-split__desc">
-            Световые конструкции с программируемыми эффектами: смена цвета,
-            движение света, мигание. Для яркого оформления городских пространств.
-        </p>
-        <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
+      <h2 class="cw-split__title">Светодинамическая конструкция</h2>
+      <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание. Для яркого оформления городских пространств.</p>
+      <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
     </aside>
 
-
     <div class="cw-split__media">
-        <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
-            poster="{% static 'images/hero-bg.png' %}">
-            <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
-        </video>
+      <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata" poster="{% static 'images/hero-bg.png' %}">
+        <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+      </video>
     </div>
 
     <!-- Модалка-плеер -->
     <div class="sv-modal" id="sdModal" hidden>
-        <div class="sv-backdrop" data-close></div>
-        <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
-            <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
-            <div class="sv-frame">
-                <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
-                    <source src="{% static 'video/hero.MOV' %}" type="video/mp4">
-                </video>
-            </div>
+      <div class="sv-backdrop" data-close></div>
+      <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
+        <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
+        <div class="sv-frame">
+          <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
+            <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+          </video>
         </div>
+      </div>
     </div>
+  </section>
+
+
+
+
+
+
+<section class="cw-news" id="news">
+  <h2 class="cw-news__title">Новости</h2>
+
+  <div class="news-wrap">
+    <button class="news-arrow news-arrow--prev" aria-label="Назад"></button>
+
+    <!-- Левое превью -->
+    <figure class="news-side news-side--left">
+      <img id="newsPrevImg" src="{% static 'images/portfolio.jpg' %}" alt="">
+    </figure>
+
+    <!-- Центральная карточка (Всегда на месте) -->
+    <article class="news-main" aria-live="polite">
+      <figure class="news-main__media">
+        <span class="news-date" id="newsDate">13 АПРЕЛЯ 2022</span>
+        <img id="newsImg" src="{% static 'images/portfolio.jpg' %}" alt="">
+      </figure>
+      <aside class="news-main__aside">
+        <h3 class="news-title" id="newsTitle">Выставка<br>CHRISTMASWORLD</h3>
+        <p class="news-desc" id="newsDesc">
+          Компания «LS illumination» приняла участие в Международной выставке Christmasworld
+        </p>
+        <a class="news-btn" id="newsLink" href="#">Читать далее</a>
+      </aside>
+    </article>
+
+    <!-- Правое превью -->
+    <figure class="news-side news-side--right">
+      <img id="newsNextImg" src="{% static 'images/portfolio.jpg' %}" alt="">
+    </figure>
+
+    <button class="news-arrow news-arrow--next" aria-label="Вперёд"></button>
+  </div>
+
+  <!-- Данные (замени на цикл Django при желании) -->
+  <script id="newsData" type="application/json">
+  [
+    {
+      "date":"13 АПРЕЛЯ 2022",
+      "title":"Выставка<br>CHRISTMASWORLD",
+      "desc":"Компания «LS illumination» приняла участие в Международной выставке Christmasworld",
+      "img":"{% static 'images/portfolio.jpg' %}",
+      "url":"#"
+    },
+    {
+      "date":"09 ИЮНЯ 2023",
+      "title":"Новогоднее<br>оформление",
+      "desc":"Комплекс световых инсталляций и динамических конструкций.",
+      "img":"{% static 'images/portfolio.jpg' %}",
+      "url":"#"
+    },
+    {
+      "date":"25 ДЕКАБРЯ 2024",
+      "title":"Новый проект<br>в центре",
+      "desc":"Арт-объект с «liquid glass» и авторской анимацией.",
+      "img":"{% static 'images/portfolio.jpg' %}",
+      "url":"#"
+    }
+  ]
+  </script>
 </section>
-
-
-
-
-
-
-
 
 <script>
     (() => {
-        const open = (sel) => {
-            const m = document.querySelector(sel);
-            if (!m) return;
-            // пауза превью
-            const prev = document.getElementById('sdPreview');
-            prev && prev.pause();
-            // открыть модалку
-            m.hidden = false;
-            document.body.style.overflow = 'hidden';
-            const full = document.getElementById('sdFull');
-            full && full.play().catch(() => { });
-        };
+    const data = JSON.parse(document.getElementById('newsData').textContent);
+    let i = 0;
 
-        const close = (m) => {
-            const full = document.getElementById('sdFull');
-            if (full) { full.pause(); /* full.currentTime = 0; */ }
-            m.hidden = true;
-            document.body.style.overflow = '';
-            // возобновим превью
-            const prev = document.getElementById('sdPreview');
-            prev && prev.play().catch(() => { });
-        };
+    const img        = document.getElementById('newsImg');
+    const dateEl     = document.getElementById('newsDate');
+    const titleEl    = document.getElementById('newsTitle');
+    const descEl     = document.getElementById('newsDesc');
+    const linkEl     = document.getElementById('newsLink');
+    const prevImgEl  = document.getElementById('newsPrevImg');
+    const nextImgEl  = document.getElementById('newsNextImg');
 
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-open]');
-            if (btn) { open(btn.dataset.open); }
-            if (e.target.matches('[data-close]')) { close(e.target.closest('.sv-modal')); }
-        });
+    const render = () => {
+        const cur  = data[i];
+        const prev = data[(i - 1 + data.length) % data.length];
+        const next = data[(i + 1) % data.length];
 
-        document.addEventListener('keydown', (e) => {
-            const m = document.getElementById('sdModal');
-            if (e.key === 'Escape' && m && !m.hidden) close(m);
-        });
+        // центр
+        img.src = cur.img;
+        dateEl.innerHTML = cur.date;
+        titleEl.innerHTML = cur.title;
+        descEl.textContent = cur.desc;
+        linkEl.href = cur.url;
 
-        // пауза превью, когда секция вне вьюпорта
-        const io = new IntersectionObserver(([ent]) => {
-            const v = document.getElementById('sdPreview');
-            if (!v) return;
-            if (ent.isIntersecting) v.play().catch(() => { });
-            else v.pause();
-        }, { threshold: 0.2 });
-        io.observe(document.getElementById('sd-section'));
+        // боковые превью (только картинки)
+        prevImgEl.src = prev.img;
+        nextImgEl.src = next.img;
+    };
+
+    document.querySelector('.news-arrow--prev').addEventListener('click', () => {
+        i = (i - 1 + data.length) % data.length;
+        render();
+    });
+    document.querySelector('.news-arrow--next').addEventListener('click', () => {
+        i = (i + 1) % data.length;
+        render();
+    });
+
+    // свайп по центральной карточке
+    const area = document.querySelector('.news-main');
+    let sx = 0;
+    area.addEventListener('pointerdown', e => { sx = e.clientX; area.setPointerCapture(e.pointerId); });
+    area.addEventListener('pointerup', e => {
+        const dx = e.clientX - sx;
+        if (Math.abs(dx) > 40) {
+        i = (i + (dx < 0 ? 1 : -1) + data.length) % data.length;
+        render();
+        }
+    });
+
+    render();
     })();
 </script>
 
 
+  <script>
+    ;(() => {
+      const open = (sel) => {
+        const m = document.querySelector(sel)
+        if (!m) return
+        // пауза превью
+        const prev = document.getElementById('sdPreview')
+        prev && prev.pause()
+        // открыть модалку
+        m.hidden = false
+        document.body.style.overflow = 'hidden'
+        const full = document.getElementById('sdFull')
+        full && full.play().catch(() => {})
+      }
+    
+      const close = (m) => {
+        const full = document.getElementById('sdFull')
+        if (full) {
+          full.pause() /* full.currentTime = 0; */
+        }
+        m.hidden = true
+        document.body.style.overflow = ''
+        // возобновим превью
+        const prev = document.getElementById('sdPreview')
+        prev && prev.play().catch(() => {})
+      }
+    
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-open]')
+        if (btn) {
+          open(btn.dataset.open)
+        }
+        if (e.target.matches('[data-close]')) {
+          close(e.target.closest('.sv-modal'))
+        }
+      })
+    
+      document.addEventListener('keydown', (e) => {
+        const m = document.getElementById('sdModal')
+        if (e.key === 'Escape' && m && !m.hidden) close(m)
+      })
+    
+      // пауза превью, когда секция вне вьюпорта
+      const io = new IntersectionObserver(
+        ([ent]) => {
+          const v = document.getElementById('sdPreview')
+          if (!v) return
+          if (ent.isIntersecting) v.play().catch(() => {})
+          else v.pause()
+        },
+        { threshold: 0.2 }
+      )
+      io.observe(document.getElementById('sd-section'))
+    })()
+  </script>
 
-
-
-
-<script>
+  <script>
     (() => {
         const s = document.getElementById('seq');
         const c = document.getElementById('seqCanvas');
@@ -454,8 +556,7 @@
     })();
 </script>
 
-
-<script>
+  <script>
     (() => {
         const modal = document.getElementById('vModal');
         const frame = document.getElementById('vFrame');
@@ -483,8 +584,7 @@
     })();
 </script>
 
-
-<script>
+  <script>
     (function () {
         const v = document.getElementById('heroVideo');
         const btn = document.getElementById('ppBtn');
@@ -515,6 +615,4 @@
         v.addEventListener('pause', () => setState(false));
     })();
 </script>
-
-
 {% endblock %}
