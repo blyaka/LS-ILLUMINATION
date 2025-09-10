@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     "allauth",
     "allauth.account",
+    'cases',
+    'content',
 ]
 
 

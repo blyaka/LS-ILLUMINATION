@@ -25,8 +25,8 @@ jobs:
           file: ./app/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/crosswell-corp-web-1:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/crosswell-corp-web-1:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/ls-illumination-web:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ls-illumination-web:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -39,6 +39,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/www/crosswell-corp
+            cd /var/www/ls-illumination
             docker compose pull web
             docker compose up -d web

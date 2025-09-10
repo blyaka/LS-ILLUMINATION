@@ -35,7 +35,7 @@ jobs:
           pull: true
           push: true
           tags: |
-            ${{ env.DOCKERHUB_USERNAME }}/crosswell-corp-web-1:latest
-            ${{ env.DOCKERHUB_USERNAME }}/crosswell-corp-web-1:${{ github.sha }}
-          cache-from: type=registry,ref=${{ env.DOCKERHUB_USERNAME }}/crosswell-corp-web-1:buildcache
-          cache-to: type=registry,ref=${{ env.DOCKERHUB_USERNAME }}/crosswell-corp-web-1:buildcache,mode=max
+            ${{ env.DOCKERHUB_USERNAME }}/ls-illumination-web:latest
+            ${{ env.DOCKERHUB_USERNAME }}/ls-illumination-web:${{ github.sha }}
+          cache-from: type=registry,ref=${{ env.DOCKERHUB_USERNAME }}/ls-illumination-web:buildcache
+          cache-to: type=registry,ref=${{ env.DOCKERHUB_USERNAME }}/ls-illumination-web:buildcache,mode=max
