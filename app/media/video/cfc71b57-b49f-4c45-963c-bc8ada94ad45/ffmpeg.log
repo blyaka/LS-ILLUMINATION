@@ -1,0 +1,79 @@
+ffmpeg version 7.1.1-1+b1 Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 14 (Debian 14.2.0-19)
+  configuration: --prefix=/usr --extra-version=1+b1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --disable-libmfx --disable-omx --enable-gnutls --enable-libaom --enable-libass --enable-libbs2b --enable-libcdio --enable-libcodec2 --enable-libdav1d --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libglslang --enable-libgme --enable-libgsm --enable-libharfbuzz --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg --enable-openal --enable-opencl --enable-opengl --disable-sndio --enable-libvpl --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-ladspa --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-libjack --enable-libpulse --enable-librabbitmq --enable-librist --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libx264 --enable-libzmq --enable-libzvbi --enable-lv2 --enable-sdl2 --enable-libplacebo --enable-librav1e --enable-pocketsphinx --enable-librsvg --enable-libjxl --enable-shared
+  libavutil      59. 39.100 / 59. 39.100
+  libavcodec     61. 19.101 / 61. 19.101
+  libavformat    61.  7.100 / 61.  7.100
+  libavdevice    61.  3.100 / 61.  3.100
+  libavfilter    10.  4.100 / 10.  4.100
+  libswscale      8.  3.100 /  8.  3.100
+  libswresample   5.  3.100 /  5.  3.100
+  libpostproc    58.  3.100 / 58.  3.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/app/media/video/source/Desktop_2025.09.11_-_15.40.27.03.mp4':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    creation_time   : 2025-09-11T12:40:29.000000Z
+    date            : 2025
+  Duration: 00:00:01.37, start: 0.000000, bitrate: 7199 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 7000 kb/s, 118.47 fps, 120 tbr, 90k tbn (default)
+      Metadata:
+        creation_time   : 2025-09-11T12:40:29.000000Z
+        handler_name    : VideoHandle
+        vendor_id       : [0][0][0][0]
+  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 189 kb/s (default)
+      Metadata:
+        creation_time   : 2025-09-11T12:40:29.000000Z
+        handler_name    : SoundHandle
+        vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))
+  Stream #0:1 -> #0:1 (aac (native) -> aac (native))
+Press [q] to stop, [?] for help
+[libx264 @ 0x6336d45eaec0] using SAR=1/1
+[libx264 @ 0x6336d45eaec0] MB rate (979200) > level limit (245760)
+[libx264 @ 0x6336d45eaec0] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+[libx264 @ 0x6336d45eaec0] profile High, level 4.1, 4:2:0, 8-bit
+[libx264 @ 0x6336d45eaec0] 264 - core 164 r3108 31e19f9 - H.264/MPEG-4 AVC codec - Copyleft 2003-2023 - http://www.videolan.org/x264.html - options: cabac=1 ref=1 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=2 psy=1 psy_rd=1.00:0.00 mixed_ref=0 me_range=16 chroma_me=1 trellis=0 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=0 threads=12 lookahead_threads=4 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=1 keyint=237 keyint_min=119 scenecut=0 intra_refresh=0 rc_lookahead=10 rc=crf mbtree=1 crf=23.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
+[hls @ 0x6336d463c600] Opening '/app/media/video/cfc71b57-b49f-4c45-963c-bc8ada94ad45/init.mp4' for writing
+Output #0, hls, to '/app/media/video/cfc71b57-b49f-4c45-963c-bc8ada94ad45/master.m3u8':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: isommp42
+    date            : 2025
+    encoder         : Lavf61.7.100
+  Stream #0:0(und): Video: h264, yuv420p(tv, bt709, progressive), 1920x1080 [SAR 1:1 DAR 16:9], q=2-31, 120 fps, 15360 tbn (default)
+      Metadata:
+        creation_time   : 2025-09-11T12:40:29.000000Z
+        handler_name    : VideoHandle
+        vendor_id       : [0][0][0][0]
+        encoder         : Lavc61.19.101 libx264
+      Side data:
+        cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: N/A
+  Stream #0:1(und): Audio: aac (LC), 48000 Hz, stereo, fltp, 160 kb/s (default)
+      Metadata:
+        creation_time   : 2025-09-11T12:40:29.000000Z
+        handler_name    : SoundHandle
+        vendor_id       : [0][0][0][0]
+        encoder         : Lavc61.19.101 aac
+frame=  142 fps= 94 q=33.0 size=N/A time=N/A bitrate=N/A dup=2 drop=0 speed=N/A    [hls @ 0x6336d463c600] Opening '/app/media/video/cfc71b57-b49f-4c45-963c-bc8ada94ad45/chunk_00000.m4s' for writing
+[out#0/hls @ 0x6336d47d1580] video:52KiB audio:25KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+frame=  164 fps=103 q=-1.0 Lsize=N/A time=00:00:01.27 bitrate=N/A dup=2 drop=0 speed=0.801x    
+[libx264 @ 0x6336d45eaec0] frame I:1     Avg QP:18.34  size: 40263
+[libx264 @ 0x6336d45eaec0] frame P:41    Avg QP:21.69  size:    99
+[libx264 @ 0x6336d45eaec0] frame B:122   Avg QP:24.33  size:    69
+[libx264 @ 0x6336d45eaec0] consecutive B-frames:  0.6%  0.0%  1.8% 97.6%
+[libx264 @ 0x6336d45eaec0] mb I  I16..4: 86.8%  1.8% 11.4%
+[libx264 @ 0x6336d45eaec0] mb P  I16..4:  0.0%  0.0%  0.0%  P16..4:  0.0%  0.0%  0.0%  0.0%  0.0%    skip:99.9%
+[libx264 @ 0x6336d45eaec0] mb B  I16..4:  0.0%  0.0%  0.0%  B16..8:  0.0%  0.0%  0.0%  direct: 0.0%  skip:100.0%  L0: 2.6% L1:97.4% BI: 0.0%
+[libx264 @ 0x6336d45eaec0] 8x8 transform intra:1.8% inter:4.8%
+[libx264 @ 0x6336d45eaec0] coded y,uvDC,uvAC intra: 8.5% 7.8% 6.6% inter: 0.0% 0.0% 0.0%
+[libx264 @ 0x6336d45eaec0] i16 v,h,dc,p: 71% 28%  0%  0%
+[libx264 @ 0x6336d45eaec0] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 25% 22% 40%  3%  1%  1%  1%  0%  6%
+[libx264 @ 0x6336d45eaec0] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 30% 29% 23%  2%  3%  3%  3%  3%  3%
+[libx264 @ 0x6336d45eaec0] i8c dc,h,v,p: 75% 22%  3%  0%
+[libx264 @ 0x6336d45eaec0] Weighted P-Frames: Y:0.0% UV:0.0%
+[libx264 @ 0x6336d45eaec0] kb/s:308.83
+[aac @ 0x6336d47658c0] Qavg: 4503.791

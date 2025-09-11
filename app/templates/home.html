@@ -176,41 +176,29 @@
     </div>
   </section>
 
+
   <section class="cw-videos" id="videos">
     <h2 class="cw-videos__title">Видеогалерея</h2>
 
     <div class="cw-videos__grid">
-      <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
-        <div class="v-card__thumb">
-          <img src="{% static 'images/portfolio.jpg' %}" alt="Москва" loading="lazy" />
-          <span class="v-card__play" aria-hidden="true"></span>
-        </div>
-        <span class="v-card__title">Москва</span>
-      </button>
-
-      <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
-        <div class="v-card__thumb">
-          <img src="{% static 'images/portfolio.jpg' %}" alt="Клин" loading="lazy" />
-          <span class="v-card__play" aria-hidden="true"></span>
-        </div>
-        <span class="v-card__title">Клин</span>
-      </button>
-
-      <button class="v-card" type="button" data-src="https://player.vimeo.com/video/76979871?autoplay=1">
-        <div class="v-card__thumb">
-          <img src="{% static 'images/portfolio.jpg' %}" alt="Лабытнанги" loading="lazy" />
-          <span class="v-card__play" aria-hidden="true"></span>
-        </div>
-        <span class="v-card__title">Лабытнанги</span>
-      </button>
-
-      <button class="v-card" type="button" data-src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1">
-        <div class="v-card__thumb">
-          <img src="{% static 'images/portfolio.jpg' %}" alt="Надым" loading="lazy" />
-          <span class="v-card__play" aria-hidden="true"></span>
-        </div>
-        <span class="v-card__title">Надым</span>
-      </button>
+      {% for v in more_videos %}
+        <button class="v-card" type="button"
+                {% if v.m3u8_url %}
+                  data-src="{{ v.m3u8_url }}"
+                  data-title="{{ v.name|default:'Видео' }}"
+                  data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
+                {% else %} disabled aria-disabled="true" title="Видео ещё не готово"
+                {% endif %}>
+          <div class="v-card__thumb">
+            <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
+                alt="{{ v.name|default:'Видео' }}" loading="lazy" />
+            <span class="v-card__play" aria-hidden="true"></span>
+          </div>
+          <span class="v-card__title">{{ v.name|default:"Видео" }}</span>
+        </button>
+      {% empty %}
+        <p>Видео пока нет.</p>
+      {% endfor %}
     </div>
 
     <!-- Модалка-плеер -->
@@ -219,11 +207,14 @@
       <div class="v-modal__dialog" role="dialog" aria-modal="true" aria-label="Видеоплеер">
         <button class="v-modal__close" type="button" data-close aria-label="Закрыть">×</button>
         <div class="v-modal__frame">
-          <iframe id="vFrame" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+          <video id="vPlayer" controls playsinline preload="none"></video>
         </div>
+        <div class="v-modal__title" id="vTitle" style="margin-top:8px"></div>
       </div>
     </div>
   </section>
+
+
 
   <section class="cw-seq" id="seq">
     <div class="cw-seq__sticky">
@@ -582,32 +573,95 @@
     })();
 </script>
 
-  <script>
-    (() => {
-        const modal = document.getElementById('vModal');
-        const frame = document.getElementById('vFrame');
-        const openBtns = document.querySelectorAll('.v-card');
 
-        openBtns.forEach(b => b.addEventListener('click', () => {
-            frame.src = b.dataset.src;
-            modal.hidden = false;
-            document.body.style.overflow = 'hidden';
-        }));
 
-        modal.addEventListener('click', e => {
-            if (e.target.hasAttribute('data-close')) {
-                frame.src = '';
-                modal.hidden = true;
-                document.body.style.overflow = '';
-            }
-        });
+<style>
+  .v-modal__dialog{max-width: min(1200px, 96vw); width:96vw}
+  .v-modal__frame{position:relative; width:100%; aspect-ratio:16/9}
+  #vPlayer{position:absolute; inset:0; width:100%; height:100%; background:#000}
+</style>
 
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && !modal.hidden) {
-                modal.querySelector('[data-close]').click();
-            }
-        });
-    })();
+
+<script>
+(() => {
+  const modal  = document.getElementById('vModal');
+  const player = document.getElementById('vPlayer');
+  const titleEl= document.getElementById('vTitle');
+  let hls = null;
+
+  function attach(src, poster) {
+    if (hls) { try{hls.destroy();}catch{} hls = null; }
+    player.pause(); player.removeAttribute('src'); player.load();
+    poster ? player.setAttribute('poster', poster) : player.removeAttribute('poster');
+
+    if (player.canPlayType('application/vnd.apple.mpegurl')) {
+      player.src = src;
+    } else if (window.Hls && Hls.isSupported()) {
+      hls = new Hls({ maxBufferLength: 10 });
+      hls.loadSource(src);
+      hls.attachMedia(player);
+    } else {
+      player.src = src; // крайний фолбэк
+    }
+  }
+
+  function open(src, poster, title) {
+    attach(src, poster);
+    titleEl.textContent = title || '';
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    player.muted = true;
+    player.play().catch(()=>{});
+  }
+
+  function close() {
+    if (hls) { try{hls.destroy();}catch{} hls = null; }
+    player.pause(); player.removeAttribute('src'); player.load();
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function togglePlay(){ player.paused ? player.play().catch(()=>{}) : player.pause(); }
+  function seekBy(s){ try{ player.currentTime = Math.max(0, Math.min((player.duration||1e9), player.currentTime + s)); }catch{} }
+  function toggleFullscreen(){
+    const el = modal.querySelector('.v-modal__dialog');
+    if (!document.fullscreenElement) { el.requestFullscreen?.(); }
+    else { document.exitFullscreen?.(); }
+  }
+
+  let clickTimer=0;
+  player.addEventListener('click', () => {
+    if (clickTimer){ clearTimeout(clickTimer); clickTimer=0; toggleFullscreen(); return; }
+    clickTimer = setTimeout(()=>{ togglePlay(); clickTimer=0; }, 200);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (modal.hidden) return;
+    const tag = (e.target.tagName||'').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+
+    const code = e.code;
+
+    if (code === 'Space' || code === 'KeyK') { e.preventDefault(); togglePlay(); }
+    else if (code === 'ArrowLeft' || code === 'KeyJ') { e.preventDefault(); seekBy(-10); }
+    else if (code === 'ArrowRight' || code === 'KeyL') { e.preventDefault(); seekBy(+10); }
+    else if (code === 'KeyF') { e.preventDefault(); toggleFullscreen(); }
+    else if (code === 'KeyM') { player.muted = !player.muted; }
+    else if (code === 'Escape') { close(); }
+  });
+
+  // Открытие/закрытие
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.v-card');
+    if (btn && btn.dataset.src) open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
+    if (e.target.matches('[data-close]')) close();
+  });
+
+  // При закрытии по клику в бекдроп (если у тебя есть data-close)
+  modal.addEventListener('click', (e) => {
+    if (e.target.hasAttribute('data-close')) close();
+  });
+})();
 </script>
 
   <script>

@@ -25,7 +25,7 @@
 
     <header class="ls-header">
         <div class="ls-header__inner">
-            <a class="ls-logo" href="/">
+            <a class="ls-logo" href="{% url 'home' %}">
                 <img src="{% static 'images/logo.png' %}" alt="LS Illumination">
                 <span class="ls-logo__brand">LS ILLUMINATION</span>
                 <i class="ls-logo__sep"></i>
@@ -35,7 +35,7 @@
             <nav class="ls-nav">
                 <a href="#" class="ls-nav__btn" id="pfOpen" aria-controls="pfPanel" role="button">Портфолио</a>
                 <a href="#">Контакты</a>
-                <a href="#">О нас</a>
+                <a href="{% url 'about' %}">О нас</a>
             </nav>
 
             <a class="ls-cta" href="#request">Оставить заявку</a>
