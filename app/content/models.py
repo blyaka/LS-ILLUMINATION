@@ -52,6 +52,37 @@ class Video(models.Model):
         return self.out_dir or f'video/{self.id}/'
 
 
+    # def save(self, *args, **kwargs):
+    #     new_file = False
+    #     if self.pk:
+    #         old = type(self).objects.filter(pk=self.pk).only('source').first()
+    #         if old and old.source != self.source:
+    #             new_file = True
+    #     else:
+    #         new_file = bool(self.source)
+
+    #     super().save(*args, **kwargs)
+
+    #     if getattr(self, 'is_featured', False):
+    #         type(self).objects.exclude(pk=self.pk).filter(is_featured=True).update(is_featured=False)
+
+    #     if new_file and self.source:
+    #         type(self).objects.filter(pk=self.pk).update(
+    #             status=self.S.QUEUED,
+    #             error='',
+    #             out_dir=f'video/{self.pk}/'
+    #         )
+
+    #         def run():
+    #             try:
+    #                 import_string('content.services.process_video')(str(self.pk))
+    #             except Exception as e:
+    #                 apps.get_model('content', 'Video').objects.filter(pk=self.pk).update(
+    #                     status=self.S.FAIL, error=str(e)
+    #                 )
+
+    #         transaction.on_commit(lambda: threading.Thread(target=run, daemon=True).start())
+
     def save(self, *args, **kwargs):
         new_file = False
         if self.pk:
@@ -67,6 +98,7 @@ class Video(models.Model):
             type(self).objects.exclude(pk=self.pk).filter(is_featured=True).update(is_featured=False)
 
         if new_file and self.source:
+            # сразу ставим queued и путь вывода, чтобы поток их увидел
             type(self).objects.filter(pk=self.pk).update(
                 status=self.S.QUEUED,
                 error='',
@@ -78,7 +110,8 @@ class Video(models.Model):
                     import_string('content.services.process_video')(str(self.pk))
                 except Exception as e:
                     apps.get_model('content', 'Video').objects.filter(pk=self.pk).update(
-                        status=self.S.FAIL, error=str(e)
+                        status=self.S.FAIL,
+                        error=str(e)
                     )
 
-            transaction.on_commit(lambda: threading.Thread(target=run, daemon=True).start())
+            threading.Thread(target=run, daemon=True).start()
