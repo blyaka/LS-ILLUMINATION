@@ -155,3 +155,8 @@ AUTHENTICATION_BACKENDS = [
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'admin@tuyana.ru'
+
+
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB памяти до свопа на диск
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760

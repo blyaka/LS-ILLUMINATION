@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>{{ video.name|default:"Видео" }}</title>
+  <style>
+    body{margin:0;background:#0b0b0b;color:#fff;font:16px/1.4 system-ui}
+    .wrap{max-width:960px;margin:0 auto;padding:24px}
+    video{width:100%;max-height:70vh;background:#000;border-radius:12px}
+    .meta{opacity:.8;margin-top:8px}
+    .err{color:#ff6b6b;margin-top:10px;display:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>{{ video.name|default:"Видео" }}</h1>
+    <video id="v" controls playsinline preload="none"
+           {% if video.poster %}poster="{{ video.poster.url }}"{% endif %}></video>
+    <div class="meta">
+      Статус: {{ video.get_status_display }} |
+      {% if video.m3u8_url %}<a href="{{ video.m3u8_url }}" target="_blank" style="color:#9cf">m3u8</a>{% endif %}
+    </div>
+    <div id="err" class="err"></div>
+  </div>
+
+  <script>
+  (function(){
+    const m3u8 = "{{ video.m3u8_url }}";
+    const el = document.getElementById('v');
+    const errBox = document.getElementById('err');
+
+    function showErr(msg){
+      errBox.textContent = msg;
+      errBox.style.display = 'block';
+    }
+
+    if (!m3u8){
+      showErr('Плейлист ещё не готов. Статус: {{ video.status }}');
+      return;
+    }
+
+    if (el.canPlayType('application/vnd.apple.mpegurl')) {
+      el.src = m3u8; // Safari / iOS
+    } else {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
+      s.onload = () => {
+        if (window.Hls && Hls.isSupported()){
+          const h = new Hls({maxBufferLength:10, lowLatencyMode:false});
+          h.on(Hls.Events.ERROR, (_, data) => showErr('HLS ошибка: '+data?.details));
+          h.loadSource(m3u8);
+          h.attachMedia(el);
+        } else {
+          showErr('Браузер не поддерживает HLS.js');
+        }
+      };
+      s.onerror = () => showErr('Не удалось загрузить hls.js');
+      document.head.appendChild(s);
+    }
+  })();
+  </script>
+</body>
+</html>
