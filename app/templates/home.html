@@ -12,29 +12,29 @@
         {% if hero_video.poster %}poster="{{ hero_video.poster.url }}"{% endif %}
         muted loop playsinline preload="none"></video>
 
+  <script src="{% static 'vendor/hls/hls.min.js' %}"></script>
   <script>
   (function(){
     const src = "{{ hero_video.m3u8_url }}";
     const el  = document.getElementById('heroVideo');
 
     function playNative(){ el.src = src; }
-    function initHls(){ if (window.Hls && Hls.isSupported()){ const h=new Hls({maxBufferLength:10}); h.loadSource(src); h.attachMedia(el); } else { playNative(); } }
-    function loadJS(u, ok, fail){ const s=document.createElement('script'); s.src=u; s.async=true; s.onload=ok; s.onerror=fail; document.head.appendChild(s); }
 
-    if (el.canPlayType('application/vnd.apple.mpegurl')) { playNative(); return; }
-
-    const cdns = [
-      "https://cdn.jsdelivr.net/npm/hls.js@latest",
-      "https://unpkg.com/hls.js@latest/dist/hls.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.8/hls.min.js"
-    ];
-    (function tryLoad(i){
-      if (i>=cdns.length){ playNative(); return; }
-      loadJS(cdns[i], initHls, ()=>tryLoad(i+1));
-    })(0);
+    if (el.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari/iOS — умеют HLS сами
+      playNative();
+    } else if (window.Hls && Hls.isSupported()) {
+      // Chrome/Firefox через hls.js
+      const h = new Hls({maxBufferLength: 10});
+      h.loadSource(src);
+      h.attachMedia(el);
+    } else {
+      playNative();
+    }
   })();
   </script>
   {% endif %}
+
 
 
     <div class="ls-hero__overlay-top"></div>
