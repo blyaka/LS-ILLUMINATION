@@ -8,10 +8,11 @@ import threading
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ('name','status','created','preview','m3u8_link')
-    list_filter  = ('status',)
+    list_display = ('name','is_featured','status','created','preview','m3u8_link')
+    list_filter  = ('status','is_featured')
+    list_editable = ('is_featured',)
     readonly_fields = ('status','m3u8_url','out_dir','meta','error','created','preview_tag')
-    fields = ('name','source','status','preview_tag','m3u8_url','out_dir','meta','error','created')
+    fields = ('name','source','is_featured','status','preview_tag','m3u8_url','out_dir','meta','error','created')
 
     def preview(self, obj):
         return format_html('<img src="{}" style="height:60px;border-radius:6px"/>', obj.poster.url) if obj.poster else '-'

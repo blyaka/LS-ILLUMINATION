@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "allauth.account",
     'cases',
     'content',
+    'pages',
 ]
 
 
