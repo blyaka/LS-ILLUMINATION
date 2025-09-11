@@ -33,7 +33,7 @@
             </a>
 
             <nav class="ls-nav">
-                <a href="#">Портфолио</a>
+                <a href="#" class="ls-nav__btn" id="pfOpen" aria-controls="pfPanel" role="button">Портфолио</a>
                 <a href="#">Контакты</a>
                 <a href="#">О нас</a>
             </nav>
@@ -41,6 +41,51 @@
             <a class="ls-cta" href="#request">Оставить заявку</a>
         </div>
     </header>
+
+    <div class="pf-underlay" id="pfUnderlay" hidden></div>
+
+    <section class="pf-panel" id="pfPanel" role="dialog" aria-modal="true" hidden>
+        <div class="pf-panel__glass">
+            <div class="pf-grid">
+                <div class="pf-grid pf-grid--5">
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/city_space.png' %}"
+                            alt=""><span>Оформление
+                            городских пространств</span></a>
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/tents.png' %}"
+                            alt=""><span>Световые потолки
+                            и шатры</span></a>
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/facades.png' %}"
+                            alt=""><span>Оформление
+                            фасадов зданий</span></a>
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/projection.png' %}"
+                            alt=""><span>Проекционная
+                            подсветка зданий</span></a>
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/contour.png' %}"
+                            alt=""><span>Контурная
+                            подсветка зданий</span></a>
+                </div>
+
+                <div class="pf-grid pf-grid--4">
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/3d_struct.png' %}"
+                            alt=""><span>Объёмно-пространственные конструкции</span></a>
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/consoles.png' %}"
+                            alt=""><span>Консоли
+                            и
+                            перетяжки</span></a>
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/kinetic.png' %}"
+                            alt=""><span>Кинетические
+                            системы</span></a>
+                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/trees.png' %}"
+                            alt=""><span>Оформление
+                            елей</span></a>
+
+                </div>
+            </div>
+            <div class="pf-grabber" aria-hidden="true"></div>
+        </div>
+    </section>
+
+
 
 
 
@@ -57,5 +102,47 @@
     </footer>
 
 </body>
+
+
+<script>
+    (() => {
+        const header = document.querySelector('header');
+        const trigger = document.getElementById('pfOpen');      // <-- одно имя
+        const panel = document.getElementById('pfPanel');
+        const under = document.getElementById('pfUnderlay');
+
+        function place() {
+            const h = header?.getBoundingClientRect().height || 0;
+            under.style.top = h + 'px';
+            panel.style.height = `calc(100dvh - ${h}px)`;
+            under.style.height = `calc(100dvh - ${h}px)`;
+        }
+
+        function open() {
+            place();
+            panel.hidden = false; under.hidden = false;
+            panel.getBoundingClientRect();                        // reflow
+            panel.classList.add('show'); under.classList.add('show');
+        }
+
+        function close() {
+            panel.classList.remove('show'); under.classList.remove('show');
+            const done = () => { panel.hidden = true; under.hidden = true; panel.removeEventListener('transitionend', done); };
+            panel.addEventListener('transitionend', done);
+        }
+
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            (panel.hidden || !panel.classList.contains('show')) ? open() : close();
+        });
+
+        under.addEventListener('click', close);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) close(); });
+        window.addEventListener('resize', place);
+    })();
+</script>
+
+
+
 
 </html>

@@ -136,6 +136,131 @@ body {
 
 
 
+
+
+/* полупрозрачный фон с блюром под хедером */
+.pf-underlay {
+    position: fixed;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transition: opacity .28s ease;
+    z-index: 900;
+}
+
+.pf-underlay.show {
+    opacity: 1;
+}
+
+/* панель: выезжает из-под хедера */
+.pf-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    transform: translateY(-18px);
+    opacity: 0;
+    transition: transform .35s cubic-bezier(.22, .61, .36, 1), opacity .35s ease;
+    z-index: 901;
+    pointer-events: none;
+}
+
+.pf-panel.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* «стекло» как на макете + мягкая дуга снизу */
+.pf-panel__glass {
+    position: relative;
+    margin: 0 auto;
+    padding: 48px 28px 56px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .10) 0%, rgba(255, 255, 255, .04) 100%);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    overflow: hidden;
+}
+
+.pf-grid {
+    display: grid;
+    justify-items: center;
+    align-items: start;
+}
+
+.pf-grid--5 {
+    grid-template-columns: repeat(5, minmax(180px, 1fr));
+}
+
+.pf-grid--4 {
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    margin-top: 26px;
+    justify-content: center;
+}
+
+/* адаптив по желанию — пример:
+@media (max-width:1200px){ .pf-grid--5{grid-template-columns:repeat(4,1fr)} .pf-grid--4{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:900px){ .pf-grid--5,.pf-grid--4{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:640px){ .pf-grid--5,.pf-grid--4{grid-template-columns:repeat(2,1fr)} } */
+
+
+
+/* карточка как в макете */
+.pf-card {
+    display: grid;
+    place-items: center;
+    gap: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text);
+    padding: 10px 8px;
+    background: transparent;
+    transition: transform .16s ease, filter .16s ease;
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, .35));
+}
+
+.pf-card:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 14px 36px rgba(0, 0, 0, .45));
+}
+
+.pf-card img {
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    display: block;
+}
+
+.pf-card span {
+    max-width: 220px;
+    font-size: var(--font-main);
+    line-height: 1.25;
+    opacity: .95;
+}
+
+/* «ползунок» по центру снизу */
+.pf-grabber {
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+    width: 78px;
+    height: 6px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, .15));
+    box-shadow: 0 1px 0 rgba(0, 0, 0, .25) inset;
+    pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
 .ls-footer {
     display: flex;
     flex-direction: row;
