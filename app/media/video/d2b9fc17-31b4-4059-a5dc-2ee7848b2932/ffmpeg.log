@@ -1,93 +1,0 @@
-ffmpeg version 7.1.1-1+b1 Copyright (c) 2000-2025 the FFmpeg developers
-  built with gcc 14 (Debian 14.2.0-19)
-  configuration: --prefix=/usr --extra-version=1+b1 --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --arch=amd64 --enable-gpl --disable-stripping --disable-libmfx --disable-omx --enable-gnutls --enable-libaom --enable-libass --enable-libbs2b --enable-libcdio --enable-libcodec2 --enable-libdav1d --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libglslang --enable-libgme --enable-libgsm --enable-libharfbuzz --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzimg --enable-openal --enable-opencl --enable-opengl --disable-sndio --enable-libvpl --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-ladspa --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-libjack --enable-libpulse --enable-librabbitmq --enable-librist --enable-libsrt --enable-libssh --enable-libsvtav1 --enable-libx264 --enable-libzmq --enable-libzvbi --enable-lv2 --enable-sdl2 --enable-libplacebo --enable-librav1e --enable-pocketsphinx --enable-librsvg --enable-libjxl --enable-shared
-  libavutil      59. 39.100 / 59. 39.100
-  libavcodec     61. 19.101 / 61. 19.101
-  libavformat    61.  7.100 / 61.  7.100
-  libavdevice    61.  3.100 / 61.  3.100
-  libavfilter    10.  4.100 / 10.  4.100
-  libswscale      8.  3.100 /  8.  3.100
-  libswresample   5.  3.100 /  5.  3.100
-  libpostproc    58.  3.100 / 58.  3.100
-[mov,mp4,m4a,3gp,3g2,mj2 @ 0x61ecda8381c0] Unknown cover type: 0x1.
-Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/app/media/video/source/hero.MOV':
-  Metadata:
-    major_brand     : qt  
-    minor_version   : 0
-    compatible_brands: qt  
-    creation_time   : 2025-08-15T19:11:04.000000Z
-    DreaminaMetaInfo: {"data":{}}
-  Duration: 00:00:57.37, start: 0.000000, bitrate: 12678 kb/s
-  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 1920x858, 12672 kb/s, 30 fps, 30 tbr, 600 tbn (default)
-      Metadata:
-        creation_time   : 2025-08-15T19:11:05.000000Z
-        handler_name    : Core Media Video
-        vendor_id       : [0][0][0][0]
-        encoder         : H.264
-  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 2 kb/s (default)
-      Metadata:
-        creation_time   : 2025-08-15T19:11:05.000000Z
-        handler_name    : Core Media Audio
-        vendor_id       : [0][0][0][0]
-Stream mapping:
-  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))
-  Stream #0:1 -> #0:1 (aac (native) -> aac (native))
-Press [q] to stop, [?] for help
-[libx264 @ 0x61ecda8403c0] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
-[libx264 @ 0x61ecda8403c0] profile High, level 4.1, 4:2:0, 8-bit
-[libx264 @ 0x61ecda8403c0] 264 - core 164 r3108 31e19f9 - H.264/MPEG-4 AVC codec - Copyleft 2003-2023 - http://www.videolan.org/x264.html - options: cabac=1 ref=1 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=2 psy=1 psy_rd=1.00:0.00 mixed_ref=0 me_range=16 chroma_me=1 trellis=0 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=0 threads=12 lookahead_threads=4 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=1 keyint=60 keyint_min=31 scenecut=0 intra_refresh=0 rc_lookahead=10 rc=crf mbtree=1 crf=23.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
-[hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/init.mp4' for writing
-Output #0, hls, to '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/master.m3u8':
-  Metadata:
-    major_brand     : qt  
-    minor_version   : 0
-    compatible_brands: qt  
-    DreaminaMetaInfo: {"data":{}}
-    encoder         : Lavf61.7.100
-  Stream #0:0(und): Video: h264, yuv420p(tv, bt709, progressive), 1920x858, q=2-31, 30 fps, 15360 tbn (default)
-      Metadata:
-        creation_time   : 2025-08-15T19:11:05.000000Z
-        handler_name    : Core Media Video
-        vendor_id       : [0][0][0][0]
-        encoder         : Lavc61.19.101 libx264
-      Side data:
-        cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: N/A
-  Stream #0:1(und): Audio: aac (LC), 48000 Hz, stereo, fltp, 160 kb/s (default)
-      Metadata:
-        creation_time   : 2025-08-15T19:11:05.000000Z
-        handler_name    : Core Media Audio
-        vendor_id       : [0][0][0][0]
-        encoder         : Lavc61.19.101 aac
-frame=   17 fps=0.0 q=29.0 size=N/A time=00:00:00.50 bitrate=N/A speed=   1x    frame=   55 fps= 55 q=29.0 size=N/A time=00:00:01.76 bitrate=N/A speed=1.76x    frame=   97 fps= 64 q=29.0 size=N/A time=00:00:03.16 bitrate=N/A speed=2.09x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00000.m4s' for writing
-frame=  150 fps= 74 q=29.0 size=N/A time=00:00:04.93 bitrate=N/A speed=2.45x    frame=  199 fps= 79 q=29.0 size=N/A time=00:00:06.56 bitrate=N/A speed=2.61x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00001.m4s' for writing
-frame=  258 fps= 85 q=29.0 size=N/A time=00:00:08.53 bitrate=N/A speed=2.83x    frame=  322 fps= 91 q=29.0 size=N/A time=00:00:10.66 bitrate=N/A speed=3.03x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00002.m4s' for writing
-frame=  373 fps= 93 q=29.0 size=N/A time=00:00:12.36 bitrate=N/A speed=3.08x    frame=  431 fps= 95 q=29.0 size=N/A time=00:00:14.30 bitrate=N/A speed=3.16x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00003.m4s' for writing
-frame=  495 fps= 99 q=29.0 size=N/A time=00:00:16.43 bitrate=N/A speed=3.27x    frame=  555 fps=100 q=29.0 size=N/A time=00:00:18.43 bitrate=N/A speed=3.34x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00004.m4s' for writing
-frame=  610 fps=101 q=29.0 size=N/A time=00:00:20.26 bitrate=N/A speed=3.36x    frame=  662 fps=101 q=29.0 size=N/A time=00:00:22.00 bitrate=N/A speed=3.37x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00005.m4s' for writing
-frame=  730 fps=101 q=29.0 size=N/A time=00:00:24.33 bitrate=N/A speed=3.35x    frame=  790 fps=102 q=29.0 size=N/A time=00:00:26.26 bitrate=N/A speed=3.38x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00006.m4s' for writing
-frame=  871 fps=102 q=29.0 size=N/A time=00:00:28.96 bitrate=N/A speed=3.39x    frame=  919 fps=101 q=29.0 size=N/A time=00:00:30.56 bitrate=N/A speed=3.37x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00007.m4s' for writing
-frame=  973 fps=102 q=29.0 size=N/A time=00:00:32.36 bitrate=N/A speed=3.39x    frame= 1025 fps=102 q=29.0 size=N/A time=00:00:34.10 bitrate=N/A speed=3.39x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00008.m4s' for writing
-frame= 1088 fps=103 q=29.0 size=N/A time=00:00:36.20 bitrate=N/A speed=3.43x    frame= 1154 fps=104 q=29.0 size=N/A time=00:00:38.40 bitrate=N/A speed=3.47x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00009.m4s' for writing
-frame= 1216 fps=105 q=29.0 size=N/A time=00:00:40.46 bitrate=N/A speed= 3.5x    frame= 1268 fps=105 q=29.0 size=N/A time=00:00:42.20 bitrate=N/A speed= 3.5x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00010.m4s' for writing
-frame= 1336 fps=106 q=29.0 size=N/A time=00:00:44.46 bitrate=N/A speed=3.54x    frame= 1406 fps=108 q=29.0 size=N/A time=00:00:46.80 bitrate=N/A speed=3.58x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00011.m4s' for writing
-frame= 1465 fps=108 q=29.0 size=N/A time=00:00:48.76 bitrate=N/A speed=3.59x    frame= 1519 fps=108 q=29.0 size=N/A time=00:00:50.60 bitrate=N/A speed=3.59x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00012.m4s' for writing
-frame= 1586 fps=109 q=29.0 size=N/A time=00:00:52.80 bitrate=N/A speed=3.62x    frame= 1635 fps=108 q=29.0 size=N/A time=00:00:54.43 bitrate=N/A speed=3.61x    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00013.m4s' for writing
-frame= 1690 fps=108 q=29.0 size=N/A time=N/A bitrate=N/A speed=N/A    [hls @ 0x61ecda86c380] Opening '/app/media/video/d2b9fc17-31b4-4059-a5dc-2ee7848b2932/chunk_00014.m4s' for writing
-[out#0/hls @ 0x61ecda851480] video:33047KiB audio:16KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
-frame= 1721 fps=109 q=-1.0 Lsize=N/A time=00:00:57.30 bitrate=N/A speed=3.64x    
-[libx264 @ 0x61ecda8403c0] frame I:29    Avg QP:20.13  size:124801
-[libx264 @ 0x61ecda8403c0] frame P:741   Avg QP:23.46  size: 31854
-[libx264 @ 0x61ecda8403c0] frame B:951   Avg QP:26.50  size:  6957
-[libx264 @ 0x61ecda8403c0] consecutive B-frames: 17.5% 22.9% 10.8% 48.8%
-[libx264 @ 0x61ecda8403c0] mb I  I16..4: 25.5% 28.1% 46.4%
-[libx264 @ 0x61ecda8403c0] mb P  I16..4:  8.3% 12.4%  4.4%  P16..4: 24.3% 10.0%  7.3%  0.0%  0.0%    skip:33.3%
-[libx264 @ 0x61ecda8403c0] mb B  I16..4:  1.3%  1.7%  0.1%  B16..8: 16.8%  5.1%  0.7%  direct: 5.0%  skip:69.3%  L0:50.3% L1:35.2% BI:14.6%
-[libx264 @ 0x61ecda8403c0] 8x8 transform intra:47.6% inter:28.7%
-[libx264 @ 0x61ecda8403c0] coded y,uvDC,uvAC intra: 44.2% 51.0% 16.3% inter: 7.6% 9.7% 0.3%
-[libx264 @ 0x61ecda8403c0] i16 v,h,dc,p: 49% 26% 19%  6%
-[libx264 @ 0x61ecda8403c0] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 27% 30% 23%  3%  3%  3%  3%  3%  4%
-[libx264 @ 0x61ecda8403c0] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 22% 23% 11%  7%  8%  7%  8%  6%  8%
-[libx264 @ 0x61ecda8403c0] i8c dc,h,v,p: 54% 21% 18%  6%
-[libx264 @ 0x61ecda8403c0] Weighted P-Frames: Y:1.1% UV:0.3%
-[libx264 @ 0x61ecda8403c0] kb/s:4719.05
-[aac @ 0x61ecdb0da740] Qavg: 65536.000

@@ -84,40 +84,33 @@
 
 
 <script>
-    (() => {
-        const header = document.querySelector('header');
-        const panel = document.getElementById('pfPanel');
-        const under = document.getElementById('pfUnderlay');
-        const trigger = document.getElementById('pfOpen');
+(() => {
+  const panel  = document.getElementById('pfPanel');
+  const under  = document.getElementById('pfUnderlay');
+  const trigger= document.getElementById('pfOpen');
 
-        function place() {
-            const h = header.getBoundingClientRect().height || 0;
-            document.documentElement.style.setProperty('--header-h', `${h}px`);
-        }
+  function open() {
+    under.classList.add('show');
+    // reflow не обязателен, но оставлю, если анимация дёргалась
+    panel.getBoundingClientRect();
+    panel.classList.add('show');
+  }
 
-        function open() {
-            place();
-            under.classList.add('show');
-            requestAnimationFrame(() => panel.classList.add('show'));
-        }
+  function close() {
+    panel.classList.remove('show');
+    under.classList.remove('show');
+  }
 
-        function close() {
-            panel.classList.remove('show');
-            under.classList.remove('show');
-        }
+  trigger.addEventListener('click', e => {
+    e.preventDefault();
+    panel.classList.contains('show') ? close() : open();
+  });
 
-        trigger.addEventListener('click', e => {
-            e.preventDefault();
-            panel.classList.contains('show') ? close() : open();
-        });
-
-        under.addEventListener('click', close);
-        document.addEventListener('keydown', e => e.key === 'Escape' && close());
-        window.addEventListener('resize', place);
-        place();
-    })();
-
+  under.addEventListener('click', close);
+  document.addEventListener('keydown', e => e.key === 'Escape' && close());
+})();
 </script>
+
 
 
 
