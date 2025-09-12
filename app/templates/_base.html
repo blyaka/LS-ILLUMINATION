@@ -36,7 +36,7 @@
 
             <nav class="ls-nav">
                 <a href="#" class="ls-nav__btn" id="pfOpen" aria-controls="pfPanel" role="button">Портфолио</a>
-                <a href="#">Контакты</a>
+                <a href="#" id="ctOpen">Контакты</a>
                 <a href="{% url 'about' %}">О нас</a>
             </nav>
 
@@ -121,6 +121,44 @@
         </div>
     </section>
 
+    <section class="rq-modal" id="ctModal" role="dialog" aria-modal="true" aria-labelledby="ctTitle" hidden>
+        <div class="rq-card contacts-modal">
+            <button class="rq-close" type="button" id="ctClose" aria-label="Закрыть">×</button>
+            <h2 class="rq-title" id="ctTitle">Контакты</h2>
+
+            <div class="ct-grid">
+                <div class="ct-col">
+                    <div class="ct-item">
+                        <span class="ct-label">Телефон</span>
+                        <div class="ct-val">+7 (812) 642-03-65</div>
+                    </div>
+                    <div class="ct-item">
+                        <span class="ct-label">Адрес</span>
+                        <div class="ct-val">г. Санкт-Петербург,<br>улица Ломоносова, 28</div>
+                    </div>
+                    <div class="ct-item">
+                        <span class="ct-label">E-mail*</span>
+                        <div class="ct-val"><a href="mailto:info@multidekor.ru">info@multidekor.ru</a></div>
+                    </div>
+                </div>
+
+                <div class="ct-col">
+                    <div class="ct-item">
+                        <span class="ct-label">Время работы:</span>
+                        <div class="ct-val">
+                            Пн–Пт<br>с 10:00 до 18:00
+                        </div>
+                    </div>
+                    <div class="ct-item">
+                        <div class="ct-val" style="margin-top:16px">
+                            Сб–Вс<br>Выходные дни
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 
     <script>
@@ -162,6 +200,43 @@
             pfOpen?.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); });
             pfUnder?.addEventListener('click', pfHide);
             document.addEventListener('keydown', e => e.key === 'Escape' && pfHide());
+
+
+            // === Контакты ===
+            const ctOpen = document.getElementById('ctOpen');
+            const ctModal = document.getElementById('ctModal');
+            const ctClose = document.getElementById('ctClose');
+            const under = document.getElementById('rqUnderlay'); // общий бэкдроп
+
+            const openCt = () => {
+                under.hidden = false; ctModal.hidden = false;
+                ctModal.getBoundingClientRect();
+                under.classList.add('show');
+                ctModal.classList.add('show');
+                document.documentElement.classList.add('rq-lock');
+            };
+            const closeCt = () => {
+                ctModal.classList.remove('show');
+                under.classList.remove('show');
+                const done = () => {
+                    ctModal.hidden = true;
+                    under.hidden = true;
+                    ctModal.removeEventListener('transitionend', done);
+                };
+                ctModal.addEventListener('transitionend', done);
+                document.documentElement.classList.remove('rq-lock');
+            };
+
+            ctOpen?.addEventListener('click', e => { e.preventDefault(); openCt(); });
+            ctClose?.addEventListener('click', closeCt);
+            under?.addEventListener('click', () => {
+                // закрываем обе, если какая-то открыта
+                if (ctModal.classList.contains('show')) closeCt();
+                if (rqModal.classList.contains('show')) rqHide();
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && ctModal.classList.contains('show')) closeCt();
+            });
         });
     </script>
 

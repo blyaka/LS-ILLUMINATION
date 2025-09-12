@@ -483,7 +483,7 @@ html.rq-lock body {
 .rq-check input:checked+i::after {
     content: "";
     position: absolute;
-    inset: 3px 5px 4px 5px;
+    inset: 1px 7px 4px 5px;
     border: 2px solid #fff;
     border-top: 0;
     border-left: 0;
@@ -538,5 +538,76 @@ html.rq-lock body {
 @media (max-width: 900px) {
     .rq-row--3 {
         grid-template-columns: 1fr;
+    }
+}
+
+
+
+
+
+/* Контакты внутри rq-card */
+.ct-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    padding: 24px 6px;
+    color: var(--text);
+}
+
+/* вертикальный разделитель по центру */
+.ct-grid::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-.5px);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, .12));
+    opacity: .9;
+}
+
+
+.rq-card.contacts-modal {
+    width: min(580px, 92vw);
+}
+
+.ct-col {
+    display: grid;
+    gap: 22px;
+    margin: 0 auto;
+}
+
+.ct-item {
+    display: grid;
+    gap: 8px;
+}
+
+.ct-label {
+    font-size: .9rem;
+    opacity: .8;
+}
+
+.ct-val {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.ct-val a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* адаптив: одна колонка, разделитель прячем */
+@media (max-width: 900px) {
+    .ct-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .ct-grid::before {
+        display: none;
     }
 }
