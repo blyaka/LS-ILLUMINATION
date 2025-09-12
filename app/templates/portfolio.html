@@ -1,8 +1,86 @@
+{% extends '_base.html' %}
+{% load static %}
 
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/portfolio.css' %}" />
+{% endblock %}
 
-<div>
-<a href="{% url 'home' %}">home</a>
-<a href="{% url '404' %}">404</a>
-<a href="{% url 'about' %}">about</a>
-<a href="{% url 'portfolio' %}">portfolio</a>
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-title">
+        <h1>Портфолио</h1>
+        <p class="about-meta">Санкт-Петербург • {{ today|date:"j E Y" }}</p>
+    </div>
+
+    <div class="category-name">
+        <h1>Оформление городских пространств</h1>
+    </div>
+
+    <div class="portfolio-grid">
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+
+        <a class="card" href="#">
+            <div class="card_photo">
+                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            </div>
+        </a>
+    </div>
+
+    <div class="next-btn-container">
+        <a href="" class="next-btn">
+            <p>Следующая категория ></p>
+        </a>
+    </div>
+
 </div>
+
+
+{% endblock %}
