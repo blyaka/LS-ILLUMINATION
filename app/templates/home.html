@@ -107,7 +107,7 @@
       <div class="liquidGlass-text">        
         <figure class="p-card__inner">
           <div class="p-card__photo">
-            <img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />
+            {% if cat.photo.url %}<img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />{% endif %}
           </div>
           <figcaption class="p-card__cap">
             <span>{{ cat.first_word }}</span>

@@ -52,7 +52,7 @@
                 <div class="pf-grid pf-grid--{{ row|length }}">
                     {% for cat in row %}
                     <a class="pf-card" href="{% url 'portfolio' slug=cat.slug %}">
-                        <img src="{{ cat.icon.url }}" alt="{{ cat.name }}">
+                        {% if cat.icon.url %}<img src="{{ cat.icon.url }}" alt="{{ cat.name }}">{% endif %}
                         <span>{{ cat.name }}</span>
                     </a>
                     {% endfor %}
