@@ -2,75 +2,109 @@
 {% load static %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
 {% endblock %}
 
 {% block content %}
-  <section class="ls-hero">
+<section class="ls-hero">
   {% if hero_video %}
-  <video id="heroVideo" class="ls-hero__media"
-        {% if hero_video.poster %}poster="{{ hero_video.poster.url }}"{% endif %}
-        muted loop playsinline></video>
+  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%} muted loop playsinline></video>
 
   <script src="{% static 'vendor/hls/hls.min.js' %}"></script>
   <script>
-  (function(){
-    const src = "{{ hero_video.m3u8_url }}";
-    const el  = document.getElementById('heroVideo');
+    (function () {
+      const src = "{{ hero_video.m3u8_url }}";
+      const el = document.getElementById('heroVideo');
 
-    function playNative(){ el.src = src; }
+      function playNative() { el.src = src; }
 
-    if (el.canPlayType('application/vnd.apple.mpegurl')) {
-      playNative();
-    } else if (window.Hls && Hls.isSupported()) {
-      const h = new Hls({maxBufferLength: 10});
-      h.loadSource(src);
-      h.attachMedia(el);
-    } else {
-      playNative();
-    }
-  })();
+      if (el.canPlayType('application/vnd.apple.mpegurl')) {
+        playNative();
+      } else if (window.Hls && Hls.isSupported()) {
+        const h = new Hls({ maxBufferLength: 10 });
+        h.loadSource(src);
+        h.attachMedia(el);
+      } else {
+        playNative();
+      }
+    })();
   </script>
   {% endif %}
 
 
 
-    <div class="ls-hero__overlay-top"></div>
-    <div class="ls-hero__overlay-bottom"></div>
+  <div class="ls-hero__overlay-top"></div>
+  <div class="ls-hero__overlay-bottom"></div>
 
-    <div class="ls-hero__content">
-      <h1 class="ls-hero__title">Москва</h1>
-      <p class="ls-hero__subtitle">Новогоднее оформление всей России</p>
+  <div class="ls-hero__content">
+    <h1 class="ls-hero__title">Москва</h1>
+    <p class="ls-hero__subtitle">Новогоднее оформление всей России</p>
+  </div>
+
+  <div class="ls-hero__stats">
+    <div class="ls-hero__stat">
+      <span>16</span><small>лет работы</small>
     </div>
-
-    <div class="ls-hero__stats">
-      <div class="ls-hero__stat">
-        <span>16</span><small>лет работы</small>
-      </div>
-      <div class="ls-hero__stat">
-        <span>250+</span><small>проектов</small>
-      </div>
-      <div class="ls-hero__stat">
-        <span>300+</span><small>человек</small>
-      </div>
+    <div class="ls-hero__stat">
+      <span>250+</span><small>проектов</small>
     </div>
+    <div class="ls-hero__stat">
+      <span>300+</span><small>человек</small>
+    </div>
+  </div>
 
-    <button class="ls-hero__pp" id="ppBtn" aria-label="Воспроизвести/Пауза">
-      <svg class="pp-icon pp-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path d="M8 5v14l11-7-11-7z" fill="currentColor" />
-      </svg>
-      <svg class="pp-icon pp-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" />
-      </svg>
-    </button>
-  </section>
+  <button class="ls-hero__pp" id="ppBtn" aria-label="Воспроизвести/Пауза">
+    <svg class="pp-icon pp-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path d="M8 5v14l11-7-11-7z" fill="currentColor" />
+    </svg>
+    <svg class="pp-icon pp-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" />
+    </svg>
+  </button>
+</section>
 
-  <section class="cw-portfolio" id="portfolio">
-    <h2 class="cw-portfolio__title">Портфолио</h2>
 
-    <div class="cw-portfolio__grid">
-      {% for cat in categories %}
-      <a class="p-card" href="#">
+
+
+
+
+<svg style="display: none">
+  <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+    <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="1" result="turbulence" />
+
+    <feComponentTransfer in="turbulence" result="mapped">
+      <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+      <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+      <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+    </feComponentTransfer>
+
+    <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+
+    <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lighting-color="white"
+      result="specLight">
+      <fePointLight x="-200" y="-200" z="300" />
+    </feSpecularLighting>
+
+    <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+
+    <feDisplacementMap in="SourceGraphic" in2="softMap" scale="75" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
+
+
+
+
+
+<section class="cw-portfolio" id="portfolio">
+  <h2 class="cw-portfolio__title">Портфолио</h2>
+
+  <div class="cw-portfolio__grid">
+    {% for cat in categories %}
+    <a class="liquidGlass-wrapper" href="#">
+      <div class="liquidGlass-effect"></div>
+      <div class="liquidGlass-tint"></div>
+      <div class="liquidGlass-shine"></div>
+      <div class="liquidGlass-text">        
         <figure class="p-card__inner">
           <div class="p-card__photo">
             <img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />
@@ -80,136 +114,143 @@
             <small>{{ cat.rest_words }}</small>
           </figcaption>
         </figure>
-      </a>
-      {% endfor %}
+      </div>
+    </a>
+    {% endfor %}
 
+  </div>
+</section>
+
+
+
+
+
+
+
+<section class="cw-videos" id="videos">
+  <h2 class="cw-videos__title">Видеогалерея</h2>
+
+  <div class="cw-videos__grid">
+    {% for v in more_videos %}
+    <button class="v-card" type="button" {% if v.m3u8_url %} data-src="{{ v.m3u8_url }}"
+      data-title="{{ v.name|default:'Видео' }}"
+      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else
+      %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
+      <div class="v-card__thumb">
+        <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
+          alt="{{ v.name|default:'Видео' }}" loading="lazy" />
+        <span class="v-card__play" aria-hidden="true"></span>
+      </div>
+      <span class="v-card__title">{{ v.name|default:"Видео" }}</span>
+    </button>
+    {% empty %}
+    <p>Видео пока нет.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Модалка-плеер -->
+  <div class="v-modal" id="vModal" hidden>
+    <div class="v-modal__backdrop" data-close></div>
+    <div class="v-modal__dialog" role="dialog" aria-modal="true" aria-label="Видеоплеер">
+      <button class="v-modal__close" type="button" data-close aria-label="Закрыть">×</button>
+      <div class="v-modal__frame">
+        <video id="vPlayer" controls playsinline preload="none"></video>
+      </div>
+      <div class="v-modal__title" id="vTitle" style="margin-top:8px"></div>
     </div>
-  </section>
+  </div>
+</section>
 
 
-  <section class="cw-videos" id="videos">
-    <h2 class="cw-videos__title">Видеогалерея</h2>
 
-    <div class="cw-videos__grid">
-      {% for v in more_videos %}
-        <button class="v-card" type="button"
-                {% if v.m3u8_url %}
-                  data-src="{{ v.m3u8_url }}"
-                  data-title="{{ v.name|default:'Видео' }}"
-                  data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
-                {% else %} disabled aria-disabled="true" title="Видео ещё не готово"
-                {% endif %}>
-          <div class="v-card__thumb">
-            <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
-                alt="{{ v.name|default:'Видео' }}" loading="lazy" />
-            <span class="v-card__play" aria-hidden="true"></span>
-          </div>
-          <span class="v-card__title">{{ v.name|default:"Видео" }}</span>
-        </button>
-      {% empty %}
-        <p>Видео пока нет.</p>
-      {% endfor %}
+<section class="cw-seq" id="seq">
+  <div class="cw-seq__sticky">
+    <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
+
+    <!-- Overlay -->
+    <div class="seq-ov">
+      <div class="seq-copy" id="seqCopy">
+        <span class="seq-kicker">Фонтан</span>
+        <h2 class="seq-title">«ТЕАТРАЛЬНЫЙ»</h2>
+        <p class="seq-desc">
+          Где дети считают звёзды.<br />
+          Где взрослые снова верят в чудо.<br />
+          Где вместе — теплее.
+        </p>
+      </div>
+
+      <!-- Артикул: слева гаснет -->
+      <div class="seq-art seq-art--right" id="artL">
+        <span class="dot"></span> <span>Арт. 1337</span>
+      </div>
+      <!-- Артикул: справа появляется -->
+      <div class="seq-art seq-art--left" id="artR">
+        <span class="dot"></span> <span>Арт. 1337</span>
+      </div>
+
+      <!-- Схема: появляется на финальных кадрах -->
+      <img class="seq-scheme" id="seqScheme" src="{% static 'images/scheme.png' %}" alt="Схема" />
     </div>
+  </div>
+</section>
 
-    <!-- Модалка-плеер -->
-    <div class="v-modal" id="vModal" hidden>
-      <div class="v-modal__backdrop" data-close></div>
-      <div class="v-modal__dialog" role="dialog" aria-modal="true" aria-label="Видеоплеер">
-        <button class="v-modal__close" type="button" data-close aria-label="Закрыть">×</button>
-        <div class="v-modal__frame">
-          <video id="vPlayer" controls playsinline preload="none"></video>
-        </div>
-        <div class="v-modal__title" id="vTitle" style="margin-top:8px"></div>
+<section class="cw-split" id="sd-section">
+  <div class="cw-split__media">
+    <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
+      poster="{% static 'images/hero-bg.png' %}">
+      <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+    </video>
+  </div>
+
+  <aside class="cw-split__aside">
+    <h2 class="cw-split__title">Светодинамическая конструкция</h2>
+    <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание.
+      Для яркого оформления городских пространств.</p>
+    <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
+  </aside>
+
+  <!-- Модалка-плеер -->
+  <div class="sv-modal" id="sdModal" hidden>
+    <div class="sv-backdrop" data-close></div>
+    <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
+      <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
+      <div class="sv-frame">
+        <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
+          <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+        </video>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
+<section class="cw-split right" id="sd-section">
+  <aside class="cw-split__aside">
+    <h2 class="cw-split__title">Светодинамическая конструкция</h2>
+    <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание.
+      Для яркого оформления городских пространств.</p>
+    <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
+  </aside>
 
+  <div class="cw-split__media">
+    <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
+      poster="{% static 'images/hero-bg.png' %}">
+      <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+    </video>
+  </div>
 
-  <section class="cw-seq" id="seq">
-    <div class="cw-seq__sticky">
-      <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
-
-      <!-- Overlay -->
-      <div class="seq-ov">
-        <div class="seq-copy" id="seqCopy">
-          <span class="seq-kicker">Фонтан</span>
-          <h2 class="seq-title">«ТЕАТРАЛЬНЫЙ»</h2>
-          <p class="seq-desc">
-            Где дети считают звёзды.<br />
-            Где взрослые снова верят в чудо.<br />
-            Где вместе — теплее.
-          </p>
-        </div>
-
-        <!-- Артикул: слева гаснет -->
-        <div class="seq-art seq-art--right" id="artL">
-          <span class="dot"></span> <span>Арт. 1337</span>
-        </div>
-        <!-- Артикул: справа появляется -->
-        <div class="seq-art seq-art--left" id="artR">
-          <span class="dot"></span> <span>Арт. 1337</span>
-        </div>
-
-        <!-- Схема: появляется на финальных кадрах -->
-        <img class="seq-scheme" id="seqScheme" src="{% static 'images/scheme.png' %}" alt="Схема" />
+  <!-- Модалка-плеер -->
+  <div class="sv-modal" id="sdModal" hidden>
+    <div class="sv-backdrop" data-close></div>
+    <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
+      <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
+      <div class="sv-frame">
+        <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
+          <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
+        </video>
       </div>
     </div>
-  </section>
-
-  <section class="cw-split" id="sd-section">
-    <div class="cw-split__media">
-      <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata" poster="{% static 'images/hero-bg.png' %}">
-        <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-      </video>
-    </div>
-
-    <aside class="cw-split__aside">
-      <h2 class="cw-split__title">Светодинамическая конструкция</h2>
-      <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание. Для яркого оформления городских пространств.</p>
-      <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
-    </aside>
-
-    <!-- Модалка-плеер -->
-    <div class="sv-modal" id="sdModal" hidden>
-      <div class="sv-backdrop" data-close></div>
-      <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
-        <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
-        <div class="sv-frame">
-          <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
-            <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-          </video>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="cw-split right" id="sd-section">
-    <aside class="cw-split__aside">
-      <h2 class="cw-split__title">Светодинамическая конструкция</h2>
-      <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание. Для яркого оформления городских пространств.</p>
-      <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
-    </aside>
-
-    <div class="cw-split__media">
-      <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata" poster="{% static 'images/hero-bg.png' %}">
-        <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-      </video>
-    </div>
-
-    <!-- Модалка-плеер -->
-    <div class="sv-modal" id="sdModal" hidden>
-      <div class="sv-backdrop" data-close></div>
-      <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
-        <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
-        <div class="sv-frame">
-          <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
-            <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-          </video>
-        </div>
-      </div>
-    </div>
-  </section>
+  </div>
+</section>
 
 
 
@@ -279,42 +320,42 @@
 </section>
 
 <script>
-    (() => {
+  (() => {
     const data = JSON.parse(document.getElementById('newsData').textContent);
     let i = 0;
 
-    const img        = document.getElementById('newsImg');
-    const dateEl     = document.getElementById('newsDate');
-    const titleEl    = document.getElementById('newsTitle');
-    const descEl     = document.getElementById('newsDesc');
-    const linkEl     = document.getElementById('newsLink');
-    const prevImgEl  = document.getElementById('newsPrevImg');
-    const nextImgEl  = document.getElementById('newsNextImg');
+    const img = document.getElementById('newsImg');
+    const dateEl = document.getElementById('newsDate');
+    const titleEl = document.getElementById('newsTitle');
+    const descEl = document.getElementById('newsDesc');
+    const linkEl = document.getElementById('newsLink');
+    const prevImgEl = document.getElementById('newsPrevImg');
+    const nextImgEl = document.getElementById('newsNextImg');
 
     const render = () => {
-        const cur  = data[i];
-        const prev = data[(i - 1 + data.length) % data.length];
-        const next = data[(i + 1) % data.length];
+      const cur = data[i];
+      const prev = data[(i - 1 + data.length) % data.length];
+      const next = data[(i + 1) % data.length];
 
-        // центр
-        img.src = cur.img;
-        dateEl.innerHTML = cur.date;
-        titleEl.innerHTML = cur.title;
-        descEl.textContent = cur.desc;
-        linkEl.href = cur.url;
+      // центр
+      img.src = cur.img;
+      dateEl.innerHTML = cur.date;
+      titleEl.innerHTML = cur.title;
+      descEl.textContent = cur.desc;
+      linkEl.href = cur.url;
 
-        // боковые превью (только картинки)
-        prevImgEl.src = prev.img;
-        nextImgEl.src = next.img;
+      // боковые превью (только картинки)
+      prevImgEl.src = prev.img;
+      nextImgEl.src = next.img;
     };
 
     document.querySelector('.news-arrow--prev').addEventListener('click', () => {
-        i = (i - 1 + data.length) % data.length;
-        render();
+      i = (i - 1 + data.length) % data.length;
+      render();
     });
     document.querySelector('.news-arrow--next').addEventListener('click', () => {
-        i = (i + 1) % data.length;
-        render();
+      i = (i + 1) % data.length;
+      render();
     });
 
     // свайп по центральной карточке
@@ -322,287 +363,303 @@
     let sx = 0;
     area.addEventListener('pointerdown', e => { sx = e.clientX; area.setPointerCapture(e.pointerId); });
     area.addEventListener('pointerup', e => {
-        const dx = e.clientX - sx;
-        if (Math.abs(dx) > 40) {
+      const dx = e.clientX - sx;
+      if (Math.abs(dx) > 40) {
         i = (i + (dx < 0 ? 1 : -1) + data.length) % data.length;
         render();
-        }
+      }
     });
 
     render();
-    })();
+  })();
 </script>
 
 
-  <script>
-    ;(() => {
-      const open = (sel) => {
-        const m = document.querySelector(sel)
-        if (!m) return
-        // пауза превью
-        const prev = document.getElementById('sdPreview')
-        prev && prev.pause()
-        // открыть модалку
-        m.hidden = false
-        document.body.style.overflow = 'hidden'
-        const full = document.getElementById('sdFull')
-        full && full.play().catch(() => {})
-      }
-    
-      const close = (m) => {
-        const full = document.getElementById('sdFull')
-        if (full) {
-          full.pause() /* full.currentTime = 0; */
-        }
-        m.hidden = true
-        document.body.style.overflow = ''
-        // возобновим превью
-        const prev = document.getElementById('sdPreview')
-        prev && prev.play().catch(() => {})
-      }
-    
-      document.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-open]')
-        if (btn) {
-          open(btn.dataset.open)
-        }
-        if (e.target.matches('[data-close]')) {
-          close(e.target.closest('.sv-modal'))
-        }
-      })
-    
-      document.addEventListener('keydown', (e) => {
-        const m = document.getElementById('sdModal')
-        if (e.key === 'Escape' && m && !m.hidden) close(m)
-      })
-    
-      // пауза превью, когда секция вне вьюпорта
-      const io = new IntersectionObserver(
-        ([ent]) => {
-          const v = document.getElementById('sdPreview')
-          if (!v) return
-          if (ent.isIntersecting) v.play().catch(() => {})
-          else v.pause()
-        },
-        { threshold: 0.2 }
-      )
-      io.observe(document.getElementById('sd-section'))
-    })()
-  </script>
+<script>
+  ; (() => {
+    const open = (sel) => {
+      const m = document.querySelector(sel)
+      if (!m) return
+      // пауза превью
+      const prev = document.getElementById('sdPreview')
+      prev && prev.pause()
+      // открыть модалку
+      m.hidden = false
+      document.body.style.overflow = 'hidden'
+      const full = document.getElementById('sdFull')
+      full && full.play().catch(() => { })
+    }
 
-  <script>
+    const close = (m) => {
+      const full = document.getElementById('sdFull')
+      if (full) {
+        full.pause() /* full.currentTime = 0; */
+      }
+      m.hidden = true
+      document.body.style.overflow = ''
+      // возобновим превью
+      const prev = document.getElementById('sdPreview')
+      prev && prev.play().catch(() => { })
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-open]')
+      if (btn) {
+        open(btn.dataset.open)
+      }
+      if (e.target.matches('[data-close]')) {
+        close(e.target.closest('.sv-modal'))
+      }
+    })
+
+    document.addEventListener('keydown', (e) => {
+      const m = document.getElementById('sdModal')
+      if (e.key === 'Escape' && m && !m.hidden) close(m)
+    })
+
+    // пауза превью, когда секция вне вьюпорта
+    const io = new IntersectionObserver(
+      ([ent]) => {
+        const v = document.getElementById('sdPreview')
+        if (!v) return
+        if (ent.isIntersecting) v.play().catch(() => { })
+        else v.pause()
+      },
+      { threshold: 0.2 }
+    )
+    io.observe(document.getElementById('sd-section'))
+  })()
+</script>
+
+<script>
     (() => {
-        const s = document.getElementById('seq');
-        const c = document.getElementById('seqCanvas');
-        const x = c.getContext('2d', { alpha: false });
-        const d = Math.min(2, window.devicePixelRatio || 1);
+      const s = document.getElementById('seq');
+      const c = document.getElementById('seqCanvas');
+      const x = c.getContext('2d', { alpha: false });
+      const d = Math.min(2, window.devicePixelRatio || 1);
 
-        const copy = document.getElementById('seqCopy');
-        const artL = document.getElementById('artL');
-        const artR = document.getElementById('artR');
-        const scheme = document.getElementById('seqScheme');
-        const desc = document.querySelector('.seq-desc');
+      const copy = document.getElementById('seqCopy');
+      const artL = document.getElementById('artL');
+      const artR = document.getElementById('artR');
+      const scheme = document.getElementById('seqScheme');
+      const desc = document.querySelector('.seq-desc');
 
-        const N = 60;
-        const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5, '0')}.webp`;
-        const G = new Array(N);
-        let tgt = 0, cur = 0, raf = 0, last = -1;
+      const N = 60;
+      const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5, '0')}.webp`;
+      const G = new Array(N);
+      let tgt = 0, cur = 0, raf = 0, last = -1;
 
-        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-        const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;      // easeInOut
-        const smooth = (a, b, t) => clamp((t - a) / (b - a), 0, 1);           // smoothstep 0..1
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;      // easeInOut
+      const smooth = (a, b, t) => clamp((t - a) / (b - a), 0, 1);           // smoothstep 0..1
 
-        function resize() {
-            c.width = Math.floor(innerWidth * d);
-            c.height = Math.floor(innerHeight * d);
-            c.style.width = '100vw'; c.style.height = '100vh';
-            x.setTransform(d, 0, 0, d, 0, 0);
-            snap(cur);
-        }
+      function resize() {
+        c.width = Math.floor(innerWidth * d);
+        c.height = Math.floor(innerHeight * d);
+        c.style.width = '100vw'; c.style.height = '100vh';
+        x.setTransform(d, 0, 0, d, 0, 0);
+        snap(cur);
+      }
 
-        function draw(img) {
-            const cw = c.width / d, ch = c.height / d;
-            const iw = img.naturalWidth, ih = img.naturalHeight;
-            const s = Math.max(cw / iw, ch / ih), w = iw * s, h = ih * s;
-            x.clearRect(0, 0, cw, ch);
-            x.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
-        }
+      function draw(img) {
+        const cw = c.width / d, ch = c.height / d;
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        const s = Math.max(cw / iw, ch / ih), w = iw * s, h = ih * s;
+        x.clearRect(0, 0, cw, ch);
+        x.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+      }
 
-        function snap(f) {
-            const idx = clamp(Math.round(f), 0, N - 1);
-            if (idx === last) return;
-            const im = G[idx];
-            if (!im || !im.complete) return;
-            last = idx; draw(im);
-        }
+      function snap(f) {
+        const idx = clamp(Math.round(f), 0, N - 1);
+        if (idx === last) return;
+        const im = G[idx];
+        if (!im || !im.complete) return;
+        last = idx; draw(im);
+      }
 
-        function progressFromScroll() {
-            const r = s.getBoundingClientRect();
-            const m = s.offsetHeight - innerHeight;
-            const y = Math.min(m, Math.max(0, -r.top));
-            tgt = m ? (y / m) * (N - 1) : 0;
-            if (!raf) raf = requestAnimationFrame(loop);
-        }
+      function progressFromScroll() {
+        const r = s.getBoundingClientRect();
+        const m = s.offsetHeight - innerHeight;
+        const y = Math.min(m, Math.max(0, -r.top));
+        tgt = m ? (y / m) * (N - 1) : 0;
+        if (!raf) raf = requestAnimationFrame(loop);
+      }
 
-        function updateOverlay(p) {
-            // движение текста: вправо + вверх
-            const t = ease(p);
-            const moveX = innerWidth * 0.66;   // насколько уедет по X
-            const moveY = innerHeight * 0.32;  // насколько поднимется по Y
-            copy.style.transform = `translate(${moveX * t}px, ${-moveY * t}px)`;
+      function updateOverlay(p) {
+        // движение текста: вправо + вверх
+        const t = ease(p);
+        const moveX = innerWidth * 0.66;   // насколько уедет по X
+        const moveY = innerHeight * 0.32;  // насколько поднимется по Y
+        copy.style.transform = `translate(${moveX * t}px, ${-moveY * t}px)`;
 
-            // артикул: слева гаснет 40–55%, справа появляется 55–70%
-            artL.style.opacity = 1 - smooth(0.40, 0.55, p);
-            artR.style.opacity = smooth(0.55, 0.70, p);
+        // артикул: слева гаснет 40–55%, справа появляется 55–70%
+        artL.style.opacity = 1 - smooth(0.40, 0.55, p);
+        artR.style.opacity = smooth(0.55, 0.70, p);
 
-            // схема: появляется внизу справа на 80–95%
-            const vis = smooth(0.80, 0.95, p);
-            scheme.style.opacity = vis;
-            scheme.style.transform = `translateY(${16 * (1 - vis)}px)`;
+        // схема: появляется внизу справа на 80–95%
+        const vis = smooth(0.80, 0.95, p);
+        scheme.style.opacity = vis;
+        scheme.style.transform = `translateY(${16 * (1 - vis)}px)`;
 
-            // абзац к финалу выравниваем по правому краю
-            <!-- desc.style.textAlign = p > 0.88 ? 'right' : 'left'; -->
-        }
+        // абзац к финалу выравниваем по правому краю
+        <!-- desc.style.textAlign = p > 0.88 ? 'right' : 'left'; -->
+      }
 
 
-        function loop() {
-            raf = 0;
-            cur += (tgt - cur) * 0.2;     // плавное, но без «мыла»
-            snap(cur);
-            updateOverlay(cur / (N - 1));
-            if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(loop);
-        }
+      function loop() {
+        raf = 0;
+        cur += (tgt - cur) * 0.2;     // плавное, но без «мыла»
+        snap(cur);
+        updateOverlay(cur / (N - 1));
+        if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(loop);
+      }
 
-        // preload
-        G[0] = new Image(); G[0].src = U(0); G[0].onload = () => { snap(0); updateOverlay(0); };
-        for (let i = 1; i < N; i++) { G[i] = new Image(); G[i].decoding = 'async'; G[i].src = U(i); }
+      // preload
+      G[0] = new Image(); G[0].src = U(0); G[0].onload = () => { snap(0); updateOverlay(0); };
+      for (let i = 1; i < N; i++) { G[i] = new Image(); G[i].decoding = 'async'; G[i].src = U(i); }
 
-        resize();
-        addEventListener('resize', () => { resize(); progressFromScroll(); });
-        addEventListener('scroll', progressFromScroll, { passive: true });
+      resize();
+      addEventListener('resize', () => { resize(); progressFromScroll(); });
+      addEventListener('scroll', progressFromScroll, { passive: true });
     })();
 </script>
 
 
 
 <style>
-  .v-modal__dialog{max-width: min(1200px, 96vw); width:96vw}
-  .v-modal__frame{position:relative; width:100%; aspect-ratio:16/9}
-  #vPlayer{position:absolute; inset:0; width:100%; height:100%; background:#000}
+  .v-modal__dialog {
+    max-width: min(1200px, 96vw);
+    width: 96vw
+  }
+
+  .v-modal__frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9
+  }
+
+  #vPlayer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #000
+  }
 </style>
 
 
 <script>
-(() => {
-  const modal  = document.getElementById('vModal');
-  const player = document.getElementById('vPlayer');
-  const titleEl= document.getElementById('vTitle');
-  let hls = null;
+  (() => {
+    const modal = document.getElementById('vModal');
+    const player = document.getElementById('vPlayer');
+    const titleEl = document.getElementById('vTitle');
+    let hls = null;
 
-  function attach(src, poster) {
-    if (hls) { try{hls.destroy();}catch{} hls = null; }
-    player.pause(); player.removeAttribute('src'); player.load();
-    poster ? player.setAttribute('poster', poster) : player.removeAttribute('poster');
+    function attach(src, poster) {
+      if (hls) { try { hls.destroy(); } catch { } hls = null; }
+      player.pause(); player.removeAttribute('src'); player.load();
+      poster ? player.setAttribute('poster', poster) : player.removeAttribute('poster');
 
-    if (player.canPlayType('application/vnd.apple.mpegurl')) {
-      player.src = src;
-    } else if (window.Hls && Hls.isSupported()) {
-      hls = new Hls({ maxBufferLength: 10 });
-      hls.loadSource(src);
-      hls.attachMedia(player);
-    } else {
-      player.src = src; // крайний фолбэк
+      if (player.canPlayType('application/vnd.apple.mpegurl')) {
+        player.src = src;
+      } else if (window.Hls && Hls.isSupported()) {
+        hls = new Hls({ maxBufferLength: 10 });
+        hls.loadSource(src);
+        hls.attachMedia(player);
+      } else {
+        player.src = src; // крайний фолбэк
+      }
     }
-  }
 
-  function open(src, poster, title) {
-    attach(src, poster);
-    titleEl.textContent = title || '';
-    modal.hidden = false;
-    document.body.style.overflow = 'hidden';
-    player.muted = true;
-    player.play().catch(()=>{});
-  }
+    function open(src, poster, title) {
+      attach(src, poster);
+      titleEl.textContent = title || '';
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      player.muted = true;
+      player.play().catch(() => { });
+    }
 
-  function close() {
-    if (hls) { try{hls.destroy();}catch{} hls = null; }
-    player.pause(); player.removeAttribute('src'); player.load();
-    modal.hidden = true;
-    document.body.style.overflow = '';
-  }
+    function close() {
+      if (hls) { try { hls.destroy(); } catch { } hls = null; }
+      player.pause(); player.removeAttribute('src'); player.load();
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
 
-  function togglePlay(){ player.paused ? player.play().catch(()=>{}) : player.pause(); }
-  function seekBy(s){ try{ player.currentTime = Math.max(0, Math.min((player.duration||1e9), player.currentTime + s)); }catch{} }
-  function toggleFullscreen(){
-    const el = modal.querySelector('.v-modal__dialog');
-    if (!document.fullscreenElement) { el.requestFullscreen?.(); }
-    else { document.exitFullscreen?.(); }
-  }
+    function togglePlay() { player.paused ? player.play().catch(() => { }) : player.pause(); }
+    function seekBy(s) { try { player.currentTime = Math.max(0, Math.min((player.duration || 1e9), player.currentTime + s)); } catch { } }
+    function toggleFullscreen() {
+      const el = modal.querySelector('.v-modal__dialog');
+      if (!document.fullscreenElement) { el.requestFullscreen?.(); }
+      else { document.exitFullscreen?.(); }
+    }
 
-  let clickTimer=0;
-  player.addEventListener('click', () => {
-    if (clickTimer){ clearTimeout(clickTimer); clickTimer=0; toggleFullscreen(); return; }
-    clickTimer = setTimeout(()=>{ togglePlay(); clickTimer=0; }, 200);
-  });
+    let clickTimer = 0;
+    player.addEventListener('click', () => {
+      if (clickTimer) { clearTimeout(clickTimer); clickTimer = 0; toggleFullscreen(); return; }
+      clickTimer = setTimeout(() => { togglePlay(); clickTimer = 0; }, 200);
+    });
 
-  document.addEventListener('keydown', (e) => {
-    if (modal.hidden) return;
-    const tag = (e.target.tagName||'').toLowerCase();
-    if (tag === 'input' || tag === 'textarea') return;
+    document.addEventListener('keydown', (e) => {
+      if (modal.hidden) return;
+      const tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
 
-    const code = e.code;
+      const code = e.code;
 
-    if (code === 'Space' || code === 'KeyK') { e.preventDefault(); togglePlay(); }
-    else if (code === 'ArrowLeft' || code === 'KeyJ') { e.preventDefault(); seekBy(-10); }
-    else if (code === 'ArrowRight' || code === 'KeyL') { e.preventDefault(); seekBy(+10); }
-    else if (code === 'KeyF') { e.preventDefault(); toggleFullscreen(); }
-    else if (code === 'KeyM') { player.muted = !player.muted; }
-    else if (code === 'Escape') { close(); }
-  });
+      if (code === 'Space' || code === 'KeyK') { e.preventDefault(); togglePlay(); }
+      else if (code === 'ArrowLeft' || code === 'KeyJ') { e.preventDefault(); seekBy(-10); }
+      else if (code === 'ArrowRight' || code === 'KeyL') { e.preventDefault(); seekBy(+10); }
+      else if (code === 'KeyF') { e.preventDefault(); toggleFullscreen(); }
+      else if (code === 'KeyM') { player.muted = !player.muted; }
+      else if (code === 'Escape') { close(); }
+    });
 
-  // Открытие/закрытие
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.v-card');
-    if (btn && btn.dataset.src) open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
-    if (e.target.matches('[data-close]')) close();
-  });
+    // Открытие/закрытие
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.v-card');
+      if (btn && btn.dataset.src) open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
+      if (e.target.matches('[data-close]')) close();
+    });
 
-  // При закрытии по клику в бекдроп (если у тебя есть data-close)
-  modal.addEventListener('click', (e) => {
-    if (e.target.hasAttribute('data-close')) close();
-  });
-})();
+    // При закрытии по клику в бекдроп (если у тебя есть data-close)
+    modal.addEventListener('click', (e) => {
+      if (e.target.hasAttribute('data-close')) close();
+    });
+  })();
 </script>
 
-  <script>
-    (function () {
-        const v = document.getElementById('heroVideo');
-        const btn = document.getElementById('ppBtn');
-        const hasSource = v.currentSrc || v.querySelector('source');
+<script>
+  (function () {
+    const v = document.getElementById('heroVideo');
+    const btn = document.getElementById('ppBtn');
+    const hasSource = v.currentSrc || v.querySelector('source');
 
-        if (!hasSource) {
-            btn.disabled = true;
-            btn.classList.add('is-disabled');
-            return;
-        }
+    if (!hasSource) {
+      btn.disabled = true;
+      btn.classList.add('is-disabled');
+      return;
+    }
 
-        v.muted = true;
+    v.muted = true;
 
-        const setState = playing => {
-            btn.classList.toggle('is-playing', playing);
-        };
+    const setState = playing => {
+      btn.classList.toggle('is-playing', playing);
+    };
 
-        btn.addEventListener('click', () => {
-            if (v.paused) {
-                v.play().then(() => setState(true)).catch(() => { });
-            } else {
-                v.pause();
-                setState(false);
-            }
-        });
+    btn.addEventListener('click', () => {
+      if (v.paused) {
+        v.play().then(() => setState(true)).catch(() => { });
+      } else {
+        v.pause();
+        setState(false);
+      }
+    });
 
-        v.addEventListener('play', () => setState(true));
-        v.addEventListener('pause', () => setState(false));
-    })();
+    v.addEventListener('play', () => setState(true));
+    v.addEventListener('pause', () => setState(false));
+  })();
 </script>
+
 {% endblock %}

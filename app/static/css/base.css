@@ -138,49 +138,61 @@ body {
 
 
 
-/* полупрозрачный фон с блюром под хедером */
-.pf-underlay {
-    position: fixed;
-    left: 0;
-    right: 0;
-    opacity: 0;
-    transition: opacity .28s ease;
-    z-index: 900;
+/* underlay — только затемнение, НИ КАКОГО backdrop-filter */
+.pf-underlay{
+  position: fixed;
+  left:0; right:0;
+  top: var(--header-h, 0px);
+  height: calc(100dvh - var(--header-h, 0px));
+  background: rgba(10,10,15,.14);   /* было .32 — слишком глушит фон */
+  opacity: 0;
+  transition: opacity .28s ease;
+  z-index: 900;
+  pointer-events: none;
+  will-change: opacity;
+}
+.pf-underlay.show{
+  opacity:1;
+  pointer-events:auto;
 }
 
-.pf-underlay.show {
-    opacity: 1;
+/* панель — как была */
+.pf-panel{
+  position: fixed;
+  left:0; right:0;
+  top: var(--header-h, 0px);
+  height: calc(100dvh - var(--header-h, 0px));
+  transform: translate3d(0,-18px,0);
+  opacity: 0;
+  transition: transform .35s cubic-bezier(.22,.61,.36,1), opacity .35s ease;
+  z-index: 901;
+  pointer-events: none;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+.pf-panel.show{
+  transform: translate3d(0,0,0);
+  opacity:1;
+  pointer-events:auto;
 }
 
-/* панель: выезжает из-под хедера */
-.pf-panel {
-    position: fixed;
-    left: 0;
-    right: 0;
-    transform: translateY(-18px);
-    opacity: 0;
-    transition: transform .35s cubic-bezier(.22, .61, .36, 1), opacity .35s ease;
-    z-index: 901;
-    pointer-events: none;
+/* СТЕКЛО — единственное место, где есть backdrop-filter */
+.pf-panel__glass{
+  position: relative;
+  margin: 0 auto;
+  padding: 48px 28px 56px;
+  background: linear-gradient(180deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.04) 100%);
+  box-shadow: 0 8px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.18);
+  overflow: hidden;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  /* для читаемости стекла поверх подложки */
+  border: 1px solid rgba(255,255,255,.18);
+  background-clip: padding-box;
 }
 
-.pf-panel.show {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-}
 
-/* «стекло» как на макете + мягкая дуга снизу */
-.pf-panel__glass {
-    position: relative;
-    margin: 0 auto;
-    padding: 48px 28px 56px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, .10) 0%, rgba(255, 255, 255, .04) 100%);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .18);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    overflow: hidden;
-}
 
 .pf-grid {
     display: grid;

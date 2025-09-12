@@ -44,21 +44,20 @@
         </div>
     </header>
 
-    <div class="pf-underlay" id="pfUnderlay" hidden></div>
-
-    <section class="pf-panel" id="pfPanel" role="dialog" aria-modal="true" hidden>
+    <div class="pf-underlay" id="pfUnderlay"></div>
+    <section class="pf-panel" id="pfPanel" role="dialog" aria-modal="true">
         <div class="pf-panel__glass">
             <div class="pf-grid">
-            {% for row in categories|chunk_categories %}
+                {% for row in categories|chunk_categories %}
                 <div class="pf-grid pf-grid--{{ row|length }}">
-                {% for cat in row %}
-                    <a class="pf-card" href="#">
-                    <img src="{{ cat.icon.url }}" alt="{{ cat.name }}">
-                    <span>{{ cat.name }}</span>
+                    {% for cat in row %}
+                    <a class="pf-card" href="">
+                        <img src="{{ cat.icon.url }}" alt="{{ cat.name }}">
+                        <span>{{ cat.name }}</span>
                     </a>
-                {% endfor %}
+                    {% endfor %}
                 </div>
-            {% endfor %}
+                {% endfor %}
             </div>
 
             <div class="pf-grabber" aria-hidden="true"></div>
@@ -87,40 +86,39 @@
 <script>
     (() => {
         const header = document.querySelector('header');
-        const trigger = document.getElementById('pfOpen');      // <-- одно имя
         const panel = document.getElementById('pfPanel');
         const under = document.getElementById('pfUnderlay');
+        const trigger = document.getElementById('pfOpen');
 
         function place() {
-            const h = header?.getBoundingClientRect().height || 0;
-            under.style.top = h + 'px';
-            panel.style.height = `calc(100dvh - ${h}px)`;
-            under.style.height = `calc(100dvh - ${h}px)`;
+            const h = header.getBoundingClientRect().height || 0;
+            document.documentElement.style.setProperty('--header-h', `${h}px`);
         }
 
         function open() {
             place();
-            panel.hidden = false; under.hidden = false;
-            panel.getBoundingClientRect();                        // reflow
-            panel.classList.add('show'); under.classList.add('show');
+            under.classList.add('show');
+            requestAnimationFrame(() => panel.classList.add('show'));
         }
 
         function close() {
-            panel.classList.remove('show'); under.classList.remove('show');
-            const done = () => { panel.hidden = true; under.hidden = true; panel.removeEventListener('transitionend', done); };
-            panel.addEventListener('transitionend', done);
+            panel.classList.remove('show');
+            under.classList.remove('show');
         }
 
-        trigger.addEventListener('click', (e) => {
+        trigger.addEventListener('click', e => {
             e.preventDefault();
-            (panel.hidden || !panel.classList.contains('show')) ? open() : close();
+            panel.classList.contains('show') ? close() : open();
         });
 
         under.addEventListener('click', close);
-        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) close(); });
+        document.addEventListener('keydown', e => e.key === 'Escape' && close());
         window.addEventListener('resize', place);
+        place();
     })();
+
 </script>
+
 
 
 
