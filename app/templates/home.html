@@ -100,7 +100,7 @@
 
   <div class="cw-portfolio__grid">
     {% for cat in categories %}
-    <a class="liquidGlass-wrapper" href="#">
+    <a class="liquidGlass-wrapper" href="{% url 'portfolio' slug=cat.slug %}">
       <div class="liquidGlass-effect"></div>
       <div class="liquidGlass-tint"></div>
       <div class="liquidGlass-shine"></div>
