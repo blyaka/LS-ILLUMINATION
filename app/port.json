@@ -1,0 +1,112 @@
+[
+{
+  "model": "cases.category",
+  "pk": 1,
+  "fields": {
+    "slug": "oformlenie-gorodskih-prostranstv",
+    "name": "Оформление городских пространств",
+    "photo": "portfolio/icons/portfolio.jpg",
+    "icon": "portfolio/icons/city_space.png",
+    "order": 1
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 2,
+  "fields": {
+    "slug": "oformlenie-fasadov-zdanij",
+    "name": "Оформление фасадов зданий",
+    "photo": "portfolio/icons/portfolio_CqYMJv9.jpg",
+    "icon": "portfolio/icons/facades.png",
+    "order": 3
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 3,
+  "fields": {
+    "slug": "svetovye-potolki-i-shatry",
+    "name": "Световые потолки и шатры",
+    "photo": "portfolio/icons/portfolio_opD3wH5.jpg",
+    "icon": "portfolio/icons/tents.png",
+    "order": 2
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 4,
+  "fields": {
+    "slug": "proekcionnaya-podsvetka-zdanij",
+    "name": "Проекционная подсветка зданий",
+    "photo": "portfolio/icons/portfolio_5J7N9Jr.jpg",
+    "icon": "portfolio/icons/projection.png",
+    "order": 4
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 5,
+  "fields": {
+    "slug": "konturnaya-podsvetka-zdanij",
+    "name": "Контурная подсветка зданий",
+    "photo": "portfolio/icons/portfolio_Hhuzw5L.jpg",
+    "icon": "portfolio/icons/contour.png",
+    "order": 5
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 6,
+  "fields": {
+    "slug": "obemno-prostranstvennye-konstrukcii",
+    "name": "Объемно-пространственные конструкции",
+    "photo": "portfolio/icons/portfolio_H8dxvr0.jpg",
+    "icon": "portfolio/icons/3d_struct.png",
+    "order": 6
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 7,
+  "fields": {
+    "slug": "konsoli-i-peretyazhki",
+    "name": "Консоли и перетяжки",
+    "photo": "portfolio/icons/portfolio_2Dg5W05.jpg",
+    "icon": "portfolio/icons/consoles.png",
+    "order": 7
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 8,
+  "fields": {
+    "slug": "kineticheskie-sistemy",
+    "name": "Кинетические системы",
+    "photo": "portfolio/icons/portfolio_6XUgIcA.jpg",
+    "icon": "portfolio/icons/kinetic.png",
+    "order": 8
+  }
+},
+{
+  "model": "cases.category",
+  "pk": 9,
+  "fields": {
+    "slug": "oformlenie-elej",
+    "name": "Оформление елей",
+    "photo": "portfolio/icons/portfolio_b1WbGFz.jpg",
+    "icon": "portfolio/icons/trees.png",
+    "order": 9
+  }
+},
+{
+  "model": "cases.case",
+  "pk": 1,
+  "fields": {
+    "category": 1,
+    "slug": "kreml",
+    "name": "Кремль",
+    "photo": "portfolio/cases/logo.png",
+    "order": 0
+  }
+}
+]
