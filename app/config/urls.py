@@ -7,6 +7,8 @@ from django.urls import path, include
 
 from django.shortcuts import render
 
+handler404 = 'pages.views.Custom404'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('profile/', include('accounts.urls')),
