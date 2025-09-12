@@ -4,6 +4,8 @@ from django.utils.text import slugify
 class Category(models.Model):
     slug = models.SlugField('Слаг', max_length=120, unique=True)
     name = models.CharField('Название', max_length=120)
+    photo = models.ImageField('Фото', upload_to='portfolio/icons/', blank=True)
+    icon = models.ImageField('Иконка', upload_to='portfolio/icons/', blank=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -21,7 +23,7 @@ class Case(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='cases', verbose_name='Категория')
     slug = models.SlugField('Слаг', max_length=120, unique=True)
     name = models.CharField('Название', max_length=120)
-    photo = models.ImageField('Фото', upload_to='cases/')
+    photo = models.ImageField('Фото', upload_to='portfolio/cases/')
     order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
 
     class Meta:

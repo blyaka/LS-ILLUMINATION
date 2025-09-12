@@ -10,7 +10,7 @@
   {% if hero_video %}
   <video id="heroVideo" class="ls-hero__media"
         {% if hero_video.poster %}poster="{{ hero_video.poster.url }}"{% endif %}
-        muted loop playsinline preload="none"></video>
+        muted loop playsinline></video>
 
   <script src="{% static 'vendor/hls/hls.min.js' %}"></script>
   <script>
