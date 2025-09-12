@@ -69,108 +69,20 @@
     <h2 class="cw-portfolio__title">Портфолио</h2>
 
     <div class="cw-portfolio__grid">
-      <!-- Карточка -->
+      {% for cat in categories %}
       <a class="p-card" href="#">
         <figure class="p-card__inner">
           <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+            <img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />
           </div>
           <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
+            <span>{{ cat.first_word }}</span>
+            <small>{{ cat.rest_words }}</small>
           </figcaption>
         </figure>
       </a>
+      {% endfor %}
 
-      <!-- продублируй/сгенерируй 9 шт. -->
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
-      <a class="p-card" href="#">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-          </div>
-          <figcaption class="p-card__cap">
-            <span>Оформление</span>
-            <small>городских пространств</small>
-          </figcaption>
-        </figure>
-      </a>
     </div>
   </section>
 

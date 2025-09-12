@@ -1,12 +1,25 @@
 from django.shortcuts import render
 from content.models import Video
+from cases.models import Category
 from django.utils import timezone
 
 
 def HomePage(request):
+    categories = Category.objects.all()
+    for cat in categories:
+        words = cat.name.split()
+        cat.first_word = words[0]
+        cat.rest_words = " ".join(words[1:]) if len(words) > 1 else ""
+
     hero = Video.objects.filter(status='ready', is_featured=True).first()
     more = Video.objects.filter(status='ready', is_featured=False).order_by('-created')
-    return render(request, 'home.html', {'hero_video': hero, 'more_videos': more})
+
+    ctx = {'hero_video': hero,
+           'more_videos': more,
+           'categories': categories,
+        }
+
+    return render(request, 'home.html', ctx)
 
 
 def AboutPage(request):

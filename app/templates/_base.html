@@ -1,4 +1,6 @@
 {% load static %}
+{% load categories_tags %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -47,40 +49,18 @@
     <section class="pf-panel" id="pfPanel" role="dialog" aria-modal="true" hidden>
         <div class="pf-panel__glass">
             <div class="pf-grid">
-                <div class="pf-grid pf-grid--5">
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/city_space.png' %}"
-                            alt=""><span>Оформление
-                            городских пространств</span></a>
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/tents.png' %}"
-                            alt=""><span>Световые потолки
-                            и шатры</span></a>
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/facades.png' %}"
-                            alt=""><span>Оформление
-                            фасадов зданий</span></a>
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/projection.png' %}"
-                            alt=""><span>Проекционная
-                            подсветка зданий</span></a>
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/contour.png' %}"
-                            alt=""><span>Контурная
-                            подсветка зданий</span></a>
+            {% for row in categories|chunk_categories %}
+                <div class="pf-grid pf-grid--{{ row|length }}">
+                {% for cat in row %}
+                    <a class="pf-card" href="#">
+                    <img src="{{ cat.icon.url }}" alt="{{ cat.name }}">
+                    <span>{{ cat.name }}</span>
+                    </a>
+                {% endfor %}
                 </div>
-
-                <div class="pf-grid pf-grid--4">
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/3d_struct.png' %}"
-                            alt=""><span>Объёмно-пространственные конструкции</span></a>
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/consoles.png' %}"
-                            alt=""><span>Консоли
-                            и
-                            перетяжки</span></a>
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/kinetic.png' %}"
-                            alt=""><span>Кинетические
-                            системы</span></a>
-                    <a class="pf-card" href="#"><img src="{% static 'images/portfolio/trees.png' %}"
-                            alt=""><span>Оформление
-                            елей</span></a>
-
-                </div>
+            {% endfor %}
             </div>
+
             <div class="pf-grabber" aria-hidden="true"></div>
         </div>
     </section>

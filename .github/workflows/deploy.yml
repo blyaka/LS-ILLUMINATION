@@ -42,3 +42,4 @@ jobs:
             cd /var/www/ls-illumination
             docker compose pull web
             docker compose up -d web
+            docker image prune -f
