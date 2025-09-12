@@ -15,7 +15,6 @@ urlpatterns = [
     path('', include('content.urls')),
     path('', include('pages.urls')),
     path('404/', lambda request: render(request, '404.html'), name='404'),
-    path('portfolio/', lambda request: render(request, 'portfolio.html'), name='portfolio'),
 ]
 
 

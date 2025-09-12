@@ -16,6 +16,13 @@ def AboutPage(request):
 
     return render(request, 'about.html', ctx)
 
+def PortfolioPage(request):
+    ctx = {
+        "today": timezone.now(),
+    }
+
+    return render(request, 'portfolio.html', ctx)
+
 
 
 def Custom404(request, exception):

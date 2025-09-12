@@ -21,10 +21,8 @@
     function playNative(){ el.src = src; }
 
     if (el.canPlayType('application/vnd.apple.mpegurl')) {
-      // Safari/iOS — умеют HLS сами
       playNative();
     } else if (window.Hls && Hls.isSupported()) {
-      // Chrome/Firefox через hls.js
       const h = new Hls({maxBufferLength: 10});
       h.loadSource(src);
       h.attachMedia(el);
