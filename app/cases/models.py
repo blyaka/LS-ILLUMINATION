@@ -6,8 +6,10 @@ class Category(models.Model):
     name = models.CharField('Название', max_length=120)
     photo = models.ImageField('Фото', upload_to='portfolio/icons/', blank=True)
     icon = models.ImageField('Иконка', upload_to='portfolio/icons/', blank=True)
+    order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
 
     class Meta:
+        ordering = ['order']
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 

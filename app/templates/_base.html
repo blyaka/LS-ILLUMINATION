@@ -51,7 +51,7 @@
                 {% for row in categories|chunk_categories %}
                 <div class="pf-grid pf-grid--{{ row|length }}">
                     {% for cat in row %}
-                    <a class="pf-card" href="">
+                    <a class="pf-card" href="{% url 'portfolio' slug=cat.slug %}">
                         <img src="{{ cat.icon.url }}" alt="{{ cat.name }}">
                         <span>{{ cat.name }}</span>
                     </a>

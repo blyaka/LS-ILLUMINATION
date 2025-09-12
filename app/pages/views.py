@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from content.models import Video
-from cases.models import Category
+from cases.models import Category, Case
 from django.utils import timezone
 
 
 def HomePage(request):
-    categories = Category.objects.all()
+    categories = Category.objects.all().order_by("order")
     for cat in categories:
         words = cat.name.split()
         cat.first_word = words[0]
@@ -29,9 +29,14 @@ def AboutPage(request):
 
     return render(request, 'about.html', ctx)
 
-def PortfolioPage(request):
+def PortfolioPage(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    cases = category.cases.all().order_by("order")
+
     ctx = {
         "today": timezone.now(),
+        'category': category,
+        'cases': cases,
     }
 
     return render(request, 'portfolio.html', ctx)

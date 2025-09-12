@@ -1,6 +1,8 @@
 {% extends '_base.html' %}
 {% load static %}
 
+{% load categories_tags %}
+
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/portfolio.css' %}" />
 {% endblock %}
@@ -15,70 +17,30 @@
     </div>
 
     <div class="category-name">
-        <h1>Оформление городских пространств</h1>
+        <h1>{{ category.name }}</h1>
     </div>
 
     <div class="portfolio-grid">
+        {% for case in cases %}
         <a class="card" href="#">
             <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
+                <img src="{{case.photo.url}}" alt="{{case.name}}" />
             </div>
         </a>
+        {% endfor %}
 
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
 
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
-
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
-
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
-
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
-
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
-
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
-
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{% static 'images/portfolio.jpg' %}" alt="Оформление городских пространств" />
-            </div>
-        </a>
     </div>
 
+
+    {% next_category categories category as next_cat %}
+    {% if next_cat %}
     <div class="next-btn-container">
-        <a href="" class="next-btn">
+        <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn">
             <p>Следующая категория ></p>
         </a>
     </div>
+    {% endif %}
 
 </div>
 
