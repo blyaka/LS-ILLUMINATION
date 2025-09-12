@@ -40,7 +40,7 @@
                 <a href="{% url 'about' %}">О нас</a>
             </nav>
 
-            <a class="ls-cta" href="#request">Оставить заявку</a>
+            <a class="ls-cta" href="#" id="rqOpen">Оставить заявку</a>
         </div>
     </header>
 
@@ -80,40 +80,95 @@
         <a href="">by</a>
     </footer>
 
+
+
+    <div class="rq-underlay" id="rqUnderlay" hidden></div>
+    <section class="rq-modal" id="rqModal" role="dialog" aria-modal="true" aria-labelledby="rqTitle" hidden>
+        <div class="rq-card">
+            <button class="rq-close" type="button" id="rqClose" aria-label="Закрыть">×</button>
+            <h2 class="rq-title" id="rqTitle">Напишите нам</h2>
+
+            <form class="rq-form" method="post" action="#">
+                <div class="rq-row rq-row--3">
+                    <label class="rq-field">
+                        <span>Ваше имя*</span>
+                        <input type="text" name="name" required>
+                    </label>
+                    <label class="rq-field">
+                        <span>Телефон*</span>
+                        <input type="tel" name="phone" inputmode="tel" placeholder="+7">
+                    </label>
+                    <label class="rq-field">
+                        <span>E-mail</span>
+                        <input type="email" name="email">
+                    </label>
+                </div>
+
+                <label class="rq-field rq-field--area">
+                    <span>Сообщение</span>
+                    <textarea name="message" rows="4"></textarea>
+                </label>
+
+                <div class="rq-bottom">
+                    <label class="rq-check">
+                        <input type="checkbox" required>
+                        <i></i>
+                        <span>Нажимая кнопку отправить, вы соглашаетесь с политикой обработки персональных данных</span>
+                    </label>
+                    <button class="rq-submit" type="submit">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ===== Заявка (модалка) =====
+            const rqOpen = document.getElementById('rqOpen');
+            const rqModal = document.getElementById('rqModal');
+            const rqUnder = document.getElementById('rqUnderlay');
+            const rqClose = document.getElementById('rqClose');
+
+            const rqShow = () => {
+                rqUnder.hidden = false; rqModal.hidden = false;
+                rqModal.getBoundingClientRect();
+                rqUnder.classList.add('show');
+                rqModal.classList.add('show');
+                document.documentElement.classList.add('rq-lock');
+            };
+            const rqHide = () => {
+                rqUnder.classList.remove('show');
+                rqModal.classList.remove('show');
+                const done = () => { rqUnder.hidden = true; rqModal.hidden = true; rqModal.removeEventListener('transitionend', done); };
+                rqModal.addEventListener('transitionend', done);
+                document.documentElement.classList.remove('rq-lock');
+            };
+
+            rqOpen?.addEventListener('click', e => { e.preventDefault(); rqShow(); });
+            rqClose?.addEventListener('click', rqHide);
+            rqUnder?.addEventListener('click', rqHide);
+            document.addEventListener('keydown', e => e.key === 'Escape' && rqModal.classList.contains('show') && rqHide());
+
+            // ===== Портфолио (панель) =====
+            const pfOpen = document.getElementById('pfOpen');
+            const pfPanel = document.getElementById('pfPanel');
+            const pfUnder = document.getElementById('pfUnderlay');
+
+            const pfShow = () => { pfUnder.classList.add('show'); pfPanel.getBoundingClientRect(); pfPanel.classList.add('show'); };
+            const pfHide = () => { pfPanel.classList.remove('show'); pfUnder.classList.remove('show'); };
+
+            pfOpen?.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); });
+            pfUnder?.addEventListener('click', pfHide);
+            document.addEventListener('keydown', e => e.key === 'Escape' && pfHide());
+        });
+    </script>
+
+
+
+
+
 </body>
-
-
-<script>
-(() => {
-  const panel  = document.getElementById('pfPanel');
-  const under  = document.getElementById('pfUnderlay');
-  const trigger= document.getElementById('pfOpen');
-
-  function open() {
-    under.classList.add('show');
-    // reflow не обязателен, но оставлю, если анимация дёргалась
-    panel.getBoundingClientRect();
-    panel.classList.add('show');
-  }
-
-  function close() {
-    panel.classList.remove('show');
-    under.classList.remove('show');
-  }
-
-  trigger.addEventListener('click', e => {
-    e.preventDefault();
-    panel.classList.contains('show') ? close() : open();
-  });
-
-  under.addEventListener('click', close);
-  document.addEventListener('keydown', e => e.key === 'Escape' && close());
-})();
-</script>
-
-
-
-
-
 
 </html>

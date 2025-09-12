@@ -15,15 +15,15 @@
 }
 
 /* .liquidGlass-effect {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-
-  backdrop-filter: blur(1px);
-  filter: url(#glass-distortion);
-  overflow: hidden;
-  isolation: isolate;
-} */
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+    
+      backdrop-filter: blur(1px);
+      filter: url(#glass-distortion);
+      overflow: hidden;
+      isolation: isolate;
+    } */
 
 
 .liquidGlass-effect {
