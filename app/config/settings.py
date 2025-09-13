@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'cases',
     'content',
     'pages',
+    'reqs',
 ]
 
 
@@ -58,6 +59,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 "cases.context_processors.categories_list",
+                "reqs.context_processors.now_ts",
             ],
         },
     },
@@ -155,10 +157,17 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'admin@tuyana.ru'
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@your-domain.tld")
+EMAIL_BACKEND      = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST         = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT         = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER    = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD= os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS      = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("true", "1", "yes")
+EMAIL_USE_SSL      = os.environ.get("EMAIL_USE_SSL", "False").lower() in ("true", "1", "yes")
 
 
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB памяти до свопа на диск
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760

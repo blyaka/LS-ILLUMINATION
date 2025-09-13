@@ -1,0 +1,65 @@
+{% autoescape on %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Заявка с сайта {{ site }}</title>
+  <style>
+    /* инлайн-стили, совместимые с почтой */
+    .wrap{width:100%;background:#f5f7fb;padding:24px 12px;}
+    .card{max-width:640px;margin:0 auto;background:#ffffff;border-radius:14px;
+          box-shadow:0 8px 30px rgba(0,0,0,.06);overflow:hidden;border:1px solid #eef1f6;}
+    .head{padding:22px 24px;background:linear-gradient(135deg,#6a5cff,#c44fff);
+          color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+    .head h1{margin:0;font-size:20px;line-height:1.3;}
+    .sub{opacity:.9;font-size:13px;margin-top:6px}
+    .body{padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#111}
+    .row{display:flex;gap:10px;margin:0 0 12px 0}
+    .k{min-width:120px;color:#6b7280;font-size:13px}
+    .v{font-size:15px}
+    .msg{white-space:pre-wrap;border:1px solid #eef1f6;background:#fafbff;border-radius:10px;padding:14px;margin-top:6px}
+    .meta{margin-top:18px;color:#6b7280;font-size:12px}
+    .btns{margin-top:18px}
+    .btn{display:inline-block;padding:10px 16px;border-radius:10px;
+         background:#111;color:#fff !important;text-decoration:none}
+    .foot{padding:16px 24px;background:#f8f9fc;color:#6b7280;font-size:12px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    @media (max-width:480px){.k{min-width:96px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="head">
+        <h1>Новая заявка с {{ site }}</h1>
+        <div class="sub">{{ when|date:"d.m.Y H:i" }}</div>
+      </div>
+      <div class="body">
+        <div class="row"><div class="k">Имя</div><div class="v">{{ obj.name }}</div></div>
+        <div class="row"><div class="k">Телефон</div><div class="v">{{ obj.phone }}</div></div>
+        <div class="row"><div class="k">E-mail</div><div class="v">{{ obj.email|default:"—" }}</div></div>
+
+        <div class="row" style="margin-top:14px">
+          <div class="k">Сообщение</div>
+          <div class="v msg">{{ obj.message|default:"—" }}</div>
+        </div>
+
+        {% if obj.email %}
+        <div class="btns">
+          <a class="btn" href="mailto:{{ obj.email }}?subject=Re:%20Заявка%20с%20{{ site }}">Ответить клиенту</a>
+        </div>
+        {% endif %}
+
+        <div class="meta">
+          Это автоматическое уведомление. Ответьте клиенту, используя кнопку выше, или перешлите письмо коллеге.
+        </div>
+      </div>
+      <div class="foot">
+        © {{ when|date:"Y" }} {{ site }} • Уведомление о заявке
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+{% endautoescape %}

@@ -329,8 +329,11 @@
       <h2 class="ct-title">Мы на связи!</h2>
       <p class="ct-sub">Оставьте заявку или свяжитесь с нами</p>
 
-      <form class="ct-grid-last" method="post" action="#">
+      <form class="ct-grid-last" method="post" action="{% url 'req_submit' %}">
         {% csrf_token %}
+        <input type="hidden" name="hp" value="">
+        <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
+
         <label class="ct-field">
           <span>Ваше имя*</span>
           <input type="text" name="name" required>
@@ -343,7 +346,7 @@
 
         <label class="ct-field">
           <span>Ваш телефон*</span>
-          <input type="tel" name="phone" required>
+          <input type="tel" name="phone" inputmode="tel" placeholder="+7" required>
         </label>
 
         <label class="ct-area">
@@ -354,6 +357,15 @@
         <button class="ct-btn" type="submit">Оставить заявку</button>
       </form>
     </div>
+    <script>
+      (function(){
+        var f = document.querySelector('.ct-grid-last');
+        if (!f) return;
+        var ts = f.querySelector('input[name="ts"]');
+        if (ts && (!ts.value || ts.value === "0")) ts.value = Math.floor(Date.now()/1000);
+      })();
+    </script>
+
 
     <!-- Правая колонка: контакты -->
     <aside class="ct-info">

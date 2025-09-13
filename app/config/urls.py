@@ -14,6 +14,7 @@ urlpatterns = [
     path('profile/', include('accounts.urls')),
     path('', include('content.urls')),
     path('', include('pages.urls')),
+    path('reqs/', include('reqs.urls')),
     path('404/', lambda request: render(request, '404.html'), name='404'),
 ]
 
