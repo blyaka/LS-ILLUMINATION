@@ -13,13 +13,13 @@
 .page-title h1 {
     font-size: var(--font-h1);
     color: var(--text);
-    font-weight: 300;
+    font-weight: var(--font-weight-light);
 }
 
 .page-title p {
     font-size: var(--font-main);
     color: var(--muted);
-    font-weight: 300;
+    font-weight: var(--font-weight-light);
 }
 
 .category-name {
@@ -30,16 +30,16 @@
 }
 
 .category-name h1 {
-    font-size: 2.5rem;
+    font-size: 2.5rem; /* Поменять значение */
     color: var(--text);
     text-align: center;
-    font-weight: 300;
+    font-weight: var(--font-weight-light);
 }
 
 
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: var(--grid3-1);
     gap: clamp(16px, 2vw, 24px);
     margin: 0 auto;
 }
@@ -75,5 +75,5 @@
     font-size: var(--font-h2);
     text-decoration: none;
     color: var(--text);
-    font-weight: 300;
+    font-weight: var(--font-weight-light);
 }

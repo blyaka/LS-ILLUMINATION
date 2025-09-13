@@ -14,10 +14,15 @@
 
     --font-sans:  Helvetica, sans-serif;
 
+    --grid3-1: repeat(3, 1fr);
 
+
+    
     --font-h1: 2rem; 
     --font-h2: 1.75rem; 
     --font-h3: 1.5rem; 
     --font-main: 1rem; 
     --font-small: 0.75rem; 
+
+    --font-weight-light: 300;
 }

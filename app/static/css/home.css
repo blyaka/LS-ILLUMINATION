@@ -878,6 +878,8 @@
     mix-blend-mode: screen;
     pointer-events: none;
     z-index: -1;
+    width: 150%;
+    transform: translateX(-10%) rotate(180deg);
 }
 
 .cw-contacts__wrap {
