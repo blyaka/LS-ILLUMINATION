@@ -337,63 +337,92 @@
   </div>
 </section>
 
+
 <script>
 (() => {
-  const view = document.getElementById('trustView');
+  const view  = document.getElementById('trustView');
   const track = document.getElementById('trustTrack');
   if (!view || !track) return;
 
-  const cfg = { cols: 7, gap: 40, min: 180, max: 300, speed: 0.5 }; // px/кадр
-  let anim = 0, offset = 0, itemW = 0, gap = cfg.gap;
+  const cfg = { cols: 7, gap: 40, min: 180, max: 300, speed: 60 }; // px/СЕКУНДУ
+  let itemW = 0, gap = cfg.gap, stepLen = 0, baseCount = 0, setLen = 0, pad = 0;
+  let nodes = [];
+  const t0 = performance.now();
+
+  function makeLoop() {
+    const kids = Array.from(track.children);
+    baseCount = kids.length;                   // длина ОДНОГО набора
+    // тройная лента, чтобы «шов» всегда был далеко вне экрана
+    track.append(...kids.map(n => n.cloneNode(true)));
+    track.append(...kids.map(n => n.cloneNode(true)));
+    nodes = Array.from(track.children);
+  }
 
   function setSize() {
-    const pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
+    pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
     const vw = view.clientWidth - pad * 2;
-    // подгоняем ширину круга так, чтобы 7 штук + интервалы заняли 100%
+
     itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
     itemW = Math.max(cfg.min, Math.min(cfg.max, itemW));
-    // если не влезаем с min, снижаем gap
+
     const need = itemW * cfg.cols + gap * (cfg.cols - 1);
     if (need > vw) {
       gap = Math.max(12, gap - (need - vw) / (cfg.cols - 1));
       itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
     }
+
+    stepLen = itemW + gap;
+    setLen  = baseCount * stepLen;             // длина ОДНОГО набора (для модуля)
     view.style.setProperty('--item', itemW + 'px');
-    view.style.setProperty('--gap', gap + 'px');
+    view.style.setProperty('--gap',  gap + 'px');
+
+    nodes = Array.from(track.children);
   }
 
-  function makeLoop() {
-    // дубль набора для бесшовности
-    const kids = [...track.children];
-    track.append(...kids.map(n => n.cloneNode(true)));
-  }
+  function highlight() {
+    const vr = view.getBoundingClientRect();
+    const cx = vr.left + vr.width/2;
+    const sigma = stepLen * 0.9;
 
-  function step() {
-    offset -= cfg.speed;
-    const stepLen = itemW + gap;
-    if (offset <= -stepLen) {
-      offset += stepLen;
-      // перекидываем первый элемент в конец — равные интервалы сохраняются
-      const first = track.firstElementChild;
-      track.appendChild(first);
+    // READ: центры
+    const centers = nodes.map(el => {
+      const b = el.getBoundingClientRect();
+      return b.left + b.width/2;
+    });
+
+    // WRITE: стиль
+    for (let i=0;i<nodes.length;i++){
+      const el = nodes[i];
+      const d  = Math.abs(centers[i] - cx);
+      const f  = Math.exp(-(d*d) / (2*sigma*sigma));          // 0..1
+      const k  = 1 + (cfg.max / itemW - 1) * f;               // к 300 в центре
+      const extraPx = (k - 1) * itemW / 2;                    // компенсация gap
+
+      el.style.setProperty('--f', f.toFixed(4));
+      el.style.setProperty('--k', k.toFixed(4));
+      el.style.setProperty('--extra', extraPx.toFixed(2) + 'px');
     }
-    track.style.transform = `translateX(${offset}px)`;
-    anim = requestAnimationFrame(step);
   }
 
-  function start() { cancelAnimationFrame(anim); offset = 0; setSize(); step(); }
-  function onResize() { setSize(); }
+  function frame() {
+    const t = (performance.now() - t0) / 1000;                 // секунды
+    // непрерывное движение: оффсет = - (v * t) mod setLen
+    const offset = -((cfg.speed * t) % setLen);
+    track.style.transform = `translate3d(${offset}px,0,0)`;
+    highlight();
+    requestAnimationFrame(frame);
+  }
 
   makeLoop();
-  start();
-  addEventListener('resize', onResize, { passive: true });
+  setSize();
+  frame();
+  addEventListener('resize', setSize, { passive:true });
 
-  // пауза при ховере
-  view.addEventListener('mouseenter', () => cancelAnimationFrame(anim));
-  view.addEventListener('mouseleave', () => step());
+  // пауза при ховере (по желанию)
+  view.addEventListener('mouseenter', () => track.style.willChange = 'auto');
+  view.addEventListener('mouseleave', () => track.style.willChange = 'transform');
 })();
 </script>
-
 
 
 
