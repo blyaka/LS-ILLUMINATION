@@ -337,56 +337,101 @@
   </div>
 </section>
 
+
 <script>
 (() => {
-  const view = document.getElementById('trustView');
+  const view  = document.getElementById('trustView');
   const track = document.getElementById('trustTrack');
   if (!view || !track) return;
 
-  const cfg = { cols: 7, gap: 40, min: 180, max: 300, speed: 0.5 }; // px/кадр
+  const cfg = { cols: 7, gap: 40, min: 180, max: 300, speed: 0.6 }; // px/кадр
   let anim = 0, offset = 0, itemW = 0, gap = cfg.gap;
+  let stepLen = 0, halfLen = 0, pad = 0;
+  let nodes = [];
 
   function setSize() {
-    const pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
+    pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
     const vw = view.clientWidth - pad * 2;
-    // подгоняем ширину круга так, чтобы 7 штук + интервалы заняли 100%
+
+    // ширина базового шарика на ленте
     itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
     itemW = Math.max(cfg.min, Math.min(cfg.max, itemW));
-    // если не влезаем с min, снижаем gap
+
+    // если не влазит — ужимаем gap
     const need = itemW * cfg.cols + gap * (cfg.cols - 1);
     if (need > vw) {
       gap = Math.max(12, gap - (need - vw) / (cfg.cols - 1));
       itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
     }
+
+    stepLen = itemW + gap;
     view.style.setProperty('--item', itemW + 'px');
-    view.style.setProperty('--gap', gap + 'px');
+    view.style.setProperty('--gap',  gap + 'px');
+
+    // пересоберём список нод
+    nodes = Array.from(track.children);
+    // половина длины (т.к. лента удвоена)
+    halfLen = nodes.length/2 * stepLen;
   }
 
   function makeLoop() {
-    // дубль набора для бесшовности
-    const kids = [...track.children];
+    // удваиваем контент один раз, никаких перестановок больше
+    const kids = Array.from(track.children);
     track.append(...kids.map(n => n.cloneNode(true)));
+    nodes = Array.from(track.children);
+  }
+
+  // читаем сначала (read phase), потом пишем (write phase) — без дерга
+  function highlight() {
+    const vr = view.getBoundingClientRect();
+    const cx = vr.left + vr.width/2;
+
+    // ширина «магнита» — соседи тоже растут синхронно
+    // возьмем ~0.9 шага, можно подкрутить
+    const sigma = stepLen * 0.9;
+
+    // READ: позиции всех центров до записи стилей
+    const centers = nodes.map(el => {
+      const b = el.getBoundingClientRect();
+      return b.left + b.width/2;
+    });
+
+    // WRITE: выставляем стили
+    for (let i=0; i<nodes.length; i++){
+      const el = nodes[i];
+      const d  = Math.abs(centers[i] - cx);
+
+      const f = Math.exp(-(d*d) / (2*sigma*sigma));  // 0..1
+      const k = 1 + (cfg.max / itemW - 1) * f;       // от itemW к 300
+      const extraPx = (k - 1) * itemW / 2;           // точная компенсация в зазор
+
+      el.style.setProperty('--f', f.toFixed(4));
+      el.style.setProperty('--k', k.toFixed(4));
+      el.style.setProperty('--extra', extraPx.toFixed(2) + 'px');
+    }
   }
 
   function step() {
+    // READ-первой: рассчитываем «куда» едем (ещё ничего не пишем в DOM)
     offset -= cfg.speed;
-    const stepLen = itemW + gap;
-    if (offset <= -stepLen) {
-      offset += stepLen;
-      // перекидываем первый элемент в конец — равные интервалы сохраняются
-      const first = track.firstElementChild;
-      track.appendChild(first);
-    }
-    track.style.transform = `translateX(${offset}px)`;
+
+    // мягкий циклический сброс по половине длины (лента продублирована)
+    if (offset <= -halfLen) offset += halfLen;
+
+    // WRITE с одной записью transform (без перестановок DOM)
+    track.style.transform = `translate3d(${offset}px,0,0)`;
+
+    // подсветка/масштаб — через фактические центры этого кадра
+    highlight();
+
     anim = requestAnimationFrame(step);
   }
 
-  function start() { cancelAnimationFrame(anim); offset = 0; setSize(); step(); }
-  function onResize() { setSize(); }
+  function start(){ cancelAnimationFrame(anim); setSize(); step(); }
 
   makeLoop();
   start();
-  addEventListener('resize', onResize, { passive: true });
+  addEventListener('resize', setSize, { passive:true });
 
   // пауза при ховере
   view.addEventListener('mouseenter', () => cancelAnimationFrame(anim));
