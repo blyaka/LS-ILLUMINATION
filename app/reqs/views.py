@@ -19,13 +19,24 @@ RATE_PER_HOUR = 5
 WINDOW_SHORT = 30
 WINDOW_LONG = 3600
 
+# def _client_ip(request):
+#     xff = request.META.get('HTTP_X_FORWARDED_FOR')
+#     return xff.split(',')[0].strip() if xff else request.META.get('REMOTE_ADDR','0.0.0.0')
+
 def _client_ip(request):
+    ip = request.META.get('HTTP_X_REAL_IP')
+    if ip:
+        return ip.strip()
     xff = request.META.get('HTTP_X_FORWARDED_FOR')
-    return xff.split(',')[0].strip() if xff else request.META.get('REMOTE_ADDR','0.0.0.0')
+    if xff:
+        return xff.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '0.0.0.0')
 
 def _rate_key(ip, kind): return f'reqs:{kind}:{ip}'
 
 def _check_rate(ip):
+    if settings.DEBUG:
+        return True
     short_k = _rate_key(ip, '30s'); long_k = _rate_key(ip, '1h')
     short = cache.get(short_k, 0);   long  = cache.get(long_k, 0)
     if short >= RATE_PER_30S or long >= RATE_PER_HOUR: return False
@@ -38,6 +49,19 @@ def _recipients():
     if emails:
         return emails
     return getattr(settings, 'REQS_EMAILS', None) or [getattr(settings, 'DEFAULT_FROM_EMAIL')]
+
+
+import threading
+import logging
+from django.core.mail import EmailMultiAlternatives, get_connection
+
+log = logging.getLogger(__name__)
+
+def _send_async(message):
+    try:
+        message.send(fail_silently=False)
+    except Exception:
+        log.exception("Mail send failed")
 
 @require_POST
 def submit_request(request):
@@ -52,6 +76,7 @@ def submit_request(request):
     obj = form.save(commit=False)
     obj.save()
 
+    from django.contrib.sites.shortcuts import get_current_site
     site = get_current_site(request)
     ctx = {
         'obj': obj,
@@ -63,15 +88,20 @@ def submit_request(request):
     html = render_to_string('reqs/email_request.html', ctx)
     text = render_to_string('reqs/email_request.txt', ctx) or strip_tags(html)
 
+    conn = get_connection(timeout=settings.EMAIL_TIMEOUT)
     msg = EmailMultiAlternatives(
         subject=subject,
         body=text,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=_recipients(),
-        headers={'Reply-To': obj.email} if obj.email else None
+        headers={'Reply-To': obj.email} if obj.email else None,
+        connection=conn,
     )
     msg.attach_alternative(html, "text/html")
-    msg.send(fail_silently=False)
+
+    # не ждём SMTP — шлём в фоне
+    threading.Thread(target=_send_async, args=(msg,), daemon=True).start()
 
     back = request.META.get('HTTP_REFERER') or reverse('home')
     return redirect(back)
+
