@@ -321,6 +321,84 @@
 
 
 
+<section class="cw-trust" id="trust">
+  <h2 class="cw-trust__title">Нам доверяют</h2>
+
+  <div class="trust-view" id="trustView">
+    <div class="trust-track" id="trustTrack">
+      <div class="trust-item"><img src="{% static 'logos/moscow.png' %}" alt=""></div>
+      <div class="trust-item"><img src="{% static 'logos/spb.png' %}" alt=""></div>
+      <div class="trust-item is-active"><img src="{% static 'logos/khimki.png' %}" alt=""></div>
+      <div class="trust-item"><img src="{% static 'logos/klin.png' %}" alt=""></div>
+      <div class="trust-item"><img src="{% static 'logos/labytnangi.png' %}" alt=""></div>
+      <div class="trust-item"><img src="{% static 'logos/nadym.png' %}" alt=""></div>
+      <div class="trust-item"><img src="{% static 'logos/yao.png' %}" alt=""></div>
+    </div>
+  </div>
+</section>
+
+<script>
+(() => {
+  const view = document.getElementById('trustView');
+  const track = document.getElementById('trustTrack');
+  if (!view || !track) return;
+
+  const cfg = { cols: 7, gap: 40, min: 180, max: 300, speed: 0.5 }; // px/кадр
+  let anim = 0, offset = 0, itemW = 0, gap = cfg.gap;
+
+  function setSize() {
+    const pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
+    const vw = view.clientWidth - pad * 2;
+    // подгоняем ширину круга так, чтобы 7 штук + интервалы заняли 100%
+    itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
+    itemW = Math.max(cfg.min, Math.min(cfg.max, itemW));
+    // если не влезаем с min, снижаем gap
+    const need = itemW * cfg.cols + gap * (cfg.cols - 1);
+    if (need > vw) {
+      gap = Math.max(12, gap - (need - vw) / (cfg.cols - 1));
+      itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
+    }
+    view.style.setProperty('--item', itemW + 'px');
+    view.style.setProperty('--gap', gap + 'px');
+  }
+
+  function makeLoop() {
+    // дубль набора для бесшовности
+    const kids = [...track.children];
+    track.append(...kids.map(n => n.cloneNode(true)));
+  }
+
+  function step() {
+    offset -= cfg.speed;
+    const stepLen = itemW + gap;
+    if (offset <= -stepLen) {
+      offset += stepLen;
+      // перекидываем первый элемент в конец — равные интервалы сохраняются
+      const first = track.firstElementChild;
+      track.appendChild(first);
+    }
+    track.style.transform = `translateX(${offset}px)`;
+    anim = requestAnimationFrame(step);
+  }
+
+  function start() { cancelAnimationFrame(anim); offset = 0; setSize(); step(); }
+  function onResize() { setSize(); }
+
+  makeLoop();
+  start();
+  addEventListener('resize', onResize, { passive: true });
+
+  // пауза при ховере
+  view.addEventListener('mouseenter', () => cancelAnimationFrame(anim));
+  view.addEventListener('mouseleave', () => step());
+})();
+</script>
+
+
+
+
+
+
 <section class="cw-contacts" id="contacts" aria-label="Контакты">
 
   <div class="cw-contacts__wrap">

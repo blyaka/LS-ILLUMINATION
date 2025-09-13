@@ -855,6 +855,65 @@
 
 
 
+.cw-trust {
+    padding: 64px 0;
+    text-align: center
+}
+
+.cw-trust__title {
+    color: #fff;
+    margin: 0 96px 40px;
+    font-size: 28px;
+    text-align: left;
+}
+
+.trust-view {
+    --cols: 7;
+    /* всегда 7 на экране */
+    --gap: 40px;
+    /* одинаковые отступы */
+    --pad: clamp(16px, 6vw, 96px);
+    position: relative;
+    overflow: hidden;
+    padding: 0 var(--pad)
+}
+
+.trust-track {
+    display: flex;
+    gap: var(--gap);
+    will-change: transform;
+}
+
+.trust-item {
+    flex: 0 0 var(--item);
+    /* ширина задаётся скриптом так, чтобы ровно 7 влезло */
+    height: var(--item);
+    border-radius: 50%;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: transform .2s ease
+}
+
+.trust-item img {
+    max-width: 70%;
+    max-height: 70%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    display: block
+}
+
+.trust-item.is-active {
+    border: 3px solid #FF058E;
+    box-shadow: 0 0 24px rgba(255, 5, 142, .35), inset 0 10px 26px rgba(0, 0, 0, .45)
+}
+
+
+
+
+
 
 
 /* ===== Contacts ===== */
