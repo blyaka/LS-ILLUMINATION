@@ -319,6 +319,90 @@
   </script>
 </section>
 
+
+
+<section class="cw-contacts" id="contacts" aria-label="Контакты">
+
+  <div class="cw-contacts__wrap">
+    <!-- Левая колонка: форма -->
+    <div class="ct-form">
+      <h2 class="ct-title">Мы на связи!</h2>
+      <p class="ct-sub">Оставьте заявку или свяжитесь с нами</p>
+
+      <form class="ct-grid-last" method="post" action="#">
+        {% csrf_token %}
+        <label class="ct-field">
+          <span>Ваше имя*</span>
+          <input type="text" name="name" required>
+        </label>
+
+        <label class="ct-field">
+          <span>Ваш E-mail*</span>
+          <input type="email" name="email" required>
+        </label>
+
+        <label class="ct-field">
+          <span>Ваш телефон*</span>
+          <input type="tel" name="phone" required>
+        </label>
+
+        <label class="ct-area">
+          <span>Ваше сообщение</span>
+          <textarea name="message" rows="6" placeholder=""></textarea>
+        </label>
+
+        <button class="ct-btn" type="submit">Оставить заявку</button>
+      </form>
+    </div>
+
+    <!-- Правая колонка: контакты -->
+    <aside class="ct-info">
+      <ul class="ct-list">
+        <li>
+          <span class="ct-ico" aria-hidden="true">
+            <!-- phone -->
+            <svg viewBox="0 0 24 24"><path fill="currentColor"
+              d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1.5 1.5 0 011.5-.36 9.9 9.9 0 003.1.5 1.5 1.5 0 011.5 1.5V20a2 2 0 01-2 2A18 18 0 012 4a2 2 0 012-2h3.16A1.5 1.5 0 018.7 3.5a9.9 9.9 0 00.5 3.1 1.5 1.5 0 01-.36 1.5L6.6 10.8z"/></svg>
+          </span>
+          <a href="tel:+78126420365">+7 (812) 642-03-65</a>
+        </li>
+        <li>
+          <span class="ct-ico" aria-hidden="true">
+            <!-- mail -->
+            <svg viewBox="0 0 24 24"><path fill="currentColor"
+              d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 3.2l-8 5-8-5V6l8 5 8-5v1.2z"/></svg>
+          </span>
+          <a href="mailto:info@multidekor.ru">info@multidekor.ru</a>
+        </li>
+        <li>
+          <span class="ct-ico" aria-hidden="true">
+            <!-- pin -->
+            <svg viewBox="0 0 24 24"><path fill="currentColor"
+              d="M12 2a7 7 0 00-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 00-7-7zm0 9.5A2.5 2.5 0 119.5 9 2.5 2.5 0 0112 11.5z"/></svg>
+          </span>
+          г. Санкт-Петербург, улица Ломоносова, 28
+        </li>
+      </ul>
+
+      <div class="ct-hours">
+        <div class="ct-hours__ico" aria-hidden="true">
+          <!-- clock -->
+          <svg viewBox="0 0 24 24"><path fill="currentColor"
+            d="M12 1a11 11 0 1011 11A11 11 0 0012 1zm1 11H7V10h4V5h2z"/></svg>
+        </div>
+        <div class="ct-hours__text">
+          <div>Пн-Пт с 10:00 до 18:00</div>
+          <div class="muted">Сб-Вс — выходные дни</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+
+
+
+
 <script>
   (() => {
     const data = JSON.parse(document.getElementById('newsData').textContent);
