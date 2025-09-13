@@ -912,7 +912,7 @@
 
 
 /* новое */
-.trust-view{ position:relative; overflow:hidden; padding:0 var(--pad) }
+.trust-view{ position:relative; overflow:hidden; padding:100px var(--pad) }
 
 .trust-track{
   display:flex;
