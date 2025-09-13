@@ -20,6 +20,15 @@
         <h1>{{ category.name }}</h1>
     </div>
 
+    {% next_category categories category as next_cat %}
+    {% if next_cat %}
+    <div class="next-btn-container">
+        <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn">
+            <p>Следующая категория ></p>
+        </a>
+    </div>
+    {% endif %}
+
     <div class="portfolio-grid">
         {% for case in cases %}
         <a class="card" href="#">
@@ -31,16 +40,6 @@
 
 
     </div>
-
-
-    {% next_category categories category as next_cat %}
-    {% if next_cat %}
-    <div class="next-btn-container">
-        <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn">
-            <p>Следующая категория ></p>
-        </a>
-    </div>
-    {% endif %}
 
 </div>
 
