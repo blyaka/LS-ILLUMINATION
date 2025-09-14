@@ -507,28 +507,26 @@ view.addEventListener('mouseleave', ()=> { if (running) cfg.speed = 0.7 });
         <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
 
         <label class="ct-field">
-          <span>Ваше имя*</span>
-          <input type="text" name="name" required>
+          <input type="text" name="name" placeholder="Ваше имя*" required>
         </label>
 
         <label class="ct-field">
-          <span>Ваш E-mail*</span>
-          <input type="email" name="email" required>
+          <input type="email" name="email" placeholder="Ваш E-mail*" required>
         </label>
 
         <label class="ct-field">
-          <span>Ваш телефон*</span>
-          <input type="tel" name="phone" inputmode="tel" placeholder="+7" required>
+          <input type="tel" name="phone" inputmode="tel" placeholder="Ваш телефон*" required>
         </label>
 
         <label class="ct-area">
-          <span>Ваше сообщение</span>
-          <textarea name="message" rows="6" placeholder=""></textarea>
+          <textarea name="message" rows="6" placeholder="Ваше сообщение"></textarea>
         </label>
 
         <button class="ct-btn" type="submit">Оставить заявку</button>
       </form>
     </div>
+
+
     <script>
       (function(){
         var f = document.querySelector('.ct-grid-last');
