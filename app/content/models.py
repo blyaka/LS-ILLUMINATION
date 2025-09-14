@@ -1,6 +1,6 @@
 import os, uuid, json, threading, subprocess, shlex
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.conf import settings
 from django.utils import timezone
 from django.utils.module_loading import import_string
