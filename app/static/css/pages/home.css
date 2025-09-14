@@ -541,7 +541,7 @@
     position: absolute;
     right: 64px;
     bottom: 0px;
-    width: min(320px, 28vw);
+    width: min(250px, 28vw);
     height: auto;
     opacity: 0;
     transform: translateY(16px);
