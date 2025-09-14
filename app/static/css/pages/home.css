@@ -302,7 +302,7 @@
 }
 
 .cw-videos {
-    padding: 22px 96px;
+    padding: 96px;
 }
 
 .cw-videos__title {
@@ -310,7 +310,7 @@
     font-size: clamp(1.6rem, 1.2rem + 2vw, 2rem);
     text-align: left;
     max-width: 1280px;
-    padding: 98px 74px 33px;
+    padding: 0px 74px 33px;
 }
 
 .cw-videos__grid {
