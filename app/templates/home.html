@@ -352,10 +352,18 @@
 
 function dupOnce(){
   const kids = Array.from(track.children);
-  // было: одна копия
-  // стало: 20 копий подряд — длинная лента
   for (let t=0; t<20; t++) track.append(...kids.map(n => n.cloneNode(true)));
   nodes = Array.from(track.children);
+}
+
+let M = 0, idxH = -1;
+function findKhimki(){
+  const kids = Array.from(track.children);
+  M = kids.length/2;
+  for (let i=0;i<M;i++){
+    const img = kids[i].querySelector('img');
+    if (img && /khimki/i.test(img.src)) { idxH = i; break; }
+  }
 }
 
   function setSize(){
@@ -373,7 +381,7 @@ function dupOnce(){
     }
 
     step = itemW + gap;
-    cycleLen = nodes.length/2 * step; // длина одной копии
+    cycleLen = nodes.length/2 * step;
 
     view.style.setProperty('--item', itemW + 'px');
     view.style.setProperty('--gap',  gap   + 'px');
@@ -384,20 +392,18 @@ function paint(){
   const sigma = step * 0.9;
   const kMax  = cfg.max / itemW;
 
-  const M = nodes.length / 2;           // логическая длина (до дублирования)
+  const M = nodes.length / 2;
 
-  // 1) считаем extra для ОДНОЙ логической петли (динамическая длина цикла)
   let sumExtra = 0;
   for (let j=0; j<M; j++){
     const center = offset + j*step + itemW/2;
     const d = Math.abs(center - cx);
     const f = Math.exp(-(d*d)/(2*sigma*sigma));
     const k = 1 + (kMax - 1) * f;
-    sumExtra += (k - 1) * itemW / 2;          // extra_j
+    sumExtra += (k - 1) * itemW / 2;
   }
-  const liveCycleLen = M * (itemW + gap) + 2 * sumExtra;  // реальная длина петли
+  const liveCycleLen = M * (itemW + gap) + 2 * sumExtra;
 
-  // 2) выставляем k/extra/b всем нодам (обеим копиям)
   for (let i=0;i<nodes.length;i++){
     const center = offset + i*step + itemW/2;
     const d = Math.abs(center - cx);
@@ -411,25 +417,88 @@ function paint(){
     nodes[i].style.setProperty('--b', b.toFixed(4));
   }
 
-  // вернём актуальную длину — пригодится в frame()
   return liveCycleLen;
 }
 
+
 function frame(){
   offset -= cfg.speed;
-  track.style.transform = `translate3d(${offset}px,0,0)`;
-  paint();
-  requestAnimationFrame(frame);
+
+  // безопасный wrap по базовой длине копии, как у тебя
+  const L0 = (nodes.length/2) * step;
+  const cx = view.clientWidth/2;
+  const centerIdx = Math.round((cx - offset - itemW/2) / step) % M;
+  const norm = (centerIdx + M) % M;
+  const safe = (idxH === -1) || (Math.abs(norm - idxH) > 2 && Math.abs(norm - (idxH+M)) > 2);
+  if (offset <= -L0 && safe) offset += L0;
+
+  // один раз за кадр считаем k/extra/b и получаем реальную длину
+  const liveLen = paint();
+
+  // лёгкий снап и один transform за кадр
+  const x = Math.round(offset * 60) / 60;
+  track.style.transform = `translate3d(${x}px,0,0)`;
+
+  raf = requestAnimationFrame(frame);
 }
 
-  dupOnce();
-  setSize();
-  view.style.setProperty('--max', cfg.max + 'px');
-  frame();
 
-  addEventListener('resize', setSize, {passive:true});
-  view.addEventListener('mouseenter', ()=> cfg.speed = 0);
-  view.addEventListener('mouseleave', ()=> cfg.speed = 0.7);
+
+dupOnce();
+findKhimki();
+setSize();
+view.style.setProperty('--max', cfg.max + 'px');
+
+const BASE_SPEED = 0.7; // фикс
+
+let raf = 0, running = false;
+function start(){
+  if (running) return;
+  running = true;
+  cfg.speed = BASE_SPEED;  // всегда одна и та же
+  offset = 0;              // чистый старт
+  raf = requestAnimationFrame(frame);
+}
+function stop(){
+  if (!running) return;
+  running = false;
+  cancelAnimationFrame(raf);
+  raf = 0;
+  cfg.speed = BASE_SPEED;  // сбросить на всякий
+}
+
+// наблюдаем блок: за 300px до появления — старт, ушёл — стоп
+const io = new IntersectionObserver((entries)=>{
+  for (const e of entries){
+    if (e.isIntersecting) start();
+    else stop();
+  }
+}, { root:null, rootMargin:'300px 0px 300px 0px', threshold:0 });
+io.observe(view);
+
+// если вкладка скрыта — стоп, вернулся и блок рядом — старт
+document.addEventListener('visibilitychange', ()=>{
+  if (document.hidden) return stop();
+  const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
+  if (r.top < vh + 300 && r.bottom > -300) start();
+});
+
+// ресайз просто обновляет размеры (анимация продолжится сама если запущена)
+addEventListener('resize', setSize, {passive:true});
+
+
+
+// ховер-пауза (возвращаем ровно базовую скорость)
+view.addEventListener('mouseenter', ()=> { if (running) cfg.speed = 0 });
+view.addEventListener('mouseleave', ()=> { if (running) cfg.speed = 0.7 });
+
+// первый запуск если блок уже в зоне
+(() => {
+  const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
+  if (r.top < vh + 300 && r.bottom > -300) start();
+})();
+
+
 })();
 </script>
 
