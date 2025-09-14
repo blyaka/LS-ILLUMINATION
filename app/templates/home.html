@@ -178,35 +178,29 @@
         const url = String(src || '').trim();
         if (!url) return resolve(false);
 
-        // cleanup
         try { player.pause(); } catch { }
         if (hls) { try { hls.destroy(); } catch { } hls = null; }
         player.removeAttribute('src'); player.load();
 
-        // постер пока оставляем, уберём на первом кадре
         if (poster) player.setAttribute('poster', poster); else player.removeAttribute('poster');
 
-        // общий «готово»
         const onReady = () => {
-          // снимем постер как только пошёл первый кадр
           const onPlaying = () => { player.removeAttribute('poster'); player.removeEventListener('playing', onPlaying); };
           player.addEventListener('playing', onPlaying, { once: true });
           resolve(true);
         };
 
-        // нативный HLS (Safari)
         if (player.canPlayType('application/vnd.apple.mpegurl')) {
           player.src = url;
           player.addEventListener('canplay', onReady, { once: true });
           return;
         }
 
-        // hls.js
         if (window.Hls && Hls.isSupported()) {
           hls = new Hls({ maxBufferLength: 10, autoStartLoad: true });
           hls.on(Hls.Events.MANIFEST_PARSED, onReady);
           hls.on(Hls.Events.ERROR, (ev, data) => {
-            // фатальные ошибки — попробуем мягко рестартнуть
+
             if (data?.fatal) {
               switch (data.type) {
                 case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break;
@@ -220,7 +214,6 @@
           return;
         }
 
-        // фолбэк (только там, где HLS нативен)
         player.src = url;
         player.addEventListener('canplay', onReady, { once: true });
       });
@@ -234,7 +227,6 @@
       const ready = await attach(src, poster);
       if (!ready) return;
 
-      // старт после готовности — теперь не залипает на постере
       player.muted = true;
       try { await player.play(); } catch { }
     }
@@ -247,7 +239,6 @@
       document.body.style.overflow = '';
     }
 
-    // открытие
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.v-card');
       if (btn && btn.dataset.src) {
@@ -257,12 +248,10 @@
       if (e.target.hasAttribute('data-close')) close();
     });
 
-    // esc
     document.addEventListener('keydown', (e) => {
       if (!modal.hidden && e.code === 'Escape') close();
     });
 
-    // клик по бэкдропу
     modal.addEventListener('click', (e) => {
       if (e.target.hasAttribute('data-close')) close();
     });
@@ -356,7 +345,7 @@
       <img id="newsPrevImg" src="{% static 'images/portfolio.jpg' %}" alt="">
     </figure>
 
-    <!-- Центральная карточка (Всегда на месте) -->
+    <!-- Центральная карточка -->
     <article class="news-main" aria-live="polite">
       <figure class="news-main__media">
         <span class="news-date" id="newsDate">{{ news.0.created_at|date:"d E Y"|upper }}</span>
@@ -522,7 +511,6 @@
     function frame() {
       offset -= cfg.speed;
 
-      // безопасный wrap по базовой длине копии, как у тебя
       const L0 = (nodes.length / 2) * step;
       const cx = view.clientWidth / 2;
       const centerIdx = Math.round((cx - offset - itemW / 2) / step) % M;
@@ -530,10 +518,8 @@
       const safe = (idxH === -1) || (Math.abs(norm - idxH) > 2 && Math.abs(norm - (idxH + M)) > 2);
       if (offset <= -L0 && safe) offset += L0;
 
-      // один раз за кадр считаем k/extra/b и получаем реальную длину
       const liveLen = paint();
 
-      // лёгкий снап и один transform за кадр
       const x = Math.round(offset * 60) / 60;
       track.style.transform = `translate3d(${x}px,0,0)`;
 
@@ -547,14 +533,14 @@
     setSize();
     view.style.setProperty('--max', cfg.max + 'px');
 
-    const BASE_SPEED = 0.7; // фикс
+    const BASE_SPEED = 0.7;
 
     let raf = 0, running = false;
     function start() {
       if (running) return;
       running = true;
-      cfg.speed = BASE_SPEED;  // всегда одна и та же
-      offset = 0;              // чистый старт
+      cfg.speed = BASE_SPEED;
+      offset = 0;
       raf = requestAnimationFrame(frame);
     }
     function stop() {
@@ -562,10 +548,9 @@
       running = false;
       cancelAnimationFrame(raf);
       raf = 0;
-      cfg.speed = BASE_SPEED;  // сбросить на всякий
+      cfg.speed = BASE_SPEED;
     }
 
-    // наблюдаем блок: за 300px до появления — старт, ушёл — стоп
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (e.isIntersecting) start();
@@ -574,23 +559,18 @@
     }, { root: null, rootMargin: '300px 0px 300px 0px', threshold: 0 });
     io.observe(view);
 
-    // если вкладка скрыта — стоп, вернулся и блок рядом — старт
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) return stop();
       const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
       if (r.top < vh + 300 && r.bottom > -300) start();
     });
 
-    // ресайз просто обновляет размеры (анимация продолжится сама если запущена)
     addEventListener('resize', setSize, { passive: true });
 
 
-
-    // ховер-пауза (возвращаем ровно базовую скорость)
     view.addEventListener('mouseenter', () => { if (running) cfg.speed = 0 });
     view.addEventListener('mouseleave', () => { if (running) cfg.speed = 0.7 });
 
-    // первый запуск если блок уже в зоне
     (() => {
       const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
       if (r.top < vh + 300 && r.bottom > -300) start();
@@ -617,7 +597,7 @@
         <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
 
         <label class="ct-field">
-          <input type="text" name="name" placeholder="Ваше имя*" required>
+          <input id="name-bot" type="text" name="name" placeholder="Ваше имя*" required>
         </label>
 
         <label class="ct-field">
@@ -625,7 +605,7 @@
         </label>
 
         <label class="ct-field">
-          <input type="tel" name="phone" inputmode="tel" placeholder="Ваш телефон*" required>
+          <input id="phone-bot" type="tel" name="phone" inputmode="tel" placeholder="Ваш телефон*" required>
         </label>
 
         <label class="ct-area">
@@ -646,6 +626,49 @@
       })();
     </script>
 
+<script>
+(() => {
+  const n = document.getElementById('name-bot');
+
+  n.addEventListener('input', () => {
+    n.value = n.value.replace(/[0-9]/g, '');
+  });
+})();
+</script>
+
+
+<script>
+(() => {
+  const input = document.getElementById('phone-bot');
+
+  input.addEventListener('input', () => {
+    let v = input.value.replace(/\D/g, '');
+    if (!v) { input.value = ''; return; }
+
+    if (v[0] === '7') {
+      v = '7' + v.slice(1);
+      input.value = format(v, true);
+    }
+    else if (v[0] === '8') {
+      input.value = format(v, false);
+    }
+    else {
+      input.value = format(v, true);
+    }
+  });
+
+  function format(digits, plus) {
+    const p = digits.padEnd(11, '_').slice(0, 11);
+    const part1 = p.slice(1, 4);
+    const part2 = p.slice(4, 7);
+    const part3 = p.slice(7, 9);
+    const part4 = p.slice(9, 11);
+
+    return (plus ? '+7' : '8') +
+      ` (${part1}) ${part2}-${part3}-${part4}`.replace(/[_-]+$/,'');
+  }
+})();
+</script>
 
     <!-- Правая колонка: контакты -->
     <aside class="ct-info">
@@ -762,7 +785,6 @@
       if (e.target.hasAttribute('data-close')) closeModal();
     });
 
-    // ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !modal.hidden) closeModal();
     });
@@ -779,10 +801,8 @@
     const open = (sel) => {
       const m = document.querySelector(sel)
       if (!m) return
-      // пауза превью
       const prev = document.getElementById('sdPreview')
       prev && prev.pause()
-      // открыть модалку
       m.hidden = false
       document.body.style.overflow = 'hidden'
       const full = document.getElementById('sdFull')
@@ -792,11 +812,10 @@
     const close = (m) => {
       const full = document.getElementById('sdFull')
       if (full) {
-        full.pause() /* full.currentTime = 0; */
+        full.pause()
       }
       m.hidden = true
       document.body.style.overflow = ''
-      // возобновим превью
       const prev = document.getElementById('sdPreview')
       prev && prev.play().catch(() => { })
     }
@@ -816,7 +835,6 @@
       if (e.key === 'Escape' && m && !m.hidden) close(m)
     })
 
-    // пауза превью, когда секция вне вьюпорта
     const io = new IntersectionObserver(
       ([ent]) => {
         const v = document.getElementById('sdPreview')
@@ -849,8 +867,8 @@
       let tgt = 0, cur = 0, raf = 0, last = -1;
 
       const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-      const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;      // easeInOut
-      const smooth = (a, b, t) => clamp((t - a) / (b - a), 0, 1);           // smoothstep 0..1
+      const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const smooth = (a, b, t) => clamp((t - a) / (b - a), 0, 1);
 
       function resize() {
         c.width = Math.floor(innerWidth * d);
@@ -885,35 +903,30 @@
       }
 
       function updateOverlay(p) {
-        // движение текста: вправо + вверх
         const t = ease(p);
-        const moveX = innerWidth * 0.66;   // насколько уедет по X
-        const moveY = innerHeight * 0.32;  // насколько поднимется по Y
+        const moveX = innerWidth * 0.66;
+        const moveY = innerHeight * 0.32;
         copy.style.transform = `translate(${moveX * t}px, ${-moveY * t}px)`;
 
-        // артикул: слева гаснет 40–55%, справа появляется 55–70%
         artL.style.opacity = 1 - smooth(0.40, 0.55, p);
         artR.style.opacity = smooth(0.55, 0.70, p);
 
-        // схема: появляется внизу справа на 80–95%
         const vis = smooth(0.80, 0.95, p);
         scheme.style.opacity = vis;
         scheme.style.transform = `translateY(${16 * (1 - vis)}px)`;
 
-        // абзац к финалу выравниваем по правому краю
         <!-- desc.style.textAlign = p > 0.88 ? 'right' : 'left'; -->
       }
 
 
       function loop() {
         raf = 0;
-        cur += (tgt - cur) * 0.2;     // плавное, но без «мыла»
+        cur += (tgt - cur) * 0.2;
         snap(cur);
         updateOverlay(cur / (N - 1));
         if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(loop);
       }
 
-      // preload
       G[0] = new Image(); G[0].src = U(0); G[0].onload = () => { snap(0); updateOverlay(0); };
       for (let i = 1; i < N; i++) { G[i] = new Image(); G[i].decoding = 'async'; G[i].src = U(i); }
 

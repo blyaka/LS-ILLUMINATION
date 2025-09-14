@@ -104,7 +104,6 @@
             const accept = document.getElementById('cookieAccept');
             const decline = document.getElementById('cookieDecline');
 
-            // проверка сохранённых настроек
             if (!localStorage.getItem('cookieConsent')) {
                 banner.hidden = false;
             }
@@ -137,11 +136,11 @@
                 <div class="rq-row rq-row--3">
                     <label class="rq-field">
                         <span>Ваше имя*</span>
-                        <input type="text" name="name" required>
+                        <input type="text" name="name" id="rqName" required>
                     </label>
                     <label class="rq-field">
                         <span>Телефон*</span>
-                        <input type="tel" name="phone" inputmode="tel" placeholder="+7" required>
+                        <input type="tel" name="phone" inputmode="tel" placeholder="+7" id="rqPhone" required>
                     </label>
                     <label class="rq-field">
                         <span>E-mail</span>
@@ -166,8 +165,45 @@
         </div>
     </section>
 
+
+<script>
+(() => {
+  const nameInput = document.getElementById('rqName');
+  const phoneInput = document.getElementById('rqPhone');
+
+  nameInput.addEventListener('input', () => {
+    nameInput.value = nameInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
+  });
+
+  phoneInput.addEventListener('input', () => {
+    let v = phoneInput.value.replace(/\D/g, '');
+    if (!v) { phoneInput.value = ''; return; }
+
+    if (v[0] === '7') {
+      v = '7' + v.slice(1);
+      phoneInput.value = format(v, true);
+    } else if (v[0] === '8') {
+      phoneInput.value = format(v, false);
+    } else {
+      phoneInput.value = format(v, true);
+    }
+  });
+
+  function format(d, plus) {
+    const p = d.padEnd(11, '_').slice(0, 11);
+    const part1 = p.slice(1, 4);
+    const part2 = p.slice(4, 7);
+    const part3 = p.slice(7, 9);
+    const part4 = p.slice(9, 11);
+
+    return (plus ? '+7' : '8') +
+      ` (${part1}) ${part2}-${part3}-${part4}`.replace(/[_-]+$/,'');
+  }
+})();
+</script>
+
+
     <script>
-        // подставим ts на клиенте, если не сделали это на сервере
         (function () {
             var ts = document.querySelector('form.rq-form input[name="ts"]');
             if (ts && (!ts.value || ts.value === "0")) ts.value = Math.floor(Date.now() / 1000);
@@ -216,7 +252,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // ===== Заявка (модалка) =====
             const rqOpen = document.getElementById('rqOpen');
             const rqModal = document.getElementById('rqModal');
             const rqUnder = document.getElementById('rqUnderlay');
@@ -242,7 +277,6 @@
             rqUnder?.addEventListener('click', rqHide);
             document.addEventListener('keydown', e => e.key === 'Escape' && rqModal.classList.contains('show') && rqHide());
 
-            // ===== Портфолио (панель) =====
             const pfOpen = document.getElementById('pfOpen');
             const pfPanel = document.getElementById('pfPanel');
             const pfUnder = document.getElementById('pfUnderlay');
@@ -254,12 +288,10 @@
             pfUnder?.addEventListener('click', pfHide);
             document.addEventListener('keydown', e => e.key === 'Escape' && pfHide());
 
-
-            // === Контакты ===
             const ctOpen = document.getElementById('ctOpen');
             const ctModal = document.getElementById('ctModal');
             const ctClose = document.getElementById('ctClose');
-            const under = document.getElementById('rqUnderlay'); // общий бэкдроп
+            const under = document.getElementById('rqUnderlay');
 
             const openCt = () => {
                 under.hidden = false; ctModal.hidden = false;
@@ -283,7 +315,6 @@
             ctOpen?.addEventListener('click', e => { e.preventDefault(); openCt(); });
             ctClose?.addEventListener('click', closeCt);
             under?.addEventListener('click', () => {
-                // закрываем обе, если какая-то открыта
                 if (ctModal.classList.contains('show')) closeCt();
                 if (rqModal.classList.contains('show')) rqHide();
             });
