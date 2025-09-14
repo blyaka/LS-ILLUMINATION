@@ -570,6 +570,25 @@
     transition: opacity .4s ease, transform .4s ease;
 }
 
+.seq-img {
+    position: absolute;
+    right: 350px;
+    bottom: 30px;
+    width: min(250px, 28vw);
+    height: auto;
+    opacity: 0;
+    transform: translateY(16px);
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, .5));
+    transition: opacity .4s ease, transform .4s ease;
+}
+
+.seq-img.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
 
 
 
