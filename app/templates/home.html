@@ -328,7 +328,7 @@
     <div class="trust-track" id="trustTrack">
       <div class="trust-item"><img src="{% static 'logos/moscow.png' %}" alt=""></div>
       <div class="trust-item"><img src="{% static 'logos/spb.png' %}" alt=""></div>
-      <div class="trust-item is-active"><img src="{% static 'logos/khimki.png' %}" alt=""></div>
+      <div class="trust-item"><img src="{% static 'logos/khimki.png' %}" alt=""></div>
       <div class="trust-item"><img src="{% static 'logos/klin.png' %}" alt=""></div>
       <div class="trust-item"><img src="{% static 'logos/labytnangi.png' %}" alt=""></div>
       <div class="trust-item"><img src="{% static 'logos/nadym.png' %}" alt=""></div>
@@ -338,108 +338,100 @@
 </section>
 
 
+
 <script>
 (() => {
   const view  = document.getElementById('trustView');
   const track = document.getElementById('trustTrack');
   if (!view || !track) return;
 
-  const cfg = { cols: 7, gap: 40, min: 180, max: 300, speed: 0.6 }; // px/кадр
-  let anim = 0, offset = 0, itemW = 0, gap = cfg.gap;
-  let stepLen = 0, halfLen = 0, pad = 0;
-  let nodes = [];
+  const cfg = { cols:7, gap:56, min:180, max:300, speed:0.7 };
 
-  function setSize() {
-    pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
-    const vw = view.clientWidth - pad * 2;
+  let itemW=0, gap=cfg.gap, step=0, offset=0;
+  let nodes=[], cycleLen=0;
 
-    // ширина базового шарика на ленте
-    itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
+function dupOnce(){
+  const kids = Array.from(track.children);
+  // было: одна копия
+  // стало: 20 копий подряд — длинная лента
+  for (let t=0; t<20; t++) track.append(...kids.map(n => n.cloneNode(true)));
+  nodes = Array.from(track.children);
+}
+
+  function setSize(){
+    const pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad'))||0;
+    const vw  = view.clientWidth - pad*2;
+
+    gap   = cfg.gap;
+    itemW = (vw - gap*(cfg.cols-1)) / cfg.cols;
     itemW = Math.max(cfg.min, Math.min(cfg.max, itemW));
 
-    // если не влазит — ужимаем gap
-    const need = itemW * cfg.cols + gap * (cfg.cols - 1);
-    if (need > vw) {
-      gap = Math.max(12, gap - (need - vw) / (cfg.cols - 1));
-      itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
+    const need = itemW*cfg.cols + gap*(cfg.cols-1);
+    if (need > vw){
+      gap   = Math.max(12, gap - (need - vw)/(cfg.cols-1));
+      itemW = (vw - gap*(cfg.cols-1)) / cfg.cols;
     }
 
-    stepLen = itemW + gap;
+    step = itemW + gap;
+    cycleLen = nodes.length/2 * step; // длина одной копии
+
     view.style.setProperty('--item', itemW + 'px');
-    view.style.setProperty('--gap',  gap + 'px');
-
-    // пересоберём список нод
-    nodes = Array.from(track.children);
-    // половина длины (т.к. лента удвоена)
-    halfLen = nodes.length/2 * stepLen;
+    view.style.setProperty('--gap',  gap   + 'px');
   }
 
-  function makeLoop() {
-    // удваиваем контент один раз, никаких перестановок больше
-    const kids = Array.from(track.children);
-    track.append(...kids.map(n => n.cloneNode(true)));
-    nodes = Array.from(track.children);
+function paint(){
+  const cx    = view.clientWidth / 2;
+  const sigma = step * 0.9;
+  const kMax  = cfg.max / itemW;
+
+  const M = nodes.length / 2;           // логическая длина (до дублирования)
+
+  // 1) считаем extra для ОДНОЙ логической петли (динамическая длина цикла)
+  let sumExtra = 0;
+  for (let j=0; j<M; j++){
+    const center = offset + j*step + itemW/2;
+    const d = Math.abs(center - cx);
+    const f = Math.exp(-(d*d)/(2*sigma*sigma));
+    const k = 1 + (kMax - 1) * f;
+    sumExtra += (k - 1) * itemW / 2;          // extra_j
+  }
+  const liveCycleLen = M * (itemW + gap) + 2 * sumExtra;  // реальная длина петли
+
+  // 2) выставляем k/extra/b всем нодам (обеим копиям)
+  for (let i=0;i<nodes.length;i++){
+    const center = offset + i*step + itemW/2;
+    const d = Math.abs(center - cx);
+    const f = Math.exp(-(d*d)/(2*sigma*sigma));
+    const k = 1 + (kMax - 1) * f;
+    const extra = (k - 1) * itemW / 2;
+    const b = Math.pow(f, 6);
+
+    nodes[i].style.setProperty('--k', k.toFixed(4));
+    nodes[i].style.setProperty('--extra', extra.toFixed(2)+'px');
+    nodes[i].style.setProperty('--b', b.toFixed(4));
   }
 
-  // читаем сначала (read phase), потом пишем (write phase) — без дерга
-  function highlight() {
-    const vr = view.getBoundingClientRect();
-    const cx = vr.left + vr.width/2;
+  // вернём актуальную длину — пригодится в frame()
+  return liveCycleLen;
+}
 
-    // ширина «магнита» — соседи тоже растут синхронно
-    // возьмем ~0.9 шага, можно подкрутить
-    const sigma = stepLen * 0.9;
+function frame(){
+  offset -= cfg.speed;
+  track.style.transform = `translate3d(${offset}px,0,0)`;
+  paint();
+  requestAnimationFrame(frame);
+}
 
-    // READ: позиции всех центров до записи стилей
-    const centers = nodes.map(el => {
-      const b = el.getBoundingClientRect();
-      return b.left + b.width/2;
-    });
+  dupOnce();
+  setSize();
+  view.style.setProperty('--max', cfg.max + 'px');
+  frame();
 
-    // WRITE: выставляем стили
-    for (let i=0; i<nodes.length; i++){
-      const el = nodes[i];
-      const d  = Math.abs(centers[i] - cx);
-
-      const f = Math.exp(-(d*d) / (2*sigma*sigma));  // 0..1
-      const k = 1 + (cfg.max / itemW - 1) * f;       // от itemW к 300
-      const extraPx = (k - 1) * itemW / 2;           // точная компенсация в зазор
-
-      el.style.setProperty('--f', f.toFixed(4));
-      el.style.setProperty('--k', k.toFixed(4));
-      el.style.setProperty('--extra', extraPx.toFixed(2) + 'px');
-    }
-  }
-
-  function step() {
-    // READ-первой: рассчитываем «куда» едем (ещё ничего не пишем в DOM)
-    offset -= cfg.speed;
-
-    // мягкий циклический сброс по половине длины (лента продублирована)
-    if (offset <= -halfLen) offset += halfLen;
-
-    // WRITE с одной записью transform (без перестановок DOM)
-    track.style.transform = `translate3d(${offset}px,0,0)`;
-
-    // подсветка/масштаб — через фактические центры этого кадра
-    highlight();
-
-    anim = requestAnimationFrame(step);
-  }
-
-  function start(){ cancelAnimationFrame(anim); setSize(); step(); }
-
-  makeLoop();
-  start();
-  addEventListener('resize', setSize, { passive:true });
-
-  // пауза при ховере
-  view.addEventListener('mouseenter', () => cancelAnimationFrame(anim));
-  view.addEventListener('mouseleave', () => step());
+  addEventListener('resize', setSize, {passive:true});
+  view.addEventListener('mouseenter', ()=> cfg.speed = 0);
+  view.addEventListener('mouseleave', ()=> cfg.speed = 0.7);
 })();
 </script>
-
-
 
 
 

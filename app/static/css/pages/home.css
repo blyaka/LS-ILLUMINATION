@@ -867,35 +867,16 @@
     text-align: left;
 }
 
-.trust-view {
-    --cols: 7;
-    /* всегда 7 на экране */
-    --gap: 40px;
-    /* одинаковые отступы */
-    --pad: clamp(16px, 6vw, 96px);
-    position: relative;
-    overflow: hidden;
-    padding: 0 var(--pad)
+.trust-view{
+  --max: 300px;              /* максимум круга */
+  position: relative;
+  overflow-x: hidden;        /* режем только по X */
+  overflow-y: visible;       /* по Y даём вылезать */
+  padding-inline: var(--pad);
+  /* динамический отступ сверху/снизу = половина разницы между max и текущим item */
+  padding-block: calc((var(--max) - var(--item)) / 2);
 }
 
-.trust-track {
-    display: flex;
-    gap: var(--gap);
-    will-change: transform;
-}
-
-.trust-item {
-    flex: 0 0 var(--item);
-    /* ширина задаётся скриптом так, чтобы ровно 7 влезло */
-    height: var(--item);
-    border-radius: 50%;
-    background: #000000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    transition: transform .2s ease
-}
 
 .trust-item img {
     max-width: 70%;
@@ -905,89 +886,38 @@
     display: block
 }
 
-.trust-item.is-active {
-    border: 3px solid #FF058E;
-    box-shadow: 0 0 24px rgba(255, 5, 142, .35), inset 0 10px 26px rgba(0, 0, 0, .45)
-}
+
+
 
 
 /* новое */
-.trust-view{ position:relative; overflow:hidden; padding:100px var(--pad) }
-
 .trust-track{
   display:flex;
-  gap:var(--gap);
+  gap:0; /* сам gap теперь регулируем margin-inline */
   will-change:transform;
+  align-items: center;
+  transform:translate3d(0,0,0);
 }
+
 
 .trust-item{
   flex:0 0 var(--item);
-  height:var(--item);
+  width:var(--item); height:var(--item);
   border-radius:50%;
   background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex; align-items:center; justify-content:center;
   overflow:hidden;
 
-  /* динамика от JS через кастомные переменные */
   transform: scale(var(--k,1));
-  border: 3px solid color-mix(in oklab, #FF058E calc(var(--f,0)*100%), transparent);
-  box-shadow:
-    0 0 calc(28px*var(--f,0)) color-mix(in oklab, #FF058E calc(var(--f,0)*100%), transparent),
-    inset 0 10px 26px rgba(0,0,0,.45);
-  transition: transform 140ms linear, border-color 140ms linear, box-shadow 140ms linear;
+  /* держим базовый зазор + компенсацию роста */
+  margin-inline: calc(var(--gap)/2 + var(--extra,0px));
+
+  border:3px solid color-mix(in oklab, #FF058E calc(var(--b,0)*100%), transparent);
 }
 
 .trust-item img{
-  max-width:70%;
-  max-height:70%;
-  object-fit:contain;
-  filter:brightness(0) invert(1);
-  display:block;
-}
-
-/* статический .is-active больше не нужен */
-.trust-item.is-active{ border-color:transparent; box-shadow:none; }
-
-
-/* заменяем margin логику */
-.trust-item{
-  flex:0 0 var(--item);
-  height:var(--item);
-  border-radius:50%;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-
-  transform: scale(var(--k,1));
-  /* базовый полузазор + половина прироста размера => идеально раздвигает соседей */
-  margin-inline: calc(var(--gap)/2 + var(--extra, 0px));
-
-  border: 3px solid color-mix(in oklab, #FF058E calc(var(--f,0)*100%), transparent);
-  box-shadow:
-    0 0 calc(28px*var(--f,0)) color-mix(in oklab, #FF058E calc(var(--f,0)*100%), transparent),
-    inset 0 10px 26px rgba(0,0,0,.45);
-  transition: transform 140ms linear,
-              border-color 140ms linear,
-              box-shadow 140ms linear,
-              margin-inline 140ms linear;
-}
-
-
-.trust-track{
-  display:flex;
-  gap:var(--gap);
-  will-change: transform;
-}
-.trust-track{ transform: translate3d(0,0,0); } /* форсим GPU */
-.trust-item{
-  transform: scale(var(--k,1));
-  margin-inline: calc(var(--gap)/2 + var(--extra, 0px));
-  transition: transform 140ms linear, border-color 140ms linear,
-              box-shadow 140ms linear, margin-inline 140ms linear;
+  max-width:70%; max-height:70%; object-fit:contain;
+  filter:brightness(0) invert(1); display:block;
 }
 
 
