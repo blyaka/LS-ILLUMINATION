@@ -6,12 +6,13 @@
 {% endblock %}
 
 {% block content %}
+
+<script src="{% static 'vendor/hls/hls.min.js' %}"></script>
+
 <section class="ls-hero">
   {% if hero_video %}
-  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%}
-    muted loop playsinline></video>
+  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%} muted loop playsinline></video>
 
-  <script src="{% static 'vendor/hls/hls.min.js' %}"></script>
   <script>
     (function () {
       const src = "{{ hero_video.m3u8_url }}";
@@ -135,8 +136,7 @@
     {% for v in more_videos %}
     <button class="v-card" type="button" {% if v.m3u8_url %} data-src="{{ v.m3u8_url }}"
       data-title="{{ v.name|default:'Видео' }}"
-      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else
-      %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
+      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
       <div class="v-card__thumb">
         <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
           alt="{{ v.name|default:'Видео' }}" loading="lazy" />
@@ -161,9 +161,6 @@
     </div>
   </div>
 </section>
-
-
-
 
 
 <script>
