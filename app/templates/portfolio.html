@@ -67,55 +67,75 @@
 
 
 <script>
-    (() => {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImg');
-        const modalClose = document.getElementById('modalClose');
-        const modalPrev = document.getElementById('modalPrev');
-        const modalNext = document.getElementById('modalNext');
-        const modalOverlay = document.getElementById('modalOverlay');
+(() => {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImg');
+  const modalClose = document.getElementById('modalClose');
+  const modalPrev = document.getElementById('modalPrev');
+  const modalNext = document.getElementById('modalNext');
+  const modalOverlay = document.getElementById('modalOverlay');
 
-        const images = [...document.querySelectorAll('.card_photo img')];  
-        let currentIndex = 0;
+  const cards = Array.from(document.querySelectorAll('.portfolio-grid .card'));
+  const images = cards.map(c => c.querySelector('.card_photo img'));
+  let i = 0, openFlag = false;
 
-        function openModal(index) {
-            currentIndex = index;
-            modalImg.src = images[currentIndex].src;
-            modal.hidden = false; 
-            setTimeout(() => modal.style.opacity = 1, 10); 
-            document.body.style.overflow = 'hidden';
-        }
+  function setImage(idx) {
+    i = (idx + images.length) % images.length;
+    const src = images[i].src;
+    modalImg.style.opacity = 0;
+    const pre = new Image();
+    pre.onload = () => {
+      modalImg.src = src;
+      modalImg.alt = images[i].alt || 'Фото';
+      requestAnimationFrame(() => { modalImg.style.opacity = 1; });
+    };
+    pre.src = src;
 
-        function closeModal() {
-            modal.style.opacity = 0; 
-            setTimeout(() => modal.hidden = true, 300);
-            document.body.style.overflow = ''; 
-        }
+    const next = images[(i + 1) % images.length]?.src;
+    const prev = images[(i - 1 + images.length) % images.length]?.src;
+    if (next) { const n = new Image(); n.src = next; }
+    if (prev) { const p = new Image(); p.src = prev; }
+  }
 
-        function showNextImage() {
-            currentIndex = (currentIndex + 1) % images.length;
-            modalImg.src = images[currentIndex].src;
-        }
+  function openModal(idx) {
+    openFlag = true;
+    setImage(idx);
+    modal.hidden = false;
+    modal.style.opacity = 1;
+    document.body.style.overflow = 'hidden';
+  }
 
-        function showPrevImage() {
-            currentIndex = (currentIndex - 1 + images.length) % images.length;
-            modalImg.src = images[currentIndex].src;
-        }
+  function closeModal() {
+    openFlag = false;
+    modal.style.opacity = 0;
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
 
-        images.forEach((img, index) => {
-            img.addEventListener('click', () => openModal(index));
-        });
+  function next() { setImage(i + 1); }
+  function prev() { setImage(i - 1); }
 
-        modalClose.addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', closeModal);
-        modalNext.addEventListener('click', showNextImage);
-        modalPrev.addEventListener('click', showPrevImage);
+  cards.forEach((card, idx) => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(idx);
+    });
+  });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-    })();
+  modalClose.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', closeModal);
+  modalNext.addEventListener('click', next);
+  modalPrev.addEventListener('click', prev);
+
+  document.addEventListener('keydown', (e) => {
+    if (!openFlag) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeModal(); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+})();
 </script>
+
 
 
 
