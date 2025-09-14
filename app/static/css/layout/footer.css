@@ -1,0 +1,16 @@
+.ls-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 400;
+    font-size: var(--font-small);
+    padding: 153px 96px 66px 96px;
+}
+
+.ls-footer a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+
