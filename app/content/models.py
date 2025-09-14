@@ -8,16 +8,20 @@ from django.apps import apps
 
 class Video(models.Model):
     class S:
-        QUEUED = 'queued'
-        PROC   = 'processing'
-        READY  = 'ready'
-        FAIL   = 'failed'
-        CHOICES = [(QUEUED,'В очереди'),(PROC,'Обработка'),(READY,'Готово'),(FAIL,'Ошибка')]
+        QUEUED='queued'; PROC='processing'; READY='ready'; FAIL='failed'
+        CHOICES=[(QUEUED,'В очереди'),(PROC,'Обработка'),(READY,'Готово'),(FAIL,'Ошибка')]
+
+    class P:
+        HERO='hero'; GALLERY='gallery'; BLOCK='block'
+        CHOICES=[(HERO,'Hero'),(GALLERY,'Видеогалерея'),(BLOCK,'Видеоблок')]
 
     id       = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name     = models.CharField('Название', max_length=200, blank=True)
+    description = models.TextField('Описание', blank=True, null=True)
     source   = models.FileField('Исходник', upload_to='video/source/')
-    is_featured = models.BooleanField('Показывать в hero', default=False, db_index=True)
+    placement= models.CharField('Размещение', max_length=12, choices=P.CHOICES, default=P.GALLERY, db_index=True)
+    position = models.PositiveIntegerField('Порядок в группе', default=0, db_index=True,
+                                           help_text='Работает для видеогалереи и видеоблока')
     status   = models.CharField('Статус', max_length=16, choices=S.CHOICES, default=S.QUEUED, db_index=True)
     poster   = models.ImageField('Постер', upload_to='video/posters/', blank=True, null=True)
     m3u8_url = models.CharField('Плейлист HLS', max_length=500, blank=True)
@@ -29,14 +33,18 @@ class Video(models.Model):
     class Meta:
         verbose_name = 'Видео'
         verbose_name_plural = 'Видео'
-        ordering = ['-created']
-
+        ordering = ('placement','position','-created')
         constraints = [
             models.UniqueConstraint(
-                fields=['is_featured'],
-                condition=Q(is_featured=True),
-                name='only_one_featured_video'
-            )
+                fields=['placement'],
+                condition=Q(placement='hero'),
+                name='only_one_hero_video'
+            ),
+            models.UniqueConstraint(
+                fields=['placement','position'],
+                condition=Q(position__gt=0),
+                name='unique_position_per_group'
+            ),
         ]
 
     def __str__(self):
@@ -51,29 +59,37 @@ class Video(models.Model):
     def rel_out_dir(self):
         return self.out_dir or f'video/{self.id}/'
 
+    def _ensure_position(self):
+        if self.placement in (self.P.GALLERY, self.P.BLOCK) and not self.position:
+            last = type(self).objects.filter(placement=self.placement).aggregate(m=Max('position'))['m'] or 0
+            self.position = last + 1
+        if self.placement == self.P.HERO:
+            self.position = 0
 
     def save(self, *args, **kwargs):
         is_create = self._state.adding
+        prev_placement = None
+        if not is_create:
+            prev_placement = type(self).objects.only('placement').get(pk=self.pk).placement
+
+        self._ensure_position()
         super().save(*args, **kwargs)
 
-        if getattr(self, 'is_featured', False):
-            type(self).objects.exclude(pk=self.pk).filter(is_featured=True).update(is_featured=False)
+        if self.placement == self.P.HERO:
+            type(self).objects.exclude(pk=self.pk).filter(placement=self.P.HERO)\
+                .update(placement=self.P.GALLERY)
 
         if is_create and self.source:
             type(self).objects.filter(pk=self.pk).update(
-                status=self.S.QUEUED,
-                error='',
-                out_dir=f'video/{self.pk}/'
+                status=self.S.QUEUED, error='', out_dir=f'video/{self.pk}/'
             )
-
             def run():
                 try:
                     import_string('content.services.process_video')(str(self.pk))
                 except Exception as e:
-                    apps.get_model('content', 'Video').objects.filter(pk=self.pk).update(
+                    apps.get_model('content','Video').objects.filter(pk=self.pk).update(
                         status=self.S.FAIL, error=str(e)
                     )
-
             threading.Thread(target=run, daemon=True).start()
 
 

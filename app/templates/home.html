@@ -23,7 +23,7 @@
       if (el.canPlayType('application/vnd.apple.mpegurl')) {
         playNative();
       } else if (window.Hls && Hls.isSupported()) {
-        const h = new Hls({ maxBufferLength: 10 });
+        const h = new Hls({ maxBufferLength: 4, autoStartLoad: true });
         h.loadSource(src);
         h.attachMedia(el);
       } else {
@@ -240,13 +240,14 @@
     }
 
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.v-card');
-      if (btn && btn.dataset.src) {
+      const btn = e.target.closest('.v-card[data-src], .v-open[data-src]');
+      if (btn) {
         e.preventDefault();
         open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
       }
       if (e.target.hasAttribute('data-close')) close();
     });
+
 
     document.addEventListener('keydown', (e) => {
       if (!modal.hidden && e.code === 'Escape') close();
@@ -295,43 +296,128 @@
   </div>
 </section>
 
-<section class="cw-split" id="sd-section">
-  <div class="cw-split__media">
-    <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
-      poster="{% static 'images/hero-bg.png' %}">
-      <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-    </video>
-  </div>
 
-  <aside class="cw-split__aside">
-    <h2 class="cw-split__title">Светодинамическая конструкция</h2>
-    <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание.
-      Для яркого оформления городских пространств.</p>
-    <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
-  </aside>
 
-  <!-- Модалка-плеер -->
 
-</section>
+{% for v in block_videos %}
+  {% if forloop.counter|divisibleby:2 %}
+  <section class="cw-split right">
+    <aside class="cw-split__aside">
+      <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
+      <p class="cw-split__desc">{{ v.description|default:"" }}</p>
+      {% if v.m3u8_url %}
+      <button class="cw-split__btn v-open"
+              data-src="{{ v.m3u8_url }}"
+              data-title="{{ v.name|default:'Видео' }}"
+              data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
+        Смотреть полностью
+      </button>
+      {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
+    </aside>
+    <div class="cw-split__media">
+    <video class="cw-split__video"
+          preload="none" muted loop playsinline
+          poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
+          data-src="{{ v.m3u8_url }}" data-kind="hls"></video>
+    </div>
+  </section>
+  {% else %}
+  <section class="cw-split">
+    <div class="cw-split__media">
+    <video class="cw-split__video"
+          preload="none" muted loop playsinline
+          poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
+          data-src="{{ v.m3u8_url }}" data-kind="hls"></video>
+    </div>
+    <aside class="cw-split__aside">
+      <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
+      <p class="cw-split__desc">{{ v.description|default:"" }}</p>
+      {% if v.m3u8_url %}
+      <button class="cw-split__btn v-open"
+              data-src="{{ v.m3u8_url }}"
+              data-title="{{ v.name|default:'Видео' }}"
+              data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
+        Смотреть полностью
+      </button>
+      {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
+    </aside>
+  </section>
+  {% endif %}
+{% endfor %}
 
-<section class="cw-split right" id="sd-section">
-  <aside class="cw-split__aside">
-    <h2 class="cw-split__title">Светодинамическая конструкция</h2>
-    <p class="cw-split__desc">Световые конструкции с программируемыми эффектами: смена цвета, движение света, мигание.
-      Для яркого оформления городских пространств.</p>
-    <button class="cw-split__btn" data-open="#sdModal">Смотреть полностью</button>
-  </aside>
 
-  <div class="cw-split__media">
-    <video id="sdPreview" class="cw-split__video" autoplay muted loop playsinline preload="metadata"
-      poster="{% static 'images/hero-bg.png' %}">
-      <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-    </video>
-  </div>
 
-  <!-- Модалка-плеер -->
+<script>
+(() => {
+  const vids = document.querySelectorAll('.cw-split__video[data-src]');
+  const st = new WeakMap();
+  const DETACH = 2000;
+  const NEAR_MARGIN = '800px 0px';
 
-</section>
+  async function attach(v){
+    const s = st.get(v) || {};
+    const src = v.dataset.src;
+    if (!src) return;
+
+    v.muted = true; v.loop = true; v.playsInline = true;
+
+    if (!s.againBound){
+      v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(()=>{}); });
+      s.againBound = true;
+    }
+
+    if (!s.attached){
+      if (v.canPlayType('application/vnd.apple.mpegurl')) {
+        v.src = src; s.hls = null; s.attached = true;
+      } else if (window.Hls && Hls.isSupported()) {
+        const h = new Hls({ maxBufferLength: 6, autoStartLoad: true });
+        h.loadSource(src); h.attachMedia(v); s.hls = h; s.attached = true;
+      } else {
+        v.src = src; s.hls = null; s.attached = true;
+      }
+      st.set(v, s);
+    }
+    try { await v.play(); } catch {}
+  }
+
+  function pause(v){
+    try { v.pause(); } catch {}
+  }
+
+  function detach(v){
+    const s = st.get(v);
+    if (!s || !s.attached) return;
+    pause(v);
+    if (s.hls) { try { s.hls.destroy(); } catch {} }
+    v.removeAttribute('src'); v.load();
+    s.attached = false; s.hls = null;
+    st.set(v, s);
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    for (const e of entries) {
+      const v = e.target;
+      if (e.isIntersecting) { attach(v); continue; }
+      const r = e.boundingClientRect;
+      const far = (r.bottom < -DETACH) || (r.top > vh + DETACH);
+      if (far) detach(v); else pause(v);
+    }
+  }, { root:null, rootMargin: NEAR_MARGIN, threshold: 0 });
+
+  vids.forEach(v => { st.set(v, { attached:false, hls:null, againBound:false }); io.observe(v); });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    vids.forEach(v => {
+      const r = v.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const near = (r.bottom > -800) && (r.top < vh + 800);
+      if (near) attach(v);
+    });
+  });
+})();
+</script>
 
 
 
@@ -798,58 +884,6 @@
 
 
 
-
-<script>
-  ; (() => {
-    const open = (sel) => {
-      const m = document.querySelector(sel)
-      if (!m) return
-      const prev = document.getElementById('sdPreview')
-      prev && prev.pause()
-      m.hidden = false
-      document.body.style.overflow = 'hidden'
-      const full = document.getElementById('sdFull')
-      full && full.play().catch(() => { })
-    }
-
-    const close = (m) => {
-      const full = document.getElementById('sdFull')
-      if (full) {
-        full.pause()
-      }
-      m.hidden = true
-      document.body.style.overflow = ''
-      const prev = document.getElementById('sdPreview')
-      prev && prev.play().catch(() => { })
-    }
-
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-open]')
-      if (btn) {
-        open(btn.dataset.open)
-      }
-      if (e.target.matches('[data-close]')) {
-        close(e.target.closest('.sv-modal'))
-      }
-    })
-
-    document.addEventListener('keydown', (e) => {
-      const m = document.getElementById('sdModal')
-      if (e.key === 'Escape' && m && !m.hidden) close(m)
-    })
-
-    const io = new IntersectionObserver(
-      ([ent]) => {
-        const v = document.getElementById('sdPreview')
-        if (!v) return
-        if (ent.isIntersecting) v.play().catch(() => { })
-        else v.pause()
-      },
-      { threshold: 0.2 }
-    )
-    io.observe(document.getElementById('sd-section'))
-  })()
-</script>
 
 <script>
   (() => {

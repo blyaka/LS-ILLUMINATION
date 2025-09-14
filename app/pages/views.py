@@ -11,17 +11,19 @@ def HomePage(request):
         cat.first_word = words[0]
         cat.rest_words = " ".join(words[1:]) if len(words) > 1 else ""
 
-    hero = Video.objects.filter(status='ready', is_featured=True).first()
-    more = Video.objects.filter(status='ready', is_featured=False).order_by('-created')
+    hero = Video.objects.filter(status='ready', placement='hero').first()
+    gallery = Video.objects.filter(status='ready', placement='gallery').order_by('position','-created')
+    blocks = Video.objects.filter(status='ready', placement='block').order_by('position','-created')
 
-    news = News.objects.all().filter(is_available=True).order_by('-created_at')
+    news = News.objects.filter(is_available=True).order_by('-created_at')
 
-    ctx = {'hero_video': hero,
-           'more_videos': more,
-           'categories': categories,
-           'news': news,
-        }
-
+    ctx = {
+        'hero_video': hero,
+        'more_videos': gallery,
+        'block_videos': blocks,
+        'categories': categories,
+        'news': news,
+    }
     return render(request, 'home.html', ctx)
 
 
