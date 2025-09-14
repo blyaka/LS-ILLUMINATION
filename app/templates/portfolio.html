@@ -75,38 +75,33 @@
         const modalNext = document.getElementById('modalNext');
         const modalOverlay = document.getElementById('modalOverlay');
 
-        const images = [...document.querySelectorAll('.card_photo img')];  // Получаем все картинки
+        const images = [...document.querySelectorAll('.card_photo img')];  
         let currentIndex = 0;
 
-        // Открытие модалки
         function openModal(index) {
             currentIndex = index;
             modalImg.src = images[currentIndex].src;
-            modal.hidden = false;  // показываем модалку
-            setTimeout(() => modal.style.opacity = 1, 10);  // плавное появление
-            document.body.style.overflow = 'hidden';  // блокируем скролл
+            modal.hidden = false; 
+            setTimeout(() => modal.style.opacity = 1, 10); 
+            document.body.style.overflow = 'hidden';
         }
 
-        // Закрытие модалки
         function closeModal() {
-            modal.style.opacity = 0; // плавное исчезновение
-            setTimeout(() => modal.hidden = true, 300); // скрытие через 0.3с
-            document.body.style.overflow = '';  // восстанавливаем скролл
+            modal.style.opacity = 0; 
+            setTimeout(() => modal.hidden = true, 300);
+            document.body.style.overflow = ''; 
         }
 
-        // Переключение на следующее изображение
         function showNextImage() {
             currentIndex = (currentIndex + 1) % images.length;
             modalImg.src = images[currentIndex].src;
         }
 
-        // Переключение на предыдущее изображение
         function showPrevImage() {
             currentIndex = (currentIndex - 1 + images.length) % images.length;
             modalImg.src = images[currentIndex].src;
         }
 
-        // Добавляем обработчики событий
         images.forEach((img, index) => {
             img.addEventListener('click', () => openModal(index));
         });
@@ -116,7 +111,6 @@
         modalNext.addEventListener('click', showNextImage);
         modalPrev.addEventListener('click', showPrevImage);
 
-        // Закрытие модалки по клавише Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });

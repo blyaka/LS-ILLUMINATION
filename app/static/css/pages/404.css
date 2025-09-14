@@ -20,7 +20,6 @@ body::before {
     background: url("/static/images/404-bg.jpg") no-repeat center center / cover;
     transform: rotate(180deg);
     z-index: -1;
-    /* чтобы фон был позади текста */
 }
 
 main {

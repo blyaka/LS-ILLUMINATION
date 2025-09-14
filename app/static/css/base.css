@@ -98,3 +98,46 @@ body {
 .cookie-btn--decline:hover {
     background: rgba(188, 66, 133, .2);
 }
+
+
+
+
+
+
+
+
+#bg-bubbles {
+    position: fixed;
+    inset: -10vh -10vw;
+    z-index: 0;
+    pointer-events: none;
+    contain: layout paint;
+}
+
+.bg-bubble {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--d);
+    height: var(--d);
+    border-radius: 50%;
+    background: var(--bubble-color);
+    opacity: .55;
+    filter: blur(24px);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    transition: opacity 1.2s ease, filter 1.2s ease;
+    mix-blend-mode: screen;
+}
+
+
+.bg-bubble.is-born {
+    opacity: 0;
+    filter: blur(40px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #bg-bubbles {
+        display: none;
+    }
+}

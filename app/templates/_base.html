@@ -25,6 +25,8 @@
 
 <body>
 
+    <div id="bg-bubbles" aria-hidden="true"></div>
+
     <header class="ls-header">
         <div class="ls-header__inner">
             <a class="ls-logo" href="{% url 'home' %}">
@@ -166,41 +168,41 @@
     </section>
 
 
-<script>
-(() => {
-  const nameInput = document.getElementById('rqName');
-  const phoneInput = document.getElementById('rqPhone');
+    <script>
+        (() => {
+        const nameInput = document.getElementById('rqName');
+        const phoneInput = document.getElementById('rqPhone');
 
-  nameInput.addEventListener('input', () => {
-    nameInput.value = nameInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
-  });
+        nameInput.addEventListener('input', () => {
+            nameInput.value = nameInput.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
+        });
 
-  phoneInput.addEventListener('input', () => {
-    let v = phoneInput.value.replace(/\D/g, '');
-    if (!v) { phoneInput.value = ''; return; }
+        phoneInput.addEventListener('input', () => {
+            let v = phoneInput.value.replace(/\D/g, '');
+            if (!v) { phoneInput.value = ''; return; }
 
-    if (v[0] === '7') {
-      v = '7' + v.slice(1);
-      phoneInput.value = format(v, true);
-    } else if (v[0] === '8') {
-      phoneInput.value = format(v, false);
-    } else {
-      phoneInput.value = format(v, true);
-    }
-  });
+            if (v[0] === '7') {
+            v = '7' + v.slice(1);
+            phoneInput.value = format(v, true);
+            } else if (v[0] === '8') {
+            phoneInput.value = format(v, false);
+            } else {
+            phoneInput.value = format(v, true);
+            }
+        });
 
-  function format(d, plus) {
-    const p = d.padEnd(11, '_').slice(0, 11);
-    const part1 = p.slice(1, 4);
-    const part2 = p.slice(4, 7);
-    const part3 = p.slice(7, 9);
-    const part4 = p.slice(9, 11);
+        function format(d, plus) {
+            const p = d.padEnd(11, '_').slice(0, 11);
+            const part1 = p.slice(1, 4);
+            const part2 = p.slice(4, 7);
+            const part3 = p.slice(7, 9);
+            const part4 = p.slice(9, 11);
 
-    return (plus ? '+7' : '8') +
-      ` (${part1}) ${part2}-${part3}-${part4}`.replace(/[_-]+$/,'');
-  }
-})();
-</script>
+            return (plus ? '+7' : '8') +
+            ` (${part1}) ${part2}-${part3}-${part4}`.replace(/[_-]+$/,'');
+        }
+        })();
+    </script>
 
 
     <script>
@@ -325,6 +327,116 @@
     </script>
 
 
+
+<script>
+(() => {
+  const root = document.getElementById('bg-bubbles');
+  if (!root) return;
+
+  const DESIRED = 5;                 // всегда 5
+  const MIN_D = 140, MAX_D = 240;    // диаметр
+  const SEP_PAD = 32;                // зазор между шарами
+  const MIN_V = 18,  MAX_V = 28;      // скорость (px/c)
+  const SEP_K = 0.015;               // мягкое «разъезжание»
+  const WANDER = 0.15;               // блуждание
+  const OFF_SPAWN = 120;             // насколько за краём спавним
+  const OFF_KILL  = 160;             // насколько далеко можно улететь до удаления
+
+  let W = innerWidth, H = innerHeight;
+  const rnd = (a,b)=>a+Math.random()*(b-a);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const balls = [];
+
+  function makeEl(d){
+    const el = document.createElement('div');
+    el.className = 'bg-bubble is-born';
+    el.style.setProperty('--d', d+'px');
+    root.appendChild(el);
+    requestAnimationFrame(()=> el.classList.remove('is-born'));
+    return el;
+  }
+
+  function spawnOutside(){
+    const d = rnd(MIN_D, MAX_D), r = d/2;
+    const side = Math.floor(rnd(0,4)); 
+    let x,y;
+    if (side===0){ x = -OFF_SPAWN - r; y = rnd(-OFF_SPAWN, H+OFF_SPAWN); }
+    if (side===1){ x = W + OFF_SPAWN + r; y = rnd(-OFF_SPAWN, H+OFF_SPAWN); }
+    if (side===2){ x = rnd(-OFF_SPAWN, W+OFF_SPAWN); y = -OFF_SPAWN - r; }
+    if (side===3){ x = rnd(-OFF_SPAWN, W+OFF_SPAWN); y = H + OFF_SPAWN + r; }
+
+    const tx = rnd(r+SEP_PAD, W - r - SEP_PAD);
+    const ty = rnd(r+SEP_PAD, H - r - SEP_PAD);
+    let vx = tx - x, vy = ty - y;
+    const len = Math.hypot(vx,vy) || 1;
+    const spd = rnd(MIN_V, MAX_V);
+    vx = vx/len * spd; vy = vy/len * spd;
+
+    const el = makeEl(d);
+    const b = { el, r, x, y, vx, vy };
+    balls.push(b);
+  }
+
+  function ensureCount(){
+    while (balls.length < DESIRED) spawnOutside();
+  }
+
+  ensureCount();
+
+  let t0 = performance.now();
+  function tick(t1){
+    ensureCount();
+
+    const dt = (t1 - t0)/1000; t0 = t1;
+
+    for (let i=0;i<balls.length;i++){
+      const b = balls[i];
+
+      let ax=(Math.random()-0.5)*WANDER, ay=(Math.random()-0.5)*WANDER;
+
+      for (let j=i+1;j<balls.length;j++){
+        const c = balls[j];
+        const dx=b.x-c.x, dy=b.y-c.y;
+        const dist = Math.hypot(dx,dy) || 0.001;
+        const need = b.r + c.r + SEP_PAD;
+        if (dist < need){
+          const push = (need - dist) * SEP_K;
+          const nx = dx/dist, ny = dy/dist;
+          ax += nx*push; ay += ny*push;
+          c.vx -= nx*push; c.vy -= ny*push;
+        }
+      }
+
+      b.vx += ax; b.vy += ay;
+
+      const sp = Math.hypot(b.vx,b.vy);
+      const tgt = clamp(sp, MIN_V, MAX_V);
+      if (sp>0.001){ b.vx = b.vx/sp*tgt; b.vy = b.vy/sp*tgt; }
+
+      b.x += b.vx*dt; b.y += b.vy*dt;
+      b.el.style.transform = `translate3d(${b.x - b.r}px, ${b.y - b.r}px, 0)`;
+    }
+
+    for (let i=balls.length-1;i>=0;i--){
+      const b = balls[i];
+      if (
+        b.x + b.r < -OFF_KILL ||
+        b.x - b.r > W + OFF_KILL ||
+        b.y + b.r < -OFF_KILL ||
+        b.y - b.r > H + OFF_KILL
+      ){
+        b.el.remove();
+        balls.splice(i,1);
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  addEventListener('resize', () => { W = innerWidth; H = innerHeight; });
+})();
+</script>
 
 
 

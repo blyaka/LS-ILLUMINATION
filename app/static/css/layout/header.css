@@ -33,8 +33,6 @@
     will-change: backdrop-filter;
 }
 
-
-/* линия снизу с затуханием */
 .ls-header::after {
     content: "";
     position: absolute;
@@ -220,14 +218,7 @@
     justify-content: center;
 }
 
-/* адаптив по желанию — пример:
-@media (max-width:1200px){ .pf-grid--5{grid-template-columns:repeat(4,1fr)} .pf-grid--4{grid-template-columns:repeat(4,1fr)} }
-@media (max-width:900px){ .pf-grid--5,.pf-grid--4{grid-template-columns:repeat(3,1fr)} }
-@media (max-width:640px){ .pf-grid--5,.pf-grid--4{grid-template-columns:repeat(2,1fr)} } */
 
-
-
-/* карточка как в макете */
 .pf-card {
     display: grid;
     place-items: center;
@@ -260,7 +251,6 @@
     opacity: .95;
 }
 
-/* «ползунок» по центру снизу */
 .pf-grabber {
     position: absolute;
     left: 50%;
@@ -279,7 +269,6 @@
 
 
 
-/* блокировка скролла когда модалка открыта */
 html.rq-lock,
 html.rq-lock body {
     overflow: hidden;
@@ -328,7 +317,6 @@ html.rq-lock body {
 }
 
 
-/* карточка — стекло + неоновая окантовка */
 .rq-card {
     position: relative;
     width: min(680px, 92vw);
@@ -359,7 +347,6 @@ html.rq-lock body {
     opacity: .95;
 }
 
-/* заголовок */
 .rq-title {
     text-align: center;
     color: var(--text);
@@ -368,7 +355,6 @@ html.rq-lock body {
     font-weight: var(--font-weight-light);
 }
 
-/* форма */
 .rq-form {
     display: grid;
     gap: 18px;
@@ -424,7 +410,6 @@ html.rq-lock body {
     background: rgba(255, 255, 255, .08);
 }
 
-/* низ формы: чекбокс + кнопка */
 .rq-bottom {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -470,7 +455,6 @@ html.rq-lock body {
     transform: rotate(45deg);
 }
 
-/* кнопка */
 .rq-submit {
     padding: 10px 18px;
     border-radius: 999px;
@@ -492,7 +476,6 @@ html.rq-lock body {
         0 16px 36px rgba(188, 66, 133, .45);
 }
 
-/* крестик */
 .rq-close {
     position: absolute;
     top: -34px;
@@ -514,7 +497,6 @@ html.rq-lock body {
     border-color: #FF45F3;
 }
 
-/* адаптив */
 @media (max-width: 900px) {
     .rq-row--3 {
         grid-template-columns: 1fr;
@@ -525,7 +507,6 @@ html.rq-lock body {
 
 
 
-/* Контакты внутри rq-card */
 .ct-grid {
     position: relative;
     display: grid;
@@ -535,7 +516,6 @@ html.rq-lock body {
     color: var(--text);
 }
 
-/* вертикальный разделитель по центру */
 .ct-grid::before {
     content: "";
     position: absolute;
@@ -580,7 +560,6 @@ html.rq-lock body {
     text-underline-offset: 3px;
 }
 
-/* адаптив: одна колонка, разделитель прячем */
 @media (max-width: 900px) {
     .ct-grid {
         grid-template-columns: 1fr;
