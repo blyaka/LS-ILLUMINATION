@@ -3,10 +3,10 @@
   "model": "cases.category",
   "pk": 1,
   "fields": {
-    "slug": "oformlenie-gorodskih-prostranstv",
-    "name": "Оформление городских пространств",
-    "photo": "portfolio/icons/portfolio.jpg",
-    "icon": "portfolio/icons/city_space.png",
+    "slug": "oformlenie-gorodskih-prostranst",
+    "name": "Оформление городских пространст",
+    "photo": "portfolio/icons/portfolio_gjISJIi.jpg",
+    "icon": "portfolio/icons/city_space.webp",
     "order": 1
   }
 },
@@ -14,22 +14,22 @@
   "model": "cases.category",
   "pk": 2,
   "fields": {
-    "slug": "oformlenie-fasadov-zdanij",
-    "name": "Оформление фасадов зданий",
-    "photo": "portfolio/icons/portfolio_CqYMJv9.jpg",
-    "icon": "portfolio/icons/facades.png",
-    "order": 3
+    "slug": "svetovye-potolki-i-shatry",
+    "name": "Световые потолки и шатры",
+    "photo": "portfolio/icons/portfolio_qBigw5k.jpg",
+    "icon": "portfolio/icons/tents.webp",
+    "order": 2
   }
 },
 {
   "model": "cases.category",
   "pk": 3,
   "fields": {
-    "slug": "svetovye-potolki-i-shatry",
-    "name": "Световые потолки и шатры",
-    "photo": "portfolio/icons/portfolio_opD3wH5.jpg",
-    "icon": "portfolio/icons/tents.png",
-    "order": 2
+    "slug": "oformlenie-fasadov-zdanij",
+    "name": "Оформление фасадов зданий",
+    "photo": "portfolio/icons/portfolio_mJx2ck2.jpg",
+    "icon": "portfolio/icons/facades.webp",
+    "order": 3
   }
 },
 {
@@ -38,8 +38,8 @@
   "fields": {
     "slug": "proekcionnaya-podsvetka-zdanij",
     "name": "Проекционная подсветка зданий",
-    "photo": "portfolio/icons/portfolio_5J7N9Jr.jpg",
-    "icon": "portfolio/icons/projection.png",
+    "photo": "portfolio/icons/portfolio_mb0Rlba.jpg",
+    "icon": "portfolio/icons/projection.webp",
     "order": 4
   }
 },
@@ -49,8 +49,8 @@
   "fields": {
     "slug": "konturnaya-podsvetka-zdanij",
     "name": "Контурная подсветка зданий",
-    "photo": "portfolio/icons/portfolio_Hhuzw5L.jpg",
-    "icon": "portfolio/icons/contour.png",
+    "photo": "portfolio/icons/portfolio_GKzoT7n.jpg",
+    "icon": "portfolio/icons/contour.webp",
     "order": 5
   }
 },
@@ -59,9 +59,9 @@
   "pk": 6,
   "fields": {
     "slug": "obemno-prostranstvennye-konstrukcii",
-    "name": "Объемно-пространственные конструкции",
-    "photo": "portfolio/icons/portfolio_H8dxvr0.jpg",
-    "icon": "portfolio/icons/3d_struct.png",
+    "name": "Объемно пространственные конструкции",
+    "photo": "portfolio/icons/portfolio_YAqu33P.jpg",
+    "icon": "portfolio/icons/3d_struct.webp",
     "order": 6
   }
 },
@@ -71,8 +71,8 @@
   "fields": {
     "slug": "konsoli-i-peretyazhki",
     "name": "Консоли и перетяжки",
-    "photo": "portfolio/icons/portfolio_2Dg5W05.jpg",
-    "icon": "portfolio/icons/consoles.png",
+    "photo": "portfolio/icons/portfolio_hMu15vo.jpg",
+    "icon": "portfolio/icons/consoles.webp",
     "order": 7
   }
 },
@@ -82,8 +82,8 @@
   "fields": {
     "slug": "kineticheskie-sistemy",
     "name": "Кинетические системы",
-    "photo": "portfolio/icons/portfolio_6XUgIcA.jpg",
-    "icon": "portfolio/icons/kinetic.png",
+    "photo": "portfolio/icons/hero-bg.png",
+    "icon": "portfolio/icons/kinetic.webp",
     "order": 8
   }
 },
@@ -93,20 +93,9 @@
   "fields": {
     "slug": "oformlenie-elej",
     "name": "Оформление елей",
-    "photo": "portfolio/icons/portfolio_b1WbGFz.jpg",
-    "icon": "portfolio/icons/trees.png",
+    "photo": "portfolio/icons/portfolio_yrq9tud.jpg",
+    "icon": "portfolio/icons/trees.webp",
     "order": 9
-  }
-},
-{
-  "model": "cases.case",
-  "pk": 1,
-  "fields": {
-    "category": 1,
-    "slug": "kreml",
-    "name": "Кремль",
-    "photo": "portfolio/cases/logo.png",
-    "order": 0
   }
 }
 ]
