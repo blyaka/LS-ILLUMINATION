@@ -1,0 +1,72 @@
+@import url(../base/variables.css);
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: "Montserrat", sans-serif;
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("/static/images/404-bg.jpg") no-repeat center center / cover;
+    transform: rotate(180deg);
+    z-index: -1;
+    /* чтобы фон был позади текста */
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    font-size: 10rem;
+    margin: 0;
+    font-weight: var(--font-weight-light);
+}
+
+p {
+    margin: 10px 0 30px;
+    font-size: var(--font-h3);
+    text-align: center;
+}
+
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 16px;
+    border-radius: 32px;
+    border: 1px solid #BC4285;
+    background: rgba(188, 66, 133, 0.1);
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 0 15px rgba(188, 66, 133, 0.6),
+        /* внешнее свечение */
+        inset 0 0 10px rgba(188, 66, 133, 0.4);
+    /* внутреннее свечение */
+}
+
+.btn:hover {
+    background: rgba(188, 66, 133, 0.2);
+    box-shadow:
+        0 0 25px rgba(188, 66, 133, 0.9),
+        /* усилили наружное */
+        inset 0 0 15px rgba(188, 66, 133, 0.6);
+    /* усилили внутреннее */
+}

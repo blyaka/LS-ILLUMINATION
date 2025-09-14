@@ -1,8 +1,21 @@
-Custom 404
+{% load static %}
 
-<div>
-<a href="{% url 'home' %}">home</a>
-<a href="{% url '404' %}">404</a>
-<a href="{% url 'about' %}">about</a>
-<a href="{% url 'portfolio' %}">portfolio</a>
-</div>
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Страница не найдена</title>
+    <link rel="stylesheet" href="{% static 'css/pages/404.css' %}">
+</head>
+
+<body>
+    <main>
+        <h1>404</h1>
+        <p>Эта страница не найдена.<br>Но вы можете вернуться на главную</p>
+        <a href="/" class="btn">Вернуться на главную</a>
+    </main>
+</body>
+
+</html>

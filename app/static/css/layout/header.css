@@ -373,7 +373,7 @@ html.rq-lock body {
 }
 
 .rq-row--3 {
-    grid-template-columns: var(--grid);
+    grid-template-columns: var(--grid3-1);
 }
 
 .rq-field {
