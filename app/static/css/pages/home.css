@@ -270,6 +270,37 @@
 
 
 
+
+.v-modal__dialog {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(16px, 3vw, 32px);
+}
+
+/* кадр растягивается по доступной высоте */
+.v-modal__frame {
+    position: relative;
+    flex: auto auto;
+    width: min(1100px, 96vw);
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .6);
+}
+
+/* видео заполняет рамку, НО БЕЗ ОБРЕЗКИ */
+#vPlayer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* ключевая строка — вместо cover */
+}
+
 .cw-videos {
     padding: 22px 96px;
 }
