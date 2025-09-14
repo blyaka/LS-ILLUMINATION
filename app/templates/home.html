@@ -8,7 +8,8 @@
 {% block content %}
 <section class="ls-hero">
   {% if hero_video %}
-  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%} muted loop playsinline></video>
+  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%}
+    muted loop playsinline></video>
 
   <script src="{% static 'vendor/hls/hls.min.js' %}"></script>
   <script>
@@ -104,7 +105,7 @@
       <div class="liquidGlass-effect"></div>
       <div class="liquidGlass-tint"></div>
       <div class="liquidGlass-shine"></div>
-      <div class="liquidGlass-text">        
+      <div class="liquidGlass-text">
         <figure class="p-card__inner">
           <div class="p-card__photo">
             {% if cat.photo.url %}<img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />{% endif %}
@@ -132,14 +133,10 @@
 
   <div class="cw-videos__grid">
     {% for v in more_videos %}
-    <button class="v-card" type="button"
-      {% if v.m3u8_url %}
-        data-src="{{ v.m3u8_url }}"
-        data-title="{{ v.name|default:'Видео' }}"
-        data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
-      {% else %}
-        disabled aria-disabled="true" title="Видео ещё не готово"
-      {% endif %}>
+    <button class="v-card" type="button" {% if v.m3u8_url %} data-src="{{ v.m3u8_url }}"
+      data-title="{{ v.name|default:'Видео' }}"
+      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else
+      %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
       <div class="v-card__thumb">
         <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
           alt="{{ v.name|default:'Видео' }}" loading="lazy" />
@@ -170,109 +167,109 @@
 
 
 <script>
-(() => {
-  if (window.__videoModalInit) return;
-  window.__videoModalInit = true;
+  (() => {
+    if (window.__videoModalInit) return;
+    window.__videoModalInit = true;
 
-  const modal   = document.getElementById('vModal');
-  const player  = document.getElementById('vPlayer');
-  const titleEl = document.getElementById('vTitle');
-  let hls = null;
+    const modal = document.getElementById('vModal');
+    const player = document.getElementById('vPlayer');
+    const titleEl = document.getElementById('vTitle');
+    let hls = null;
 
-  function attach(src, poster) {
-    return new Promise((resolve) => {
-      const url = String(src || '').trim();
-      if (!url) return resolve(false);
+    function attach(src, poster) {
+      return new Promise((resolve) => {
+        const url = String(src || '').trim();
+        if (!url) return resolve(false);
 
-      // cleanup
-      try { player.pause(); } catch {}
-      if (hls) { try { hls.destroy(); } catch {} hls = null; }
-      player.removeAttribute('src'); player.load();
+        // cleanup
+        try { player.pause(); } catch { }
+        if (hls) { try { hls.destroy(); } catch { } hls = null; }
+        player.removeAttribute('src'); player.load();
 
-      // постер пока оставляем, уберём на первом кадре
-      if (poster) player.setAttribute('poster', poster); else player.removeAttribute('poster');
+        // постер пока оставляем, уберём на первом кадре
+        if (poster) player.setAttribute('poster', poster); else player.removeAttribute('poster');
 
-      // общий «готово»
-      const onReady = () => {
-        // снимем постер как только пошёл первый кадр
-        const onPlaying = () => { player.removeAttribute('poster'); player.removeEventListener('playing', onPlaying); };
-        player.addEventListener('playing', onPlaying, { once:true });
-        resolve(true);
-      };
+        // общий «готово»
+        const onReady = () => {
+          // снимем постер как только пошёл первый кадр
+          const onPlaying = () => { player.removeAttribute('poster'); player.removeEventListener('playing', onPlaying); };
+          player.addEventListener('playing', onPlaying, { once: true });
+          resolve(true);
+        };
 
-      // нативный HLS (Safari)
-      if (player.canPlayType('application/vnd.apple.mpegurl')) {
-        player.src = url;
-        player.addEventListener('canplay', onReady, { once:true });
-        return;
-      }
+        // нативный HLS (Safari)
+        if (player.canPlayType('application/vnd.apple.mpegurl')) {
+          player.src = url;
+          player.addEventListener('canplay', onReady, { once: true });
+          return;
+        }
 
-      // hls.js
-      if (window.Hls && Hls.isSupported()) {
-        hls = new Hls({ maxBufferLength: 10, autoStartLoad: true });
-        hls.on(Hls.Events.MANIFEST_PARSED, onReady);
-        hls.on(Hls.Events.ERROR, (ev, data) => {
-          // фатальные ошибки — попробуем мягко рестартнуть
-          if (data?.fatal) {
-            switch (data.type) {
-              case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break;
-              case Hls.ErrorTypes.MEDIA_ERROR:   hls.recoverMediaError(); break;
-              default: try { hls.destroy(); } catch {}
+        // hls.js
+        if (window.Hls && Hls.isSupported()) {
+          hls = new Hls({ maxBufferLength: 10, autoStartLoad: true });
+          hls.on(Hls.Events.MANIFEST_PARSED, onReady);
+          hls.on(Hls.Events.ERROR, (ev, data) => {
+            // фатальные ошибки — попробуем мягко рестартнуть
+            if (data?.fatal) {
+              switch (data.type) {
+                case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break;
+                case Hls.ErrorTypes.MEDIA_ERROR: hls.recoverMediaError(); break;
+                default: try { hls.destroy(); } catch { }
+              }
             }
-          }
-        });
-        hls.loadSource(url);
-        hls.attachMedia(player);
-        return;
-      }
+          });
+          hls.loadSource(url);
+          hls.attachMedia(player);
+          return;
+        }
 
-      // фолбэк (только там, где HLS нативен)
-      player.src = url;
-      player.addEventListener('canplay', onReady, { once:true });
-    });
-  }
-
-  async function open(src, poster, title) {
-    titleEl.textContent = title || '';
-    modal.hidden = false;
-    document.body.style.overflow = 'hidden';
-
-    const ready = await attach(src, poster);
-    if (!ready) return;
-
-    // старт после готовности — теперь не залипает на постере
-    player.muted = true;
-    try { await player.play(); } catch {}
-  }
-
-  function close() {
-    try { player.pause(); } catch {}
-    if (hls) { try { hls.destroy(); } catch {} hls = null; }
-    player.removeAttribute('src'); player.load();
-    modal.hidden = true;
-    document.body.style.overflow = '';
-  }
-
-  // открытие
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.v-card');
-    if (btn && btn.dataset.src) {
-      e.preventDefault();
-      open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
+        // фолбэк (только там, где HLS нативен)
+        player.src = url;
+        player.addEventListener('canplay', onReady, { once: true });
+      });
     }
-    if (e.target.hasAttribute('data-close')) close();
-  });
 
-  // esc
-  document.addEventListener('keydown', (e) => {
-    if (!modal.hidden && e.code === 'Escape') close();
-  });
+    async function open(src, poster, title) {
+      titleEl.textContent = title || '';
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
 
-  // клик по бэкдропу
-  modal.addEventListener('click', (e) => {
-    if (e.target.hasAttribute('data-close')) close();
-  });
-})();
+      const ready = await attach(src, poster);
+      if (!ready) return;
+
+      // старт после готовности — теперь не залипает на постере
+      player.muted = true;
+      try { await player.play(); } catch { }
+    }
+
+    function close() {
+      try { player.pause(); } catch { }
+      if (hls) { try { hls.destroy(); } catch { } hls = null; }
+      player.removeAttribute('src'); player.load();
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    // открытие
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.v-card');
+      if (btn && btn.dataset.src) {
+        e.preventDefault();
+        open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
+      }
+      if (e.target.hasAttribute('data-close')) close();
+    });
+
+    // esc
+    document.addEventListener('keydown', (e) => {
+      if (!modal.hidden && e.code === 'Escape') close();
+    });
+
+    // клик по бэкдропу
+    modal.addEventListener('click', (e) => {
+      if (e.target.hasAttribute('data-close')) close();
+    });
+  })();
 </script>
 
 
@@ -380,7 +377,7 @@
     <!-- Правое превью -->
     <figure class="news-side news-side--right">
       {% if news|length > 1 %}
-        <img id="newsNextImg" src="{{ news.1.image.url }}" alt="">
+      <img id="newsNextImg" src="{{ news.1.image.url }}" alt="">
       {% endif %}
     </figure>
 
@@ -389,19 +386,40 @@
 
   <!-- Данные для слайдера -->
   <script id="newsData" type="application/json">
-  [
-    {% for n in news %}
+    [
+      {% for n in news %}
       {
         "date":"{{ n.created_at|date:'d E Y'|upper }}",
         "title":"{{ n.title|escapejs }}",
         "desc":"{{ n.text|truncatewords:30|escapejs }}",
         "img":"{{ n.image.url }}",
-        "url":"#"
+        "body":"{{ n.text|linebreaksbr|escapejs }}"
       }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-  ]
+      {% endfor %}
+    ]
   </script>
+
 </section>
+
+<!-- Модалка новостей -->
+<div class="news-modal" id="newsModal" hidden>
+  <div class="news-modal__backdrop" data-close></div>
+  <div class="news-modal__dialog" role="dialog" aria-modal="true" aria-label="Новость">
+    <button class="news-modal__close" type="button" data-close aria-label="Закрыть">×</button>
+
+    <h3 class="news-modal__title" id="nmTitle"></h3>
+    <div class="news-modal__date" id="nmDate"></div>
+
+    <figure class="news-modal__media">
+      <img id="nmImg" src="" alt="">
+    </figure>
+
+    <div class="news-modal__body" id="nmBody"></div>
+
+    <button class="news-modal__btn" type="button" data-close>Закрыть</button>
+  </div>
+</div>
+
 
 
 <section class="cw-trust" id="trust">
@@ -423,166 +441,166 @@
 
 
 <script>
-(() => {
-  const view  = document.getElementById('trustView');
-  const track = document.getElementById('trustTrack');
-  if (!view || !track) return;
+  (() => {
+    const view = document.getElementById('trustView');
+    const track = document.getElementById('trustTrack');
+    if (!view || !track) return;
 
-  const cfg = { cols:7, gap:56, min:180, max:300, speed:0.7 };
+    const cfg = { cols: 7, gap: 56, min: 180, max: 300, speed: 0.7 };
 
-  let itemW=0, gap=cfg.gap, step=0, offset=0;
-  let nodes=[], cycleLen=0;
+    let itemW = 0, gap = cfg.gap, step = 0, offset = 0;
+    let nodes = [], cycleLen = 0;
 
-function dupOnce(){
-  const kids = Array.from(track.children);
-  for (let t=0; t<20; t++) track.append(...kids.map(n => n.cloneNode(true)));
-  nodes = Array.from(track.children);
-}
-
-let M = 0, idxH = -1;
-function findKhimki(){
-  const kids = Array.from(track.children);
-  M = kids.length/2;
-  for (let i=0;i<M;i++){
-    const img = kids[i].querySelector('img');
-    if (img && /khimki/i.test(img.src)) { idxH = i; break; }
-  }
-}
-
-  function setSize(){
-    const pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad'))||0;
-    const vw  = view.clientWidth - pad*2;
-
-    gap   = cfg.gap;
-    itemW = (vw - gap*(cfg.cols-1)) / cfg.cols;
-    itemW = Math.max(cfg.min, Math.min(cfg.max, itemW));
-
-    const need = itemW*cfg.cols + gap*(cfg.cols-1);
-    if (need > vw){
-      gap   = Math.max(12, gap - (need - vw)/(cfg.cols-1));
-      itemW = (vw - gap*(cfg.cols-1)) / cfg.cols;
+    function dupOnce() {
+      const kids = Array.from(track.children);
+      for (let t = 0; t < 20; t++) track.append(...kids.map(n => n.cloneNode(true)));
+      nodes = Array.from(track.children);
     }
 
-    step = itemW + gap;
-    cycleLen = nodes.length/2 * step;
+    let M = 0, idxH = -1;
+    function findKhimki() {
+      const kids = Array.from(track.children);
+      M = kids.length / 2;
+      for (let i = 0; i < M; i++) {
+        const img = kids[i].querySelector('img');
+        if (img && /khimki/i.test(img.src)) { idxH = i; break; }
+      }
+    }
 
-    view.style.setProperty('--item', itemW + 'px');
-    view.style.setProperty('--gap',  gap   + 'px');
-  }
+    function setSize() {
+      const pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
+      const vw = view.clientWidth - pad * 2;
 
-function paint(){
-  const cx    = view.clientWidth / 2;
-  const sigma = step * 0.9;
-  const kMax  = cfg.max / itemW;
+      gap = cfg.gap;
+      itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
+      itemW = Math.max(cfg.min, Math.min(cfg.max, itemW));
 
-  const M = nodes.length / 2;
+      const need = itemW * cfg.cols + gap * (cfg.cols - 1);
+      if (need > vw) {
+        gap = Math.max(12, gap - (need - vw) / (cfg.cols - 1));
+        itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
+      }
 
-  let sumExtra = 0;
-  for (let j=0; j<M; j++){
-    const center = offset + j*step + itemW/2;
-    const d = Math.abs(center - cx);
-    const f = Math.exp(-(d*d)/(2*sigma*sigma));
-    const k = 1 + (kMax - 1) * f;
-    sumExtra += (k - 1) * itemW / 2;
-  }
-  const liveCycleLen = M * (itemW + gap) + 2 * sumExtra;
+      step = itemW + gap;
+      cycleLen = nodes.length / 2 * step;
 
-  for (let i=0;i<nodes.length;i++){
-    const center = offset + i*step + itemW/2;
-    const d = Math.abs(center - cx);
-    const f = Math.exp(-(d*d)/(2*sigma*sigma));
-    const k = 1 + (kMax - 1) * f;
-    const extra = (k - 1) * itemW / 2;
-    const b = Math.pow(f, 6);
+      view.style.setProperty('--item', itemW + 'px');
+      view.style.setProperty('--gap', gap + 'px');
+    }
 
-    nodes[i].style.setProperty('--k', k.toFixed(4));
-    nodes[i].style.setProperty('--extra', extra.toFixed(2)+'px');
-    nodes[i].style.setProperty('--b', b.toFixed(4));
-  }
+    function paint() {
+      const cx = view.clientWidth / 2;
+      const sigma = step * 0.9;
+      const kMax = cfg.max / itemW;
 
-  return liveCycleLen;
-}
+      const M = nodes.length / 2;
 
+      let sumExtra = 0;
+      for (let j = 0; j < M; j++) {
+        const center = offset + j * step + itemW / 2;
+        const d = Math.abs(center - cx);
+        const f = Math.exp(-(d * d) / (2 * sigma * sigma));
+        const k = 1 + (kMax - 1) * f;
+        sumExtra += (k - 1) * itemW / 2;
+      }
+      const liveCycleLen = M * (itemW + gap) + 2 * sumExtra;
 
-function frame(){
-  offset -= cfg.speed;
+      for (let i = 0; i < nodes.length; i++) {
+        const center = offset + i * step + itemW / 2;
+        const d = Math.abs(center - cx);
+        const f = Math.exp(-(d * d) / (2 * sigma * sigma));
+        const k = 1 + (kMax - 1) * f;
+        const extra = (k - 1) * itemW / 2;
+        const b = Math.pow(f, 6);
 
-  // безопасный wrap по базовой длине копии, как у тебя
-  const L0 = (nodes.length/2) * step;
-  const cx = view.clientWidth/2;
-  const centerIdx = Math.round((cx - offset - itemW/2) / step) % M;
-  const norm = (centerIdx + M) % M;
-  const safe = (idxH === -1) || (Math.abs(norm - idxH) > 2 && Math.abs(norm - (idxH+M)) > 2);
-  if (offset <= -L0 && safe) offset += L0;
+        nodes[i].style.setProperty('--k', k.toFixed(4));
+        nodes[i].style.setProperty('--extra', extra.toFixed(2) + 'px');
+        nodes[i].style.setProperty('--b', b.toFixed(4));
+      }
 
-  // один раз за кадр считаем k/extra/b и получаем реальную длину
-  const liveLen = paint();
-
-  // лёгкий снап и один transform за кадр
-  const x = Math.round(offset * 60) / 60;
-  track.style.transform = `translate3d(${x}px,0,0)`;
-
-  raf = requestAnimationFrame(frame);
-}
+      return liveCycleLen;
+    }
 
 
+    function frame() {
+      offset -= cfg.speed;
 
-dupOnce();
-findKhimki();
-setSize();
-view.style.setProperty('--max', cfg.max + 'px');
+      // безопасный wrap по базовой длине копии, как у тебя
+      const L0 = (nodes.length / 2) * step;
+      const cx = view.clientWidth / 2;
+      const centerIdx = Math.round((cx - offset - itemW / 2) / step) % M;
+      const norm = (centerIdx + M) % M;
+      const safe = (idxH === -1) || (Math.abs(norm - idxH) > 2 && Math.abs(norm - (idxH + M)) > 2);
+      if (offset <= -L0 && safe) offset += L0;
 
-const BASE_SPEED = 0.7; // фикс
+      // один раз за кадр считаем k/extra/b и получаем реальную длину
+      const liveLen = paint();
 
-let raf = 0, running = false;
-function start(){
-  if (running) return;
-  running = true;
-  cfg.speed = BASE_SPEED;  // всегда одна и та же
-  offset = 0;              // чистый старт
-  raf = requestAnimationFrame(frame);
-}
-function stop(){
-  if (!running) return;
-  running = false;
-  cancelAnimationFrame(raf);
-  raf = 0;
-  cfg.speed = BASE_SPEED;  // сбросить на всякий
-}
+      // лёгкий снап и один transform за кадр
+      const x = Math.round(offset * 60) / 60;
+      track.style.transform = `translate3d(${x}px,0,0)`;
 
-// наблюдаем блок: за 300px до появления — старт, ушёл — стоп
-const io = new IntersectionObserver((entries)=>{
-  for (const e of entries){
-    if (e.isIntersecting) start();
-    else stop();
-  }
-}, { root:null, rootMargin:'300px 0px 300px 0px', threshold:0 });
-io.observe(view);
-
-// если вкладка скрыта — стоп, вернулся и блок рядом — старт
-document.addEventListener('visibilitychange', ()=>{
-  if (document.hidden) return stop();
-  const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
-  if (r.top < vh + 300 && r.bottom > -300) start();
-});
-
-// ресайз просто обновляет размеры (анимация продолжится сама если запущена)
-addEventListener('resize', setSize, {passive:true});
+      raf = requestAnimationFrame(frame);
+    }
 
 
 
-// ховер-пауза (возвращаем ровно базовую скорость)
-view.addEventListener('mouseenter', ()=> { if (running) cfg.speed = 0 });
-view.addEventListener('mouseleave', ()=> { if (running) cfg.speed = 0.7 });
+    dupOnce();
+    findKhimki();
+    setSize();
+    view.style.setProperty('--max', cfg.max + 'px');
 
-// первый запуск если блок уже в зоне
-(() => {
-  const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
-  if (r.top < vh + 300 && r.bottom > -300) start();
-})();
+    const BASE_SPEED = 0.7; // фикс
+
+    let raf = 0, running = false;
+    function start() {
+      if (running) return;
+      running = true;
+      cfg.speed = BASE_SPEED;  // всегда одна и та же
+      offset = 0;              // чистый старт
+      raf = requestAnimationFrame(frame);
+    }
+    function stop() {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      cfg.speed = BASE_SPEED;  // сбросить на всякий
+    }
+
+    // наблюдаем блок: за 300px до появления — старт, ушёл — стоп
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) start();
+        else stop();
+      }
+    }, { root: null, rootMargin: '300px 0px 300px 0px', threshold: 0 });
+    io.observe(view);
+
+    // если вкладка скрыта — стоп, вернулся и блок рядом — старт
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) return stop();
+      const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
+      if (r.top < vh + 300 && r.bottom > -300) start();
+    });
+
+    // ресайз просто обновляет размеры (анимация продолжится сама если запущена)
+    addEventListener('resize', setSize, { passive: true });
 
 
-})();
+
+    // ховер-пауза (возвращаем ровно базовую скорость)
+    view.addEventListener('mouseenter', () => { if (running) cfg.speed = 0 });
+    view.addEventListener('mouseleave', () => { if (running) cfg.speed = 0.7 });
+
+    // первый запуск если блок уже в зоне
+    (() => {
+      const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
+      if (r.top < vh + 300 && r.bottom > -300) start();
+    })();
+
+
+  })();
 </script>
 
 
@@ -623,11 +641,11 @@ view.addEventListener('mouseleave', ()=> { if (running) cfg.speed = 0.7 });
 
 
     <script>
-      (function(){
+      (function () {
         var f = document.querySelector('.ct-grid-last');
         if (!f) return;
         var ts = f.querySelector('input[name="ts"]');
-        if (ts && (!ts.value || ts.value === "0")) ts.value = Math.floor(Date.now()/1000);
+        if (ts && (!ts.value || ts.value === "0")) ts.value = Math.floor(Date.now() / 1000);
       })();
     </script>
 
@@ -689,51 +707,64 @@ view.addEventListener('mouseleave', ()=> { if (running) cfg.speed = 0.7 });
     const dateEl = document.getElementById('newsDate');
     const titleEl = document.getElementById('newsTitle');
     const descEl = document.getElementById('newsDesc');
-    const linkEl = document.getElementById('newsLink');
     const prevImgEl = document.getElementById('newsPrevImg');
     const nextImgEl = document.getElementById('newsNextImg');
+
+    const modal = document.getElementById('newsModal');
+    const nmTitle = document.getElementById('nmTitle');
+    const nmDate = document.getElementById('nmDate');
+    const nmImg = document.getElementById('nmImg');
+    const nmBody = document.getElementById('nmBody');
 
     const render = () => {
       const cur = data[i];
       const prev = data[(i - 1 + data.length) % data.length];
       const next = data[(i + 1) % data.length];
-
-      // центр
       img.src = cur.img;
       dateEl.innerHTML = cur.date;
       titleEl.innerHTML = cur.title;
       descEl.textContent = cur.desc;
-      linkEl.href = cur.url;
-
-      // боковые превью (только картинки)
-      prevImgEl.src = prev.img;
-      nextImgEl.src = next.img;
+      prevImgEl && (prevImgEl.src = prev.img);
+      nextImgEl && (nextImgEl.src = next.img);
     };
 
-    document.querySelector('.news-arrow--prev').addEventListener('click', () => {
-      i = (i - 1 + data.length) % data.length;
-      render();
-    });
-    document.querySelector('.news-arrow--next').addEventListener('click', () => {
-      i = (i + 1) % data.length;
-      render();
+    function openModal(idx) {
+      if (!modal) return;
+      const n = data[idx];
+      nmTitle.textContent = n.title;
+      nmDate.textContent = n.date;
+      nmImg.src = n.img; nmImg.alt = n.title;
+      nmBody.innerHTML = n.body;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      if (!modal) return;
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    // стрелки
+    document.querySelector('.news-arrow--prev')?.addEventListener('click', () => { i = (i - 1 + data.length) % data.length; render(); });
+    document.querySelector('.news-arrow--next')?.addEventListener('click', () => { i = (i + 1) % data.length; render(); });
+
+    // ЧИТАТЬ ДАЛЕЕ — делегирование (на случай перекрытий/рендеров)
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('.news-btn');
+      if (a) { e.preventDefault(); openModal(i); }
+      if (e.target.hasAttribute('data-close')) closeModal();
     });
 
-    // свайп по центральной карточке
-    const area = document.querySelector('.news-main');
-    let sx = 0;
-    area.addEventListener('pointerdown', e => { sx = e.clientX; area.setPointerCapture(e.pointerId); });
-    area.addEventListener('pointerup', e => {
-      const dx = e.clientX - sx;
-      if (Math.abs(dx) > 40) {
-        i = (i + (dx < 0 ? 1 : -1) + data.length) % data.length;
-        render();
-      }
+    // ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.hidden) closeModal();
     });
 
     render();
   })();
 </script>
+
+
 
 
 <script>

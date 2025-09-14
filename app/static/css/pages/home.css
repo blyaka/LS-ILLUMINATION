@@ -378,8 +378,8 @@
     width: 76px;
     height: 76px;
     border-radius: 50%;
-    background: radial-gradient(70% 70% at 30% 30%, #FF45F3, #C80570);
-    box-shadow: 0 10px 30px rgba(200, 5, 112, .45), inset 0 0 0 6px rgba(255, 255, 255, .18);
+    background: var(--accent2);
+    /* box-shadow: 0 10px 30px rgba(200, 5, 112, .45), inset 0 0 0 6px rgba(255, 255, 255, .18); */
     display: grid;
     place-items: center;
 }
@@ -868,6 +868,113 @@
     box-shadow: 0 8px 22px rgba(188, 66, 133, .45), inset 0 0 0 1px rgba(255, 255, 255, .18);
     margin-top: 50px;
 }
+
+
+
+/* Модалка новостей */
+.news-modal[hidden] {
+    display: none
+}
+
+.news-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000; 
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+.news-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 7, 17, .65);
+    backdrop-filter: blur(6px)
+}
+
+.news-modal__dialog {
+    position: relative;
+    margin: 24px auto;
+    max-width: 520px;
+    background: #fff;
+    color: #111;
+    border-radius: 8px;
+    overflow: auto;
+    max-height: calc(100dvh - 48px)
+}
+
+.news-modal__close {
+    position: absolute;
+    right: 12px;
+    top: 8px;
+    font-size: 24px;
+    line-height: 1;
+    border: 0;
+    background: transparent;
+    cursor: pointer
+}
+
+.news-modal__title {
+    font-size: var(--font-h1);
+    text-transform: uppercase;
+    margin: 0 32px 8px 0;
+    padding: 48px 48px 20px;
+}
+
+.news-modal__date {
+    display: inline-block;
+    background: #111;
+    color: #fff;
+    font-size: var(--font-small);
+    letter-spacing: .02em;
+    padding: 8px 14px;
+    margin: 0 0 16px;
+    border-right: 6px solid #BC4285;
+}
+
+
+
+.news-modal__media {
+    padding: 0px 48px;
+}
+
+.news-modal__media img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+    margin: 0 0 20px
+}
+
+.news-modal__body {
+    font-size: var(--font-main);
+    color: var(--black);
+    padding: 0px 48px;
+}
+
+.news-modal__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 24px 48px 48px;
+    padding: 15px 16px;
+    border-radius: var(--radius2);
+    border: 1px solid #BC4285;
+    background: var(--accent2);
+    color: #fff;
+    font-size: var(--font-main);
+    cursor: pointer;
+    transition: .25s ease;
+    user-select: none
+}
+
+
+
+
+
+
+
+
 
 
 
