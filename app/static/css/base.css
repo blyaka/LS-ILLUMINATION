@@ -113,7 +113,7 @@ body {
     width: 1px;
     height: 16px;
     opacity: .4;
-    background: #fff;
+    background: var(--text);
 }
 
 .ls-logo__ru {
@@ -413,9 +413,9 @@ html.rq-lock body {
 .rq-title {
     text-align: center;
     color: var(--text);
-    font-size: 1.5rem;
+    font-size: var(--font-h3);
     margin: 6px 0 22px;
-    font-weight: 300;
+    font-weight: var(--font-weight-light);
 }
 
 /* форма */
@@ -430,7 +430,7 @@ html.rq-lock body {
 }
 
 .rq-row--3 {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: var(--grid);
 }
 
 .rq-field {
@@ -620,7 +620,7 @@ html.rq-lock body {
 }
 
 .ct-val {
-    font-size: 1rem;
+    font-size: var(--font-main);
     line-height: 1.5;
 }
 
