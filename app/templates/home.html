@@ -713,25 +713,37 @@
     const nmImg = document.getElementById('nmImg');
     const nmBody = document.getElementById('nmBody');
 
-    const render = () => {
+    const render = async () => {
       const cur = data[i];
       const prev = data[(i - 1 + data.length) % data.length];
       const next = data[(i + 1) % data.length];
-      img.src = cur.img;
-      dateEl.innerHTML = cur.date;
-      titleEl.innerHTML = cur.title;
-      descEl.textContent = cur.desc;
-      prevImgEl && (prevImgEl.src = prev.img);
-      nextImgEl && (nextImgEl.src = next.img);
+
+      const im = new Image();
+      im.decoding = 'async';
+      im.src = cur.img;
+      await im.decode().catch(()=>{});
+      img.src = im.src;
+
+      dateEl.innerHTML  = cur.date;
+      titleEl.innerHTML = (cur.title || '').replace(/\n/g, '<br>');
+      descEl.textContent = cur.desc || '';
+
+      if (prevImgEl) prevImgEl.src = prev.img;
+      if (nextImgEl) nextImgEl.src = next.img;
     };
+
 
     function openModal(idx) {
       if (!modal) return;
-      const n = data[idx];
-      nmTitle.textContent = n.title;
-      nmDate.textContent = n.date;
-      nmImg.src = n.img; nmImg.alt = n.title;
-      nmBody.innerHTML = n.body;
+      const n = data[idx] || {};
+      nmTitle.innerHTML = (n.title || '').replace(/\n/g, '<br>');
+      nmDate.innerHTML = n.date || '';
+      nmImg.src = n.img || img.src;
+      nmImg.alt = (n.title || '').replace(/<[^>]+>/g,'').trim() || 'Новость';
+      nmBody.innerHTML = n.body && n.body.trim()
+        ? n.body
+        : (n.desc ? `<p>${n.desc}</p>` : '');
+
       modal.hidden = false;
       document.body.style.overflow = 'hidden';
     }
@@ -741,11 +753,9 @@
       document.body.style.overflow = '';
     }
 
-    // стрелки
     document.querySelector('.news-arrow--prev')?.addEventListener('click', () => { i = (i - 1 + data.length) % data.length; render(); });
     document.querySelector('.news-arrow--next')?.addEventListener('click', () => { i = (i + 1) % data.length; render(); });
 
-    // ЧИТАТЬ ДАЛЕЕ — делегирование (на случай перекрытий/рендеров)
     document.addEventListener('click', (e) => {
       const a = e.target.closest('.news-btn');
       if (a) { e.preventDefault(); openModal(i); }
