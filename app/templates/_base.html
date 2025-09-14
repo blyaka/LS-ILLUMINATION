@@ -82,56 +82,97 @@
 
 
 
+    <div class="cookie-banner" id="cookieBanner" hidden>
+        <div class="cookie-banner__wrap">
+            <h3>Мы используем файлы cookie</h3>
+            <p>
+                Этот сайт применяет cookie-файлы и аналогичные технологии, чтобы обеспечить корректную работу,
+                улучшить удобство использования, анализировать трафик и предлагать персонализированный контент.
+                Подробнее — см. нашу <a href="/cookie-policy/" target="_blank">Политику использования файлов cookie</a>.
+            </p>
+            <div class="cookie-banner__actions">
+                <button class="cookie-btn cookie-btn--decline" id="cookieDecline">Отклонить</button>
+                <button class="cookie-btn cookie-btn--accept" id="cookieAccept">Принять все</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        (() => {
+            const banner = document.getElementById('cookieBanner');
+            const accept = document.getElementById('cookieAccept');
+            const decline = document.getElementById('cookieDecline');
+
+            // проверка сохранённых настроек
+            if (!localStorage.getItem('cookieConsent')) {
+                banner.hidden = false;
+            }
+
+            function setConsent(value) {
+                localStorage.setItem('cookieConsent', value);
+                banner.hidden = true;
+            }
+
+            accept.addEventListener('click', () => setConsent('accepted'));
+            decline.addEventListener('click', () => setConsent('declined'));
+        })();
+    </script>
+
+
+
+
+
     <div class="rq-underlay" id="rqUnderlay" hidden></div>
     <section class="rq-modal" id="rqModal" role="dialog" aria-modal="true" aria-labelledby="rqTitle" hidden>
-    <div class="rq-card">
-        <button class="rq-close" type="button" id="rqClose" aria-label="Закрыть">×</button>
-        <h2 class="rq-title" id="rqTitle">Напишите нам</h2>
+        <div class="rq-card">
+            <button class="rq-close" type="button" id="rqClose" aria-label="Закрыть">×</button>
+            <h2 class="rq-title" id="rqTitle">Напишите нам</h2>
 
-        <form class="rq-form" method="post" action="{% url 'req_submit' %}">
-        {% csrf_token %}
-        <input type="hidden" name="hp" value="">
-        <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
+            <form class="rq-form" method="post" action="{% url 'req_submit' %}">
+                {% csrf_token %}
+                <input type="hidden" name="hp" value="">
+                <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
 
-        <div class="rq-row rq-row--3">
-            <label class="rq-field">
-            <span>Ваше имя*</span>
-            <input type="text" name="name" required>
-            </label>
-            <label class="rq-field">
-            <span>Телефон*</span>
-            <input type="tel" name="phone" inputmode="tel" placeholder="+7" required>
-            </label>
-            <label class="rq-field">
-            <span>E-mail</span>
-            <input type="email" name="email">
-            </label>
+                <div class="rq-row rq-row--3">
+                    <label class="rq-field">
+                        <span>Ваше имя*</span>
+                        <input type="text" name="name" required>
+                    </label>
+                    <label class="rq-field">
+                        <span>Телефон*</span>
+                        <input type="tel" name="phone" inputmode="tel" placeholder="+7" required>
+                    </label>
+                    <label class="rq-field">
+                        <span>E-mail</span>
+                        <input type="email" name="email">
+                    </label>
+                </div>
+
+                <label class="rq-field rq-field--area">
+                    <span>Сообщение</span>
+                    <textarea name="message" rows="4"></textarea>
+                </label>
+
+                <div class="rq-bottom">
+                    <label class="rq-check">
+                        <input type="checkbox" required>
+                        <i></i>
+                        <span>Нажимая кнопку отправить, вы соглашаетесь с политикой обработки персональных данных</span>
+                    </label>
+                    <button class="rq-submit" type="submit">Отправить</button>
+                </div>
+            </form>
         </div>
-
-        <label class="rq-field rq-field--area">
-            <span>Сообщение</span>
-            <textarea name="message" rows="4"></textarea>
-        </label>
-
-        <div class="rq-bottom">
-            <label class="rq-check">
-            <input type="checkbox" required>
-            <i></i>
-            <span>Нажимая кнопку отправить, вы соглашаетесь с политикой обработки персональных данных</span>
-            </label>
-            <button class="rq-submit" type="submit">Отправить</button>
-        </div>
-        </form>
-    </div>
     </section>
 
-<script>
-  // подставим ts на клиенте, если не сделали это на сервере
-  (function(){
-    var ts = document.querySelector('form.rq-form input[name="ts"]');
-    if (ts && (!ts.value || ts.value === "0")) ts.value = Math.floor(Date.now()/1000);
-  })();
-</script>
+    <script>
+        // подставим ts на клиенте, если не сделали это на сервере
+        (function () {
+            var ts = document.querySelector('form.rq-form input[name="ts"]');
+            if (ts && (!ts.value || ts.value === "0")) ts.value = Math.floor(Date.now() / 1000);
+        })();
+    </script>
 
     <section class="rq-modal" id="ctModal" role="dialog" aria-modal="true" aria-labelledby="ctTitle" hidden>
         <div class="rq-card contacts-modal">
