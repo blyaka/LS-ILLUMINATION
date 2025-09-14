@@ -132,10 +132,14 @@
 
   <div class="cw-videos__grid">
     {% for v in more_videos %}
-    <button class="v-card" type="button" {% if v.m3u8_url %} data-src="{{ v.m3u8_url }}"
-      data-title="{{ v.name|default:'Видео' }}"
-      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else
-      %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
+    <button class="v-card" type="button"
+      {% if v.m3u8_url %}
+        data-src="{{ v.m3u8_url }}"
+        data-title="{{ v.name|default:'Видео' }}"
+        data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
+      {% else %}
+        disabled aria-disabled="true" title="Видео ещё не готово"
+      {% endif %}>
       <div class="v-card__thumb">
         <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
           alt="{{ v.name|default:'Видео' }}" loading="lazy" />
@@ -156,10 +160,147 @@
       <div class="v-modal__frame">
         <video id="vPlayer" controls playsinline preload="none"></video>
       </div>
-      <div class="v-modal__title" id="vTitle" style="margin-top:8px"></div>
+      <div class="v-modal__title" id="vTitle"></div>
     </div>
   </div>
 </section>
+
+
+
+<style>
+.v-modal__dialog{
+  width: min(1200px, 96vw);
+  max-height: 96vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* кадр растягивается по доступной высоте */
+.v-modal__frame{
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* видео заполняет рамку, НО БЕЗ ОБРЕЗКИ */
+#vPlayer{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;   /* ключевая строка — вместо cover */
+  background: #000;
+}
+</style>
+
+
+
+<script>
+(() => {
+  if (window.__videoModalInit) return;
+  window.__videoModalInit = true;
+
+  const modal   = document.getElementById('vModal');
+  const player  = document.getElementById('vPlayer');
+  const titleEl = document.getElementById('vTitle');
+  let hls = null;
+
+  function attach(src, poster) {
+    return new Promise((resolve) => {
+      const url = String(src || '').trim();
+      if (!url) return resolve(false);
+
+      // cleanup
+      try { player.pause(); } catch {}
+      if (hls) { try { hls.destroy(); } catch {} hls = null; }
+      player.removeAttribute('src'); player.load();
+
+      // постер пока оставляем, уберём на первом кадре
+      if (poster) player.setAttribute('poster', poster); else player.removeAttribute('poster');
+
+      // общий «готово»
+      const onReady = () => {
+        // снимем постер как только пошёл первый кадр
+        const onPlaying = () => { player.removeAttribute('poster'); player.removeEventListener('playing', onPlaying); };
+        player.addEventListener('playing', onPlaying, { once:true });
+        resolve(true);
+      };
+
+      // нативный HLS (Safari)
+      if (player.canPlayType('application/vnd.apple.mpegurl')) {
+        player.src = url;
+        player.addEventListener('canplay', onReady, { once:true });
+        return;
+      }
+
+      // hls.js
+      if (window.Hls && Hls.isSupported()) {
+        hls = new Hls({ maxBufferLength: 10, autoStartLoad: true });
+        hls.on(Hls.Events.MANIFEST_PARSED, onReady);
+        hls.on(Hls.Events.ERROR, (ev, data) => {
+          // фатальные ошибки — попробуем мягко рестартнуть
+          if (data?.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR: hls.startLoad(); break;
+              case Hls.ErrorTypes.MEDIA_ERROR:   hls.recoverMediaError(); break;
+              default: try { hls.destroy(); } catch {}
+            }
+          }
+        });
+        hls.loadSource(url);
+        hls.attachMedia(player);
+        return;
+      }
+
+      // фолбэк (только там, где HLS нативен)
+      player.src = url;
+      player.addEventListener('canplay', onReady, { once:true });
+    });
+  }
+
+  async function open(src, poster, title) {
+    titleEl.textContent = title || '';
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+
+    const ready = await attach(src, poster);
+    if (!ready) return;
+
+    // старт после готовности — теперь не залипает на постере
+    player.muted = true;
+    try { await player.play(); } catch {}
+  }
+
+  function close() {
+    try { player.pause(); } catch {}
+    if (hls) { try { hls.destroy(); } catch {} hls = null; }
+    player.removeAttribute('src'); player.load();
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  // открытие
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.v-card');
+    if (btn && btn.dataset.src) {
+      e.preventDefault();
+      open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
+    }
+    if (e.target.hasAttribute('data-close')) close();
+  });
+
+  // esc
+  document.addEventListener('keydown', (e) => {
+    if (!modal.hidden && e.code === 'Escape') close();
+  });
+
+  // клик по бэкдропу
+  modal.addEventListener('click', (e) => {
+    if (e.target.hasAttribute('data-close')) close();
+  });
+})();
+</script>
+
 
 
 
@@ -210,17 +351,7 @@
   </aside>
 
   <!-- Модалка-плеер -->
-  <div class="sv-modal" id="sdModal" hidden>
-    <div class="sv-backdrop" data-close></div>
-    <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
-      <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
-      <div class="sv-frame">
-        <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
-          <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-        </video>
-      </div>
-    </div>
-  </div>
+
 </section>
 
 <section class="cw-split right" id="sd-section">
@@ -239,17 +370,7 @@
   </div>
 
   <!-- Модалка-плеер -->
-  <div class="sv-modal" id="sdModal" hidden>
-    <div class="sv-backdrop" data-close></div>
-    <div class="sv-dialog" role="dialog" aria-modal="true" aria-label="Видео">
-      <button class="sv-close" type="button" data-close aria-label="Закрыть">×</button>
-      <div class="sv-frame">
-        <video id="sdFull" controls playsinline preload="metadata" poster="{% static 'images/sd-poster.jpg' %}">
-          <source src="{% static 'video/hero.MOV' %}" type="video/mp4" />
-        </video>
-      </div>
-    </div>
-  </div>
+
 </section>
 
 
@@ -320,7 +441,7 @@
       <div class="trust-item"><img src="{% static 'logos/klin.png' %}" alt=""></div>
       <div class="trust-item"><img src="{% static 'logos/labytnangi.png' %}" alt=""></div>
       <div class="trust-item"><img src="{% static 'logos/nadym.png' %}" alt=""></div>
-      <div class="trust-item"><img src="{% static 'logos/yao.png' %}" alt=""></div>
+      <div class="trust-item"><img src="{% static 'logos/klin.png' %}" alt=""></div>
     </div>
   </div>
 </section>
@@ -792,109 +913,6 @@ view.addEventListener('mouseleave', ()=> { if (running) cfg.speed = 0.7 });
 
 
 
-<style>
-  .v-modal__dialog {
-    max-width: min(1200px, 96vw);
-    width: 96vw
-  }
-
-  .v-modal__frame {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16/9
-  }
-
-  #vPlayer {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background: #000
-  }
-</style>
-
-
-<script>
-  (() => {
-    const modal = document.getElementById('vModal');
-    const player = document.getElementById('vPlayer');
-    const titleEl = document.getElementById('vTitle');
-    let hls = null;
-
-    function attach(src, poster) {
-      if (hls) { try { hls.destroy(); } catch { } hls = null; }
-      player.pause(); player.removeAttribute('src'); player.load();
-      poster ? player.setAttribute('poster', poster) : player.removeAttribute('poster');
-
-      if (player.canPlayType('application/vnd.apple.mpegurl')) {
-        player.src = src;
-      } else if (window.Hls && Hls.isSupported()) {
-        hls = new Hls({ maxBufferLength: 10 });
-        hls.loadSource(src);
-        hls.attachMedia(player);
-      } else {
-        player.src = src; // крайний фолбэк
-      }
-    }
-
-    function open(src, poster, title) {
-      attach(src, poster);
-      titleEl.textContent = title || '';
-      modal.hidden = false;
-      document.body.style.overflow = 'hidden';
-      player.muted = true;
-      player.play().catch(() => { });
-    }
-
-    function close() {
-      if (hls) { try { hls.destroy(); } catch { } hls = null; }
-      player.pause(); player.removeAttribute('src'); player.load();
-      modal.hidden = true;
-      document.body.style.overflow = '';
-    }
-
-    function togglePlay() { player.paused ? player.play().catch(() => { }) : player.pause(); }
-    function seekBy(s) { try { player.currentTime = Math.max(0, Math.min((player.duration || 1e9), player.currentTime + s)); } catch { } }
-    function toggleFullscreen() {
-      const el = modal.querySelector('.v-modal__dialog');
-      if (!document.fullscreenElement) { el.requestFullscreen?.(); }
-      else { document.exitFullscreen?.(); }
-    }
-
-    let clickTimer = 0;
-    player.addEventListener('click', () => {
-      if (clickTimer) { clearTimeout(clickTimer); clickTimer = 0; toggleFullscreen(); return; }
-      clickTimer = setTimeout(() => { togglePlay(); clickTimer = 0; }, 200);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (modal.hidden) return;
-      const tag = (e.target.tagName || '').toLowerCase();
-      if (tag === 'input' || tag === 'textarea') return;
-
-      const code = e.code;
-
-      if (code === 'Space' || code === 'KeyK') { e.preventDefault(); togglePlay(); }
-      else if (code === 'ArrowLeft' || code === 'KeyJ') { e.preventDefault(); seekBy(-10); }
-      else if (code === 'ArrowRight' || code === 'KeyL') { e.preventDefault(); seekBy(+10); }
-      else if (code === 'KeyF') { e.preventDefault(); toggleFullscreen(); }
-      else if (code === 'KeyM') { player.muted = !player.muted; }
-      else if (code === 'Escape') { close(); }
-    });
-
-    // Открытие/закрытие
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.v-card');
-      if (btn && btn.dataset.src) open(btn.dataset.src, btn.dataset.poster, btn.dataset.title);
-      if (e.target.matches('[data-close]')) close();
-    });
-
-    // При закрытии по клику в бекдроп (если у тебя есть data-close)
-    modal.addEventListener('click', (e) => {
-      if (e.target.hasAttribute('data-close')) close();
-    });
-  })();
-</script>
 
 <script>
   (function () {
