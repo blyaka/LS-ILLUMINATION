@@ -43,5 +43,76 @@
 
 </div>
 
+<!-- Модалка для просмотра изображения -->
+<div class="image-modal" id="imageModal" hidden>
+  <div class="image-modal__overlay" id="modalOverlay"></div>
+  <div class="image-modal__content">
+    <button class="image-modal__close" id="modalClose">×</button>
+    <div class="image-modal__nav">
+      <button class="image-modal__prev" id="modalPrev">←</button>
+      <img id="modalImg" src="" alt="Large image">
+      <button class="image-modal__next" id="modalNext">→</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(() => {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImg');
+  const modalClose = document.getElementById('modalClose');
+  const modalPrev = document.getElementById('modalPrev');
+  const modalNext = document.getElementById('modalNext');
+  const modalOverlay = document.getElementById('modalOverlay');
+  
+  const images = [...document.querySelectorAll('.card_photo img')];  // Получаем все картинки
+  let currentIndex = 0;
+
+  // Открытие модалки
+  function openModal(index) {
+    currentIndex = index;
+    modalImg.src = images[currentIndex].src;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';  // Блокируем скролл
+  }
+
+  // Закрытие модалки
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';  // Восстанавливаем скролл
+  }
+
+  // Переключение на следующее изображение
+  function showNextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    modalImg.src = images[currentIndex].src;
+  }
+
+  // Переключение на предыдущее изображение
+  function showPrevImage() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    modalImg.src = images[currentIndex].src;
+  }
+
+  // Добавляем обработчики событий
+  images.forEach((img, index) => {
+    img.addEventListener('click', () => openModal(index));
+  });
+
+  modalClose.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', closeModal);
+  modalNext.addEventListener('click', showNextImage);
+  modalPrev.addEventListener('click', showPrevImage);
+
+  // Закрытие модалки по клавише Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+})();
+</script>
+
+
+
 
 {% endblock %}

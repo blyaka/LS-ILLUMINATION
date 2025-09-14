@@ -587,7 +587,7 @@
     gap: clamp(20px, 3vw, 40px);
     align-items: stretch;
     min-height: min(86vh, 900px);
-    padding: 24px 0px 48px 96px;
+    padding: 24px 96px 48px 0px;
 }
 
 .cw-split.right {
@@ -635,21 +635,33 @@
 .cw-split__btn {
     justify-self: start;
     margin: auto auto 0px;
-    padding: 12px 18px;
-    border: 1px solid rgba(255, 255, 255, .18);
-    border-radius: 999px;
-    background: var(--grad);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 32px;
+    border: 1px solid #BC4285;
+    background: rgba(188, 66, 133, 0.1);
     color: #fff;
-    font-weight: var(--font-weight-bold);
-    cursor: pointer;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
     box-shadow:
-        0 10px 30px rgba(188, 66, 133, .35),
-        inset 0 0 0 6px rgba(255, 255, 255, .12);
-    transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+        0 0 45px rgba(188, 66, 133, 0.6),
+        inset 0 0 45px rgba(188, 66, 133, 0.4);
+    text-shadow:
+        0 0 8px rgba(188, 66, 133, 0.8),
+        0 0 16px rgba(188, 66, 133, 0.6);
 }
 
 .cw-split__btn:hover {
-    transform: translateY(-1px);
+    background: rgba(188, 66, 133, 0.2);
+    box-shadow:
+        0 0 25px rgba(188, 66, 133, 0.9),
+        inset 0 0 15px rgba(188, 66, 133, 0.6);
+    text-shadow:
+        0 0 12px rgba(188, 66, 133, 1),
+        0 0 24px rgba(188, 66, 133, 0.8);
 }
 
 .cw-split__btn:active {
@@ -857,16 +869,34 @@
 }
 
 .news-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 32px;
+    border: 1px solid #BC4285;
+    background: rgba(188, 66, 133, 0.1);
     color: #fff;
     text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 999px;
-    font-size: 13px;
-    background: radial-gradient(60% 140% at 50% 50%, rgba(255, 88, 220, .35) 0%, rgba(255, 88, 220, 0) 60%),
-        linear-gradient(90deg, #B83D83 0%, #C80570 50%, #602BFF 100%);
-    box-shadow: 0 8px 22px rgba(188, 66, 133, .45), inset 0 0 0 1px rgba(255, 255, 255, .18);
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 0 45px rgba(188, 66, 133, 0.6),
+        inset 0 0 45px rgba(188, 66, 133, 0.4);
+    text-shadow:
+        0 0 8px rgba(188, 66, 133, 0.8),
+        0 0 16px rgba(188, 66, 133, 0.6);
     margin-top: 50px;
+}
+
+.news-btn:hover {
+    background: rgba(188, 66, 133, 0.2);
+    box-shadow:
+        0 0 25px rgba(188, 66, 133, 0.9),
+        inset 0 0 15px rgba(188, 66, 133, 0.6);
+    text-shadow:
+        0 0 12px rgba(188, 66, 133, 1),
+        0 0 24px rgba(188, 66, 133, 0.8);
 }
 
 
@@ -879,7 +909,7 @@
 .news-modal {
     position: fixed;
     inset: 0;
-    z-index: 1000; 
+    z-index: 1000;
     display: flex;
     justify-content: end;
     align-items: center;
@@ -959,6 +989,7 @@
     margin: 24px 48px 48px;
     padding: 15px 16px;
     border-radius: 10px;
+    border: none;
     background: var(--accent2);
     color: #fff;
     font-size: var(--font-main);
@@ -1155,19 +1186,33 @@
     grid-column: 1 / span 2;
     justify-self: start;
     margin-top: 6px;
-    padding: 12px 22px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, .18);
-    background: linear-gradient(90deg, #B83D83 0%, #C80570 50%, #602BFF 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 32px;
+    border: 1px solid #BC4285;
+    background: rgba(188, 66, 133, 0.1);
     color: #fff;
-    font-weight: var(--font-weight-bold);
-    cursor: pointer;
-    box-shadow: 0 14px 34px rgba(188, 66, 133, .45), inset 0 0 0 6px rgba(255, 255, 255, .12);
-    transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 0 45px rgba(188, 66, 133, 0.6),    
+        inset 0 0 45px rgba(188, 66, 133, 0.4);
+    text-shadow: 
+        0 0 8px rgba(188, 66, 133, 0.8),   
+        0 0 16px rgba(188, 66, 133, 0.6);  
 }
 
 .ct-btn:hover {
-    transform: translateY(-1px);
+    background: rgba(188, 66, 133, 0.2);
+    box-shadow:
+        0 0 25px rgba(188, 66, 133, 0.9),      
+        inset 0 0 15px rgba(188, 66, 133, 0.6);
+    text-shadow: 
+        0 0 12px rgba(188, 66, 133, 1), 
+        0 0 24px rgba(188, 66, 133, 0.8);
 }
 
 
@@ -1357,8 +1402,3 @@
         border-radius: 10px;
     }
 }
-
-
-
-
-
