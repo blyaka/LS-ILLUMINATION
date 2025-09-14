@@ -888,7 +888,7 @@
 .news-modal__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(10, 7, 17, .65);
+    background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(6px)
 }
 
@@ -958,8 +958,7 @@
     justify-content: center;
     margin: 24px 48px 48px;
     padding: 15px 16px;
-    border-radius: var(--radius2);
-    border: 1px solid #BC4285;
+    border-radius: 10px;
     background: var(--accent2);
     color: #fff;
     font-size: var(--font-main);
