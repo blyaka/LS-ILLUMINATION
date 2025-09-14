@@ -11,7 +11,7 @@
 
 <section class="ls-hero">
   {% if hero_video %}
-  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%} muted loop playsinline></video>
+  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%} autoplay muted loop playsinline></video>
 
   <script>
     (function () {
