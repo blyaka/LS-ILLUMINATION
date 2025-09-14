@@ -75,3 +75,22 @@ class Video(models.Model):
                     )
 
             threading.Thread(target=run, daemon=True).start()
+
+
+
+
+
+class News(models.Model):
+    title = models.CharField("Название", max_length=255)
+    image = models.ImageField("Фото", upload_to="news/%Y/%m/")
+    text = models.TextField("Текст")
+    is_available = models.BooleanField('Показывать на главной', default=True)
+    created_at = models.DateTimeField("Дата создания", default=timezone.now)
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = "Новость"
+        verbose_name_plural = "Новости"
+
+    def __str__(self):
+        return self.title

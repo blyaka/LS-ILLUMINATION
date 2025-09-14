@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from content.models import Video
+from content.models import Video, News
 from cases.models import Category, Case
 from django.utils import timezone
 
@@ -14,9 +14,12 @@ def HomePage(request):
     hero = Video.objects.filter(status='ready', is_featured=True).first()
     more = Video.objects.filter(status='ready', is_featured=False).order_by('-created')
 
+    news = News.objects.all().filter(is_available=True).order_by('-created_at')
+
     ctx = {'hero_video': hero,
            'more_videos': more,
            'categories': categories,
+           'news': news,
         }
 
     return render(request, 'home.html', ctx)

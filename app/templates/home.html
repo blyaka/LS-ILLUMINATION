@@ -256,7 +256,6 @@
 
 
 
-
 <section class="cw-news" id="news">
   <h2 class="cw-news__title">Новости</h2>
 
@@ -271,13 +270,13 @@
     <!-- Центральная карточка (Всегда на месте) -->
     <article class="news-main" aria-live="polite">
       <figure class="news-main__media">
-        <span class="news-date" id="newsDate">13 АПРЕЛЯ 2022</span>
-        <img id="newsImg" src="{% static 'images/portfolio.jpg' %}" alt="">
+        <span class="news-date" id="newsDate">{{ news.0.created_at|date:"d E Y"|upper }}</span>
+        <img id="newsImg" src="{{ news.0.image.url }}" alt="">
       </figure>
       <aside class="news-main__aside">
-        <h3 class="news-title" id="newsTitle">Выставка<br>CHRISTMASWORLD</h3>
+        <h3 class="news-title" id="newsTitle">{{ news.0.title|linebreaksbr }}</h3>
         <p class="news-desc" id="newsDesc">
-          Компания «LS illumination» приняла участие в Международной выставке Christmasworld
+          {{ news.0.text|truncatewords:25 }}
         </p>
         <a class="news-btn" id="newsLink" href="#">Читать далее</a>
       </aside>
@@ -285,40 +284,29 @@
 
     <!-- Правое превью -->
     <figure class="news-side news-side--right">
-      <img id="newsNextImg" src="{% static 'images/portfolio.jpg' %}" alt="">
+      {% if news|length > 1 %}
+        <img id="newsNextImg" src="{{ news.1.image.url }}" alt="">
+      {% endif %}
     </figure>
 
     <button class="news-arrow news-arrow--next" aria-label="Вперёд"></button>
   </div>
 
-  <!-- Данные (замени на цикл Django при желании) -->
+  <!-- Данные для слайдера -->
   <script id="newsData" type="application/json">
   [
-    {
-      "date":"13 АПРЕЛЯ 2022",
-      "title":"Выставка<br>CHRISTMASWORLD",
-      "desc":"Компания «LS illumination» приняла участие в Международной выставке Christmasworld",
-      "img":"{% static 'images/portfolio.jpg' %}",
-      "url":"#"
-    },
-    {
-      "date":"09 ИЮНЯ 2023",
-      "title":"Новогоднее<br>оформление",
-      "desc":"Комплекс световых инсталляций и динамических конструкций.",
-      "img":"{% static 'images/portfolio.jpg' %}",
-      "url":"#"
-    },
-    {
-      "date":"25 ДЕКАБРЯ 2024",
-      "title":"Новый проект<br>в центре",
-      "desc":"Арт-объект с «liquid glass» и авторской анимацией.",
-      "img":"{% static 'images/portfolio.jpg' %}",
-      "url":"#"
-    }
+    {% for n in news %}
+      {
+        "date":"{{ n.created_at|date:'d E Y'|upper }}",
+        "title":"{{ n.title|escapejs }}",
+        "desc":"{{ n.text|truncatewords:30|escapejs }}",
+        "img":"{{ n.image.url }}",
+        "url":"#"
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}
   ]
   </script>
 </section>
-
 
 
 <section class="cw-trust" id="trust">
