@@ -11,8 +11,9 @@
 
 <section class="ls-hero">
   {% if hero_video %}
-  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%}
-    autoplay muted loop playsinline></video>
+  <div class="ls-hero__media-wrap">
+    <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {%endif%} autoplay muted loop playsinline></video>
+  </div>
 
   <script>
     (function () {
@@ -64,6 +65,13 @@
       <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" />
     </svg>
   </button>
+
+  <a href="" class="pdf-button">
+      <svg width="29" height="33">
+        <use xlink:href="{% static 'images/icons.svg' %}#icon-pdf"></use>
+      </svg>
+    Запросить каталог PDF
+  </a>
 </section>
 
 
@@ -122,347 +130,347 @@
 
 
 <script>
-    (() => {
-      const $ = id => document.getElementById(id);
-      const middle = $('middle');
-      const grid = $('grid');
+  (() => {
+    const $ = id => document.getElementById(id);
+    const middle = $('middle');
+    const grid = $('grid');
 
-      /* ======= Константы поведения (оптимальные дефолты) ======= */
-      const CFG = {
-        far: 400, near: 140,
-        gamma: 2.24, boostMult: 1.5, boostPow: 1.2,
-        blurBoost: 1.0, shadowBoost: 1.0, focusGamma: 1.1, spreadMax: 6,
-        opacityGamma: 1.0, edgeBias: 76,
-        hoverSpin: 60,           // deg/s при наведении внутри карточки
-        inertiaFollow: 336,      // мс — инерция слежения
-        inertiaSpin: 280,        // мс — инерция вращения на ховере
-        handoffMs: 250,          // окно плавной стыковки при вход/выходе курсора
-        // Фоновые шары:
-        bgCount: 3, bgSpeed: 80, bgJitter: 0.7,
-        bgC: ['#ff2bd6', '#8b5cf6', '#2bd7ff'], bgR: [320, 260, 380], bgS: [0.60, 0.55, 0.65]
+    /* ======= Константы поведения (оптимальные дефолты) ======= */
+    const CFG = {
+      far: 400, near: 140,
+      gamma: 2.24, boostMult: 1.5, boostPow: 1.2,
+      blurBoost: 1.0, shadowBoost: 1.0, focusGamma: 1.1, spreadMax: 6,
+      opacityGamma: 1.0, edgeBias: 76,
+      hoverSpin: 60,           // deg/s при наведении внутри карточки
+      inertiaFollow: 336,      // мс — инерция слежения
+      inertiaSpin: 280,        // мс — инерция вращения на ховере
+      handoffMs: 250,          // окно плавной стыковки при вход/выходе курсора
+      // Фоновые шары:
+      bgCount: 3, bgSpeed: 80, bgJitter: 0.7,
+      bgC: ['#ff2bd6', '#8b5cf6', '#2bd7ff'], bgR: [320, 260, 380], bgS: [0.60, 0.55, 0.65]
+    };
+
+    /* ======= Карточки ======= */
+    const frames = Array.from(document.querySelectorAll('.frame')).map(el => {
+      const bcv = el.querySelector('canvas.blobs');
+      const bctx = bcv.getContext('2d');
+      return {
+        el, bcv, bctx,
+        rect: el.getBoundingClientRect(), halfW: 0, halfH: 0, radPx: 0,
+        hover: false, spinAngle: 0, visAngle: 0,
+        prevVisAngle: 0, lastDir: 1, handoffUntil: 0, handoffDir: 1
       };
+    });
 
-      /* ======= Карточки ======= */
-      const frames = Array.from(document.querySelectorAll('.frame')).map(el => {
-        const bcv = el.querySelector('canvas.blobs');
-        const bctx = bcv.getContext('2d');
-        return {
-          el, bcv, bctx,
-          rect: el.getBoundingClientRect(), halfW: 0, halfH: 0, radPx: 0,
-          hover: false, spinAngle: 0, visAngle: 0,
-          prevVisAngle: 0, lastDir: 1, handoffUntil: 0, handoffDir: 1
-        };
-      });
+    const getRadiusPx = el => {
+      const m = /([0-9.]+)px/.exec(getComputedStyle(el).borderRadius);
+      return m ? +m[1] : 0;
+    };
 
-      const getRadiusPx = el => {
-        const m = /([0-9.]+)px/.exec(getComputedStyle(el).borderRadius);
-        return m ? +m[1] : 0;
+    let midRect = middle.getBoundingClientRect();
+    function updateGeomAll() {
+      midRect = middle.getBoundingClientRect();
+      for (const f of frames) {
+        f.rect = f.el.getBoundingClientRect();
+        f.halfW = f.rect.width / 2; f.halfH = f.rect.height / 2;
+        f.radPx = getRadiusPx(f.el);
+        // ДПИ-буфер для локального канваса
+        const DPRl = Math.max(1, Math.min(2, devicePixelRatio || 1));
+        const w = Math.max(1, Math.round(f.rect.width * DPRl));
+        const h = Math.max(1, Math.round(f.rect.height * DPRl));
+        if (f.bcv.width !== w || f.bcv.height !== h) {
+          f.bcv.width = w; f.bcv.height = h;
+          f.bctx.setTransform(DPRl, 0, 0, DPRl, 0, 0);
+        }
+      }
+    }
+
+    // SDF расстояние до рамок карточки (скруглённый прямоугольник)
+    function sdfRoundRectFrame(f, px, py) {
+      const cx = f.rect.left + f.halfW, cy = f.rect.top + f.halfH;
+      const x = Math.abs(px - cx) - (f.halfW - f.radPx), y = Math.abs(py - cy) - (f.halfH - f.radPx);
+      const qx = Math.max(x, 0), qy = Math.max(y, 0); const outside = Math.hypot(qx, qy); const inside = Math.min(Math.max(x, y), 0);
+      return outside + inside - f.radPx;
+    }
+
+    const norm360 = v => ((v % 360) + 360) % 360;
+    const angDiff = (a, b) => ((b - a + 540) % 360) - 180;
+    function angleAtFrame(f, x, y) { const cx = f.rect.left + f.halfW, cy = f.rect.top + f.halfH; let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI; if (deg < 0) deg += 360; return (deg + 90) % 360; }
+
+    /* ======= Фоновые шары (только для .middle) ======= */
+    const bgcv = $('bgCanvas'); const bgx = bgcv.getContext('2d');
+    const OFF = document.createElement('canvas'); const OX = OFF.getContext('2d');
+    let DPR = Math.max(1, Math.min(2, devicePixelRatio || 1));
+
+    function resizeOffAndBg() {
+      const w = Math.max(1, Math.round(middle.clientWidth * DPR));
+      const h = Math.max(1, Math.round(middle.clientHeight * DPR));
+      if (OFF.width !== w || OFF.height !== h) { OFF.width = w; OFF.height = h; OX.setTransform(DPR, 0, 0, DPR, 0, 0); }
+      if (bgcv.width !== w || bgcv.height !== h) { bgcv.width = w; bgcv.height = h; bgx.setTransform(1, 0, 0, 1, 0, 0); }
+    }
+
+    const BG = { blobs: [] };
+    function verticalInsetPx() { return Math.max(180, Math.round(Math.max(...CFG.bgR) * 0.75)); }
+    function hexToRgb(hex) { const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : { r: 255, g: 255, b: 255 }; }
+    function rgba(r, g, b, a) { return `rgba(${r},${g},${b},${a})`; }
+
+    function ensureBlobs() {
+      const need = Math.max(1, Math.min(3, CFG.bgCount | 0));
+      while (BG.blobs.length < need) BG.blobs.push(makeBlob(BG.blobs.length));
+      while (BG.blobs.length > need) BG.blobs.pop();
+    }
+    function makeBlob(i) {
+      const ang = Math.random() * Math.PI * 2;
+      const W = middle.clientWidth, H = middle.clientHeight, inset = verticalInsetPx();
+      return {
+        i, dir: ang,
+        x: Math.random() * W,
+        y: Math.random() * (H - inset * 2) + inset,
+        get r() { return CFG.bgR[i] || 300; },
+        get soft() { return CFG.bgS[i] || 0.6; },
+        get col() { return CFG.bgC[i] || '#ffffff'; }
       };
+    }
 
-      let midRect = middle.getBoundingClientRect();
-      function updateGeomAll() {
-        midRect = middle.getBoundingClientRect();
-        for (const f of frames) {
-          f.rect = f.el.getBoundingClientRect();
-          f.halfW = f.rect.width / 2; f.halfH = f.rect.height / 2;
-          f.radPx = getRadiusPx(f.el);
-          // ДПИ-буфер для локального канваса
-          const DPRl = Math.max(1, Math.min(2, devicePixelRatio || 1));
-          const w = Math.max(1, Math.round(f.rect.width * DPRl));
-          const h = Math.max(1, Math.round(f.rect.height * DPRl));
-          if (f.bcv.width !== w || f.bcv.height !== h) {
-            f.bcv.width = w; f.bcv.height = h;
-            f.bctx.setTransform(DPRl, 0, 0, DPRl, 0, 0);
-          }
-        }
+    function updateBlobs(dt) {
+      const spd = CFG.bgSpeed, jit = CFG.bgJitter, marginX = 200;
+      const W = middle.clientWidth, H = middle.clientHeight, insetY = verticalInsetPx();
+
+      for (const b of BG.blobs) {
+        b.dir += (Math.random() * 2 - 1) * jit * dt;
+        const vx = Math.cos(b.dir) * spd, vy = Math.sin(b.dir) * spd;
+        b.x += vx * dt; b.y += vy * dt;
+
+        // Горизонтальная бесконечность
+        if (b.x < -marginX) b.x = W + marginX;
+        if (b.x > W + marginX) b.x = -marginX;
+
+        // Вертикальные «борта» внутри секции
+        if (b.y < insetY) { b.y = insetY; b.dir = -b.dir + (Math.random() - 0.5) * 0.4; }
+        else if (b.y > H - insetY) { b.y = H - insetY; b.dir = -b.dir + (Math.random() - 0.5) * 0.4; }
       }
+    }
 
-      // SDF расстояние до рамок карточки (скруглённый прямоугольник)
-      function sdfRoundRectFrame(f, px, py) {
-        const cx = f.rect.left + f.halfW, cy = f.rect.top + f.halfH;
-        const x = Math.abs(px - cx) - (f.halfW - f.radPx), y = Math.abs(py - cy) - (f.halfH - f.radPx);
-        const qx = Math.max(x, 0), qy = Math.max(y, 0); const outside = Math.hypot(qx, qy); const inside = Math.min(Math.max(x, y), 0);
-        return outside + inside - f.radPx;
+    function paintOff() {
+      const W = middle.clientWidth, H = middle.clientHeight;
+      OX.clearRect(0, 0, W, H);
+      OX.globalCompositeOperation = 'lighter';
+      for (const b of BG.blobs) {
+        const { r, g, b: bb } = hexToRgb(b.col);
+        const R = b.r, s = Math.max(0, Math.min(1, b.soft));
+        const mid = 0.15 + 0.75 * s;
+        const grd = OX.createRadialGradient(b.x, b.y, 0, b.x, b.y, R);
+        grd.addColorStop(0.0, rgba(r, g, bb, 0.60));
+        grd.addColorStop(mid, rgba(r, g, bb, 0.25));
+        grd.addColorStop(1.0, rgba(r, g, bb, 0.00));
+        OX.fillStyle = grd;
+        OX.beginPath(); OX.arc(b.x, b.y, R, 0, Math.PI * 2); OX.fill();
       }
+      OX.globalCompositeOperation = 'source-over';
+    }
 
-      const norm360 = v => ((v % 360) + 360) % 360;
-      const angDiff = (a, b) => ((b - a + 540) % 360) - 180;
-      function angleAtFrame(f, x, y) { const cx = f.rect.left + f.halfW, cy = f.rect.top + f.halfH; let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI; if (deg < 0) deg += 360; return (deg + 90) % 360; }
+    function paintBg() { bgx.clearRect(0, 0, bgcv.width, bgcv.height); bgx.drawImage(OFF, 0, 0); }
 
-      /* ======= Фоновые шары (только для .middle) ======= */
-      const bgcv = $('bgCanvas'); const bgx = bgcv.getContext('2d');
-      const OFF = document.createElement('canvas'); const OX = OFF.getContext('2d');
-      let DPR = Math.max(1, Math.min(2, devicePixelRatio || 1));
-
-      function resizeOffAndBg() {
-        const w = Math.max(1, Math.round(middle.clientWidth * DPR));
-        const h = Math.max(1, Math.round(middle.clientHeight * DPR));
-        if (OFF.width !== w || OFF.height !== h) { OFF.width = w; OFF.height = h; OX.setTransform(DPR, 0, 0, DPR, 0, 0); }
-        if (bgcv.width !== w || bgcv.height !== h) { bgcv.width = w; bgcv.height = h; bgx.setTransform(1, 0, 0, 1, 0, 0); }
+    function blitToFrames() {
+      for (const f of frames) {
+        const sx = (f.rect.left - midRect.left);
+        const sy = (f.rect.top - midRect.top);
+        const sw = f.rect.width, sh = f.rect.height;
+        f.bctx.clearRect(0, 0, sw, sh);
+        f.bctx.drawImage(OFF, sx * DPR, sy * DPR, sw * DPR, sh * DPR, 0, 0, sw, sh);
       }
+    }
 
-      const BG = { blobs: [] };
-      function verticalInsetPx() { return Math.max(180, Math.round(Math.max(...CFG.bgR) * 0.75)); }
-      function hexToRgb(hex) { const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : { r: 255, g: 255, b: 255 }; }
-      function rgba(r, g, b, a) { return `rgba(${r},${g},${b},${a})`; }
+    /* ======= FOLLOW / INERTIA / EDGE ======= */
+    let raf = null, prevTS = 0, dirty = true;
+    let lastX = innerWidth / 2, lastY = innerHeight / 2;
 
-      function ensureBlobs() {
-        const need = Math.max(1, Math.min(3, CFG.bgCount | 0));
-        while (BG.blobs.length < need) BG.blobs.push(makeBlob(BG.blobs.length));
-        while (BG.blobs.length > need) BG.blobs.pop();
+    function ensure() { if (!raf) raf = requestAnimationFrame(tick); }
+    function requestRender() { dirty = true; ensure(); }
+
+    function computeStrength(d) {
+      const c = CFG;
+      if (d >= c.far) return { S: 0, mid: 0, close: 0, zone: 'far' };
+      if (d > c.near) {
+        const raw = 1 - (d - c.near) / (c.far - c.near);
+        const mid = Math.pow(raw, c.gamma);
+        return { S: mid, mid, close: 0, zone: 'mid' };
       }
-      function makeBlob(i) {
-        const ang = Math.random() * Math.PI * 2;
-        const W = middle.clientWidth, H = middle.clientHeight, inset = verticalInsetPx();
-        return {
-          i, dir: ang,
-          x: Math.random() * W,
-          y: Math.random() * (H - inset * 2) + inset,
-          get r() { return CFG.bgR[i] || 300; },
-          get soft() { return CFG.bgS[i] || 0.6; },
-          get col() { return CFG.bgC[i] || '#ffffff'; }
-        };
+      const t = (c.near - d) / c.near;
+      const extra = c.boostMult * Math.pow(t, c.boostPow);
+      const S = 1 + extra;
+      const close = Math.min(1, Math.pow(t, c.focusGamma));
+      return { S, mid: 1, close, zone: 'close' };
+    }
+
+    function setStops(el, varNames, values) {
+      for (let i = 0; i < values.length; i++) {
+        el.style.setProperty(varNames[i], values[i].toFixed(3) + '%');
       }
+    }
 
-      function updateBlobs(dt) {
-        const spd = CFG.bgSpeed, jit = CFG.bgJitter, marginX = 200;
-        const W = middle.clientWidth, H = middle.clientHeight, insetY = verticalInsetPx();
+    function applyToFrame(f, dEdge) {
+      const el = f.el; const Sinfo = computeStrength(dEdge);
+      let op = 0; if (Sinfo.zone === 'mid') op = Math.pow(Sinfo.S, CFG.opacityGamma); else if (Sinfo.zone === 'close') op = 1;
+      el.style.setProperty('--layer-op', op.toFixed(3));
 
-        for (const b of BG.blobs) {
-          b.dir += (Math.random() * 2 - 1) * jit * dt;
-          const vx = Math.cos(b.dir) * spd, vy = Math.sin(b.dir) * spd;
-          b.x += vx * dt; b.y += vy * dt;
+      const S = Sinfo.S;
+      const blurMult = (S <= 1) ? S : (1 + CFG.blurBoost * (S - 1));
+      const shadowMult = (S <= 1) ? S : (1 + CFG.shadowBoost * (S - 1));
+      el.style.setProperty('--blur-mult', blurMult.toFixed(3));
+      el.style.setProperty('--thin-blur-mult', blurMult.toFixed(3));
+      el.style.setProperty('--ds-blur-mult', shadowMult.toFixed(3));
+      el.style.setProperty('--thin-ds-blur-mult', shadowMult.toFixed(3));
 
-          // Горизонтальная бесконечность
-          if (b.x < -marginX) b.x = W + marginX;
-          if (b.x > W + marginX) b.x = -marginX;
+      // Стопы
+      if (Sinfo.zone !== 'close') {
+        setStops(el, ['--g1', '--g2', '--g3', '--g4', '--g5', '--g6'], [3, 10, 12, 88, 90, 97]);
+        setStops(el, ['--b1', '--b2', '--b3', '--b4', '--b5', '--b6'], [3, 12, 14, 86, 88, 97]);
+      } else {
+        const nearPx = CFG.near;
+        const d_bias = Math.min(nearPx, Math.max(0, dEdge + CFG.edgeBias));
+        const t_bias = (nearPx - d_bias) / nearPx;
+        const fcs = Math.min(1, Math.pow(t_bias, CFG.focusGamma));
+        const w = CFG.spreadMax * fcs;
 
-          // Вертикальные «борта» внутри секции
-          if (b.y < insetY) { b.y = insetY; b.dir = -b.dir + (Math.random() - 0.5) * 0.4; }
-          else if (b.y > H - insetY) { b.y = H - insetY; b.dir = -b.dir + (Math.random() - 0.5) * 0.4; }
-        }
+        const baseGlow = [3, 10, 12, 88, 90, 97];
+        const baseEdge = [3, 12, 14, 86, 88, 97];
+        const L = 50 - w, M = 50, R = 50 + w;
+        const nearArr = [L, M, R, 100 - R, 100 - M, 100 - L];
+        const lerp = (a, b, t) => a + (b - a) * t;
+
+        setStops(el, ['--g1', '--g2', '--g3', '--g4', '--g5', '--g6'], baseGlow.map((v, i) => lerp(v, nearArr[i], fcs)));
+        setStops(el, ['--b1', '--b2', '--b3', '--b4', '--b5', '--b6'], baseEdge.map((v, i) => lerp(v, nearArr[i], fcs)));
       }
+    }
 
-      function paintOff() {
-        const W = middle.clientWidth, H = middle.clientHeight;
-        OX.clearRect(0, 0, W, H);
-        OX.globalCompositeOperation = 'lighter';
-        for (const b of BG.blobs) {
-          const { r, g, b: bb } = hexToRgb(b.col);
-          const R = b.r, s = Math.max(0, Math.min(1, b.soft));
-          const mid = 0.15 + 0.75 * s;
-          const grd = OX.createRadialGradient(b.x, b.y, 0, b.x, b.y, R);
-          grd.addColorStop(0.0, rgba(r, g, bb, 0.60));
-          grd.addColorStop(mid, rgba(r, g, bb, 0.25));
-          grd.addColorStop(1.0, rgba(r, g, bb, 0.00));
-          OX.fillStyle = grd;
-          OX.beginPath(); OX.arc(b.x, b.y, R, 0, Math.PI * 2); OX.fill();
-        }
-        OX.globalCompositeOperation = 'source-over';
-      }
+    const getComputedAngle = (el) => { const cs = getComputedStyle(el); const base = parseFloat(cs.getPropertyValue('--base-angle')) || 0; const spin = parseFloat(cs.getPropertyValue('--css-spin')) || 0; return norm360(base + spin); };
 
-      function paintBg() { bgx.clearRect(0, 0, bgcv.width, bgcv.height); bgx.drawImage(OFF, 0, 0); }
+    function tick(ts) {
+      const dt = prevTS ? (ts - prevTS) / 1000 : 0; prevTS = ts;
 
-      function blitToFrames() {
-        for (const f of frames) {
-          const sx = (f.rect.left - midRect.left);
-          const sy = (f.rect.top - midRect.top);
-          const sw = f.rect.width, sh = f.rect.height;
-          f.bctx.clearRect(0, 0, sw, sh);
-          f.bctx.drawImage(OFF, sx * DPR, sy * DPR, sw * DPR, sh * DPR, 0, 0, sw, sh);
-        }
-      }
+      updateBlobs(dt); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames();
 
-      /* ======= FOLLOW / INERTIA / EDGE ======= */
-      let raf = null, prevTS = 0, dirty = true;
-      let lastX = innerWidth / 2, lastY = innerHeight / 2;
+      let anySpin = false, anyLerp = false;
 
-      function ensure() { if (!raf) raf = requestAnimationFrame(tick); }
-      function requestRender() { dirty = true; ensure(); }
+      for (const f of frames) {
+        const dPrev = angDiff(f.prevVisAngle, f.visAngle);
+        if (Math.abs(dPrev) > 0.05) f.lastDir = Math.sign(dPrev);
+        f.prevVisAngle = f.visAngle;
 
-      function computeStrength(d) {
-        const c = CFG;
-        if (d >= c.far) return { S: 0, mid: 0, close: 0, zone: 'far' };
-        if (d > c.near) {
-          const raw = 1 - (d - c.near) / (c.far - c.near);
-          const mid = Math.pow(raw, c.gamma);
-          return { S: mid, mid, close: 0, zone: 'mid' };
-        }
-        const t = (c.near - d) / c.near;
-        const extra = c.boostMult * Math.pow(t, c.boostPow);
-        const S = 1 + extra;
-        const close = Math.min(1, Math.pow(t, c.focusGamma));
-        return { S, mid: 1, close, zone: 'close' };
-      }
+        // расстояние до края (внутри — приравниваем к 0)
+        const signed = sdfRoundRectFrame(f, lastX, lastY);
+        const dEdge = Math.max(0, signed);
 
-      function setStops(el, varNames, values) {
-        for (let i = 0; i < values.length; i++) {
-          el.style.setProperty(varNames[i], values[i].toFixed(3) + '%');
-        }
-      }
+        // таргет угла
+        const rawFollow = angleAtFrame(f, lastX, lastY);
+        let target = rawFollow;
 
-      function applyToFrame(f, dEdge) {
-        const el = f.el; const Sinfo = computeStrength(dEdge);
-        let op = 0; if (Sinfo.zone === 'mid') op = Math.pow(Sinfo.S, CFG.opacityGamma); else if (Sinfo.zone === 'close') op = 1;
-        el.style.setProperty('--layer-op', op.toFixed(3));
-
-        const S = Sinfo.S;
-        const blurMult = (S <= 1) ? S : (1 + CFG.blurBoost * (S - 1));
-        const shadowMult = (S <= 1) ? S : (1 + CFG.shadowBoost * (S - 1));
-        el.style.setProperty('--blur-mult', blurMult.toFixed(3));
-        el.style.setProperty('--thin-blur-mult', blurMult.toFixed(3));
-        el.style.setProperty('--ds-blur-mult', shadowMult.toFixed(3));
-        el.style.setProperty('--thin-ds-blur-mult', shadowMult.toFixed(3));
-
-        // Стопы
-        if (Sinfo.zone !== 'close') {
-          setStops(el, ['--g1', '--g2', '--g3', '--g4', '--g5', '--g6'], [3, 10, 12, 88, 90, 97]);
-          setStops(el, ['--b1', '--b2', '--b3', '--b4', '--b5', '--b6'], [3, 12, 14, 86, 88, 97]);
-        } else {
-          const nearPx = CFG.near;
-          const d_bias = Math.min(nearPx, Math.max(0, dEdge + CFG.edgeBias));
-          const t_bias = (nearPx - d_bias) / nearPx;
-          const fcs = Math.min(1, Math.pow(t_bias, CFG.focusGamma));
-          const w = CFG.spreadMax * fcs;
-
-          const baseGlow = [3, 10, 12, 88, 90, 97];
-          const baseEdge = [3, 12, 14, 86, 88, 97];
-          const L = 50 - w, M = 50, R = 50 + w;
-          const nearArr = [L, M, R, 100 - R, 100 - M, 100 - L];
-          const lerp = (a, b, t) => a + (b - a) * t;
-
-          setStops(el, ['--g1', '--g2', '--g3', '--g4', '--g5', '--g6'], baseGlow.map((v, i) => lerp(v, nearArr[i], fcs)));
-          setStops(el, ['--b1', '--b2', '--b3', '--b4', '--b5', '--b6'], baseEdge.map((v, i) => lerp(v, nearArr[i], fcs)));
-        }
-      }
-
-      const getComputedAngle = (el) => { const cs = getComputedStyle(el); const base = parseFloat(cs.getPropertyValue('--base-angle')) || 0; const spin = parseFloat(cs.getPropertyValue('--css-spin')) || 0; return norm360(base + spin); };
-
-      function tick(ts) {
-        const dt = prevTS ? (ts - prevTS) / 1000 : 0; prevTS = ts;
-
-        updateBlobs(dt); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames();
-
-        let anySpin = false, anyLerp = false;
-
-        for (const f of frames) {
-          const dPrev = angDiff(f.prevVisAngle, f.visAngle);
-          if (Math.abs(dPrev) > 0.05) f.lastDir = Math.sign(dPrev);
-          f.prevVisAngle = f.visAngle;
-
-          // расстояние до края (внутри — приравниваем к 0)
-          const signed = sdfRoundRectFrame(f, lastX, lastY);
-          const dEdge = Math.max(0, signed);
-
-          // таргет угла
-          const rawFollow = angleAtFrame(f, lastX, lastY);
-          let target = rawFollow;
-
-          if (f.hover && CFG.hoverSpin > 0) {
-            f.spinAngle = norm360(f.spinAngle + CFG.hoverSpin * dt);
-            target = f.spinAngle;
-            anySpin = true;
-          } else if (!f.hover && performance.now() < f.handoffUntil) {
-            // плавная стыковка направления после выхода
-            const delta = angDiff(f.visAngle, rawFollow);
-            if (f.handoffDir > 0 && delta < 0) target = rawFollow + 360;
-            if (f.handoffDir < 0 && delta > 0) target = rawFollow - 360;
-          }
-
-          // инерция
-          const tauMs = (f.hover && CFG.hoverSpin > 0) ? CFG.inertiaSpin : CFG.inertiaFollow;
-          if (tauMs <= 0) { f.visAngle = norm360(target); }
-          else {
-            const alpha = 1 - Math.exp(- (dt) / Math.max(1e-6, tauMs / 1000));
-            const dA = angDiff(f.visAngle, target);
-            f.visAngle = norm360(f.visAngle + dA * alpha);
-            if (Math.abs(dA) > 0.1) anyLerp = true;
-          }
-
-          f.el.style.setProperty('--base-angle', f.visAngle + 'deg');
-          f.el.style.setProperty('--css-spin', '0deg');
-
-          applyToFrame(f, dEdge);
+        if (f.hover && CFG.hoverSpin > 0) {
+          f.spinAngle = norm360(f.spinAngle + CFG.hoverSpin * dt);
+          target = f.spinAngle;
+          anySpin = true;
+        } else if (!f.hover && performance.now() < f.handoffUntil) {
+          // плавная стыковка направления после выхода
+          const delta = angDiff(f.visAngle, rawFollow);
+          if (f.handoffDir > 0 && delta < 0) target = rawFollow + 360;
+          if (f.handoffDir < 0 && delta > 0) target = rawFollow - 360;
         }
 
-        if (dirty || anySpin || anyLerp) { dirty = false; raf = requestAnimationFrame(tick); } else { raf = null; }
+        // инерция
+        const tauMs = (f.hover && CFG.hoverSpin > 0) ? CFG.inertiaSpin : CFG.inertiaFollow;
+        if (tauMs <= 0) { f.visAngle = norm360(target); }
+        else {
+          const alpha = 1 - Math.exp(- (dt) / Math.max(1e-6, tauMs / 1000));
+          const dA = angDiff(f.visAngle, target);
+          f.visAngle = norm360(f.visAngle + dA * alpha);
+          if (Math.abs(dA) > 0.1) anyLerp = true;
+        }
+
+        f.el.style.setProperty('--base-angle', f.visAngle + 'deg');
+        f.el.style.setProperty('--css-spin', '0deg');
+
+        applyToFrame(f, dEdge);
       }
 
-      function onMoveLike(x, y) { lastX = x; lastY = y; requestRender(); }
+      if (dirty || anySpin || anyLerp) { dirty = false; raf = requestAnimationFrame(tick); } else { raf = null; }
+    }
 
-      // Ховеры/выходы — фиксация направления и «стыковка»
+    function onMoveLike(x, y) { lastX = x; lastY = y; requestRender(); }
+
+    // Ховеры/выходы — фиксация направления и «стыковка»
+    frames.forEach(f => {
+      f.el.addEventListener('pointerenter', () => {
+        f.hover = true;
+        const cur = getComputedAngle(f.el);
+        f.visAngle = cur; f.spinAngle = cur;
+        f.lastDir = (CFG.hoverSpin >= 0) ? +1 : -1;
+        ensure();
+      }, { passive: true });
+      f.el.addEventListener('pointerleave', () => {
+        f.hover = false;
+        f.handoffUntil = performance.now() + CFG.handoffMs;
+        f.handoffDir = f.lastDir || (CFG.hoverSpin >= 0 ? +1 : -1);
+        requestRender();
+      }, { passive: true });
+    });
+
+    // Глобальное слежение за указателем
+    addEventListener('pointermove', e => { if (e.clientX != null) onMoveLike(e.clientX, e.clientY); }, { passive: true });
+
+    // Тач: не даём странице скроллиться под пальцем над grid
+    let touchingFrame = false;
+    grid.addEventListener('pointerdown', e => { if (e.target.closest('.frame')) touchingFrame = true; }, { passive: true });
+    grid.addEventListener('pointerup', () => touchingFrame = false, { passive: true });
+    grid.addEventListener('pointercancel', () => touchingFrame = false, { passive: true });
+    addEventListener('touchstart', e => { if (e.target.closest('.frame')) touchingFrame = true; }, { passive: true });
+    addEventListener('touchend', () => touchingFrame = false, { passive: true });
+    addEventListener('touchcancel', () => touchingFrame = false, { passive: true });
+    addEventListener('touchmove', e => { const t = e.touches && e.touches[0]; if (!t) return; if (touchingFrame) e.preventDefault(); onMoveLike(t.clientX, t.clientY); }, { passive: false });
+
+    // Пересчёт геометрии при изменениях
+    function recalc() {
+      updateGeomAll();
+      requestAnimationFrame(() => { updateGeomAll(); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames(); requestRender(); });
+    }
+    const ro = new ResizeObserver(() => recalc());
+    ro.observe(middle); ro.observe(grid); frames.forEach(f => ro.observe(f.el));
+    if (window.visualViewport) {
+      visualViewport.addEventListener('resize', recalc, { passive: true });
+      visualViewport.addEventListener('scroll', recalc, { passive: true });
+    }
+    addEventListener('resize', recalc, { passive: true });
+    addEventListener('scroll', recalc, { passive: true });
+
+    /* ======= iOS micro-jitter/scroll (авто, только Safari iOS) ======= */
+    const ua = navigator.userAgent || "", isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isSafari = /^Apple/i.test(navigator.vendor || "") && !/CriOS|FxiOS|EdgiOS|OPiOS|Mercury/i.test(ua);
+    const scroller = $('iosScroller');
+    let jRAF = null, jLast = 0, jFlip = false, sRAF = null, sLast = 0;
+    function jTick(ts) { if (!jLast || ts - jLast >= 80) { jFlip = !jFlip; grid.style.transform = 'translateZ(0) rotate(' + (jFlip ? 0.01 : 0) + 'deg)'; jLast = ts; } jRAF = requestAnimationFrame(jTick); }
+    function sTick(ts) { if (!sLast || ts - sLast >= 60) { scroller.scrollTop = (scroller.scrollTop === 0 ? 1 : 0); sLast = ts; } sRAF = requestAnimationFrame(sTick); }
+    function startIOSWorkaround() { if (!jRAF) { jLast = 0; jRAF = requestAnimationFrame(jTick); } if (!sRAF) { sLast = 0; sRAF = requestAnimationFrame(sTick); } }
+    function stopIOSWorkaround() { if (jRAF) { cancelAnimationFrame(jRAF); jRAF = null; } if (sRAF) { cancelAnimationFrame(sRAF); sRAF = null; } grid.style.transform = 'translateZ(0)'; }
+    function setupIOSFix() { if (isIOS && isSafari) startIOSWorkaround(); }
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stopIOSWorkaround(); else setupIOSFix(); });
+
+    /* ======= init ======= */
+    function initAngles() {
+      const cx = innerWidth / 2, cy = innerHeight / 2;
       frames.forEach(f => {
-        f.el.addEventListener('pointerenter', () => {
-          f.hover = true;
-          const cur = getComputedAngle(f.el);
-          f.visAngle = cur; f.spinAngle = cur;
-          f.lastDir = (CFG.hoverSpin >= 0) ? +1 : -1;
-          ensure();
-        }, { passive: true });
-        f.el.addEventListener('pointerleave', () => {
-          f.hover = false;
-          f.handoffUntil = performance.now() + CFG.handoffMs;
-          f.handoffDir = f.lastDir || (CFG.hoverSpin >= 0 ? +1 : -1);
-          requestRender();
-        }, { passive: true });
+        const start = angleAtFrame(f, cx, cy);
+        f.visAngle = start; f.spinAngle = start; f.prevVisAngle = start; f.lastDir = 1;
+        f.el.style.setProperty('--base-angle', start + 'deg');
+        f.el.style.setProperty('--css-spin', '0deg');
       });
+    }
 
-      // Глобальное слежение за указателем
-      addEventListener('pointermove', e => { if (e.clientX != null) onMoveLike(e.clientX, e.clientY); }, { passive: true });
-
-      // Тач: не даём странице скроллиться под пальцем над grid
-      let touchingFrame = false;
-      grid.addEventListener('pointerdown', e => { if (e.target.closest('.frame')) touchingFrame = true; }, { passive: true });
-      grid.addEventListener('pointerup', () => touchingFrame = false, { passive: true });
-      grid.addEventListener('pointercancel', () => touchingFrame = false, { passive: true });
-      addEventListener('touchstart', e => { if (e.target.closest('.frame')) touchingFrame = true; }, { passive: true });
-      addEventListener('touchend', () => touchingFrame = false, { passive: true });
-      addEventListener('touchcancel', () => touchingFrame = false, { passive: true });
-      addEventListener('touchmove', e => { const t = e.touches && e.touches[0]; if (!t) return; if (touchingFrame) e.preventDefault(); onMoveLike(t.clientX, t.clientY); }, { passive: false });
-
-      // Пересчёт геометрии при изменениях
-      function recalc() {
-        updateGeomAll();
-        requestAnimationFrame(() => { updateGeomAll(); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames(); requestRender(); });
-      }
-      const ro = new ResizeObserver(() => recalc());
-      ro.observe(middle); ro.observe(grid); frames.forEach(f => ro.observe(f.el));
-      if (window.visualViewport) {
-        visualViewport.addEventListener('resize', recalc, { passive: true });
-        visualViewport.addEventListener('scroll', recalc, { passive: true });
-      }
-      addEventListener('resize', recalc, { passive: true });
-      addEventListener('scroll', recalc, { passive: true });
-
-      /* ======= iOS micro-jitter/scroll (авто, только Safari iOS) ======= */
-      const ua = navigator.userAgent || "", isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      const isSafari = /^Apple/i.test(navigator.vendor || "") && !/CriOS|FxiOS|EdgiOS|OPiOS|Mercury/i.test(ua);
-      const scroller = $('iosScroller');
-      let jRAF = null, jLast = 0, jFlip = false, sRAF = null, sLast = 0;
-      function jTick(ts) { if (!jLast || ts - jLast >= 80) { jFlip = !jFlip; grid.style.transform = 'translateZ(0) rotate(' + (jFlip ? 0.01 : 0) + 'deg)'; jLast = ts; } jRAF = requestAnimationFrame(jTick); }
-      function sTick(ts) { if (!sLast || ts - sLast >= 60) { scroller.scrollTop = (scroller.scrollTop === 0 ? 1 : 0); sLast = ts; } sRAF = requestAnimationFrame(sTick); }
-      function startIOSWorkaround() { if (!jRAF) { jLast = 0; jRAF = requestAnimationFrame(jTick); } if (!sRAF) { sLast = 0; sRAF = requestAnimationFrame(sTick); } }
-      function stopIOSWorkaround() { if (jRAF) { cancelAnimationFrame(jRAF); jRAF = null; } if (sRAF) { cancelAnimationFrame(sRAF); sRAF = null; } grid.style.transform = 'translateZ(0)'; }
-      function setupIOSFix() { if (isIOS && isSafari) startIOSWorkaround(); }
-      document.addEventListener('visibilitychange', () => { if (document.hidden) stopIOSWorkaround(); else setupIOSFix(); });
-
-      /* ======= init ======= */
-      function initAngles() {
-        const cx = innerWidth / 2, cy = innerHeight / 2;
-        frames.forEach(f => {
-          const start = angleAtFrame(f, cx, cy);
-          f.visAngle = start; f.spinAngle = start; f.prevVisAngle = start; f.lastDir = 1;
-          f.el.style.setProperty('--base-angle', start + 'deg');
-          f.el.style.setProperty('--css-spin', '0deg');
-        });
-      }
-
-      updateGeomAll(); initAngles();
-      ensureBlobs(); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames();
-      setupIOSFix();
-      // старт рендера
-      (function kick() { lastX = innerWidth / 2; lastY = innerHeight / 2; requestRender(); })();
-    })();
+    updateGeomAll(); initAngles();
+    ensureBlobs(); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames();
+    setupIOSFix();
+    // старт рендера
+    (function kick() { lastX = innerWidth / 2; lastY = innerHeight / 2; requestRender(); })();
+  })();
 </script>
 
 
@@ -485,7 +493,8 @@
     {% for v in more_videos %}
     <button class="v-card" type="button" {% if v.m3u8_url %} data-src="{{ v.m3u8_url }}"
       data-title="{{ v.name|default:'Видео' }}"
-      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
+      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else
+      %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
       <div class="v-card__thumb">
         <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
           alt="{{ v.name|default:'Видео' }}" loading="lazy" />
@@ -657,10 +666,10 @@
   (() => {
     const s = document.getElementById('seq');
     const c = document.getElementById('seqCanvas');
-    const x = c.getContext('2d', { alpha:false });
+    const x = c.getContext('2d', { alpha: false });
     const d = Math.min(2, window.devicePixelRatio || 1);
 
-    const copyStart = document.getElementById('seqCopy');       
+    const copyStart = document.getElementById('seqCopy');
     const ov = document.querySelector('.seq-ov');
     const artL = document.getElementById('artL');
     const artR = document.getElementById('artR');
@@ -670,7 +679,7 @@
     const k1 = copyStart.querySelector('.seq-kicker');
     const t1 = copyStart.querySelector('.seq-title');
     const d1 = copyStart.querySelector('.seq-desc');
-    const d2orig = copyStart.querySelector('.seq-desc2'); 
+    const d2orig = copyStart.querySelector('.seq-desc2');
 
     const copyFinal = copyStart.cloneNode(true);
     copyFinal.id = 'seqCopyFinal';
@@ -683,9 +692,9 @@
     const t2 = copyFinal.querySelector('.seq-title');
     const d2 = copyFinal.querySelector('.seq-desc2');
 
-    [k1,t1,d1,k2,t2,d2].forEach(el => { el.classList.add('reveal'); });
+    [k1, t1, d1, k2, t2, d2].forEach(el => { el.classList.add('reveal'); });
 
-    function resize(){
+    function resize() {
       c.width = Math.floor(innerWidth * d);
       c.height = Math.floor(innerHeight * d);
       c.style.width = '100vw'; c.style.height = '100vh';
@@ -694,23 +703,23 @@
     }
 
     const N = 60;
-    const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5,'0')}.webp`;
+    const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5, '0')}.webp`;
     const G = new Array(N);
     let tgt = 0, cur = 0, raf = 0, last = -1;
 
-    const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
-    const smooth = (a,b,t) => clamp((t - a) / (b - a), 0, 1);
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const smooth = (a, b, t) => clamp((t - a) / (b - a), 0, 1);
 
-    function draw(img){
+    function draw(img) {
       const cw = c.width / d, ch = c.height / d;
       const iw = img.naturalWidth, ih = img.naturalHeight;
-      const s = Math.max(cw/iw, ch/ih), w = iw*s, h = ih*s;
-      x.clearRect(0,0,cw,ch);
-      x.drawImage(img, (cw-w)/2, (ch-h)/2, w, h);
+      const s = Math.max(cw / iw, ch / ih), w = iw * s, h = ih * s;
+      x.clearRect(0, 0, cw, ch);
+      x.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
     }
 
-    function snap(f){
-      const idx = clamp(Math.round(f), 0, N-1);
+    function snap(f) {
+      const idx = clamp(Math.round(f), 0, N - 1);
       if (idx === last) return;
       const im = G[idx];
       if (!im || !im.complete) return;
@@ -719,7 +728,7 @@
 
     let entered = false;
 
-    function progressFromScroll(){
+    function progressFromScroll() {
       const r = s.getBoundingClientRect();
       const m = s.offsetHeight - innerHeight;
       const y = Math.min(m, Math.max(0, -r.top));
@@ -728,9 +737,9 @@
       const SHOW_AT = 0.85;                     // позже триггерим: 85% экрана
       const MIN_VIS_VH = 0.55;                  // должно быть видно >=55% ВЬЮПОРТА
 
-      const topReached   = r.top <= innerHeight * SHOW_AT;
-      const visiblePx    = Math.min(innerHeight, r.bottom) - Math.max(0, r.top);
-      const enoughInView = visiblePx >= innerHeight * MIN_VIS_VH;  
+      const topReached = r.top <= innerHeight * SHOW_AT;
+      const visiblePx = Math.min(innerHeight, r.bottom) - Math.max(0, r.top);
+      const enoughInView = visiblePx >= innerHeight * MIN_VIS_VH;
 
       if (!entered && topReached && enoughInView) {
         entered = true;
@@ -746,17 +755,17 @@
     }
 
 
-    function updateOverlay(p){
+    function updateOverlay(p) {
       artL.style.opacity = 1 - smooth(0.40, 0.55, p);
-      artR.style.opacity =       smooth(0.55, 0.70, p);
+      artR.style.opacity = smooth(0.55, 0.70, p);
 
       const vis = smooth(0.80, 0.95, p);
       scheme.style.opacity = vis;
-      scheme.style.transform = `translateY(${16*(1-vis)}px)`;
+      scheme.style.transform = `translateY(${16 * (1 - vis)}px)`;
       seqImg.classList.toggle('show', p > 0.80);
 
       if (!entered) {
-        [k1,t1,d1,k2,t2,d2].forEach(el => el.classList.remove('show'));
+        [k1, t1, d1, k2, t2, d2].forEach(el => el.classList.remove('show'));
         return;
       }
 
@@ -770,21 +779,21 @@
     }
 
 
-    function loop(){
+    function loop() {
       raf = 0;
       cur += (tgt - cur) * 0.2;
       snap(cur);
-      updateOverlay(cur / (N-1));
+      updateOverlay(cur / (N - 1));
       if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(loop);
     }
 
     G[0] = new Image(); G[0].src = U(0);
     G[0].onload = () => { snap(0); updateOverlay(0); };
-    for (let i=1;i<N;i++){ G[i] = new Image(); G[i].decoding='async'; G[i].src = U(i); }
+    for (let i = 1; i < N; i++) { G[i] = new Image(); G[i].decoding = 'async'; G[i].src = U(i); }
 
     resize();
     addEventListener('resize', () => { resize(); progressFromScroll(); });
-    addEventListener('scroll', progressFromScroll, { passive:true });
+    addEventListener('scroll', progressFromScroll, { passive: true });
     progressFromScroll();
   })();
 </script>

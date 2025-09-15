@@ -103,10 +103,35 @@ body {
 
 
 
+/* вырубаем старую систему div-баблов */
+#bg-bubbles,
+.bg-bubble {
+    display: none !important;
+}
+
+/* новый канвас с шарами */
+.bgCanvasBase {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+    contain: paint;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bgCanvasBase {
+        display: none;
+    }
+}
 
 
 
-#bg-bubbles {
+
+
+/* #bg-bubbles {
     position: fixed;
     inset: -10vh -10vw;
     z-index: 0;
@@ -140,4 +165,4 @@ body {
     #bg-bubbles {
         display: none;
     }
-}
+} */
