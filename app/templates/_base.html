@@ -543,6 +543,20 @@
 
 
 
+<script src="https://unpkg.com/lenis@1.3.11/dist/lenis.min.js"></script> 
+<script>
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const lenis = new Lenis({ duration: 1.3, smoothWheel: true, normalizeWheel: true });
+    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+    window.lenis = lenis;
+  }
+</script>
+
+
+
+
+
 </body>
 
 </html>
