@@ -112,13 +112,16 @@
 
   <div id="grid" class="grid">
     {% for cat in categories %}
-    <div class="frame"><i class="thin"></i><i class="cut"></i><canvas class="blobs"></canvas>
-      <div class="glass">
-        <div class="imgWrap">{% if cat.photo.url %}<img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />{% endif %}
+
+    <a  href="{% url 'portfolio' slug=cat.slug %}" style="text-decoration: none;">
+      <div class="frame"><i class="thin"></i><i class="cut"></i><canvas class="blobs"></canvas>
+        <div class="glass">
+          <div class="imgWrap">{% if cat.photo.url %}<img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />{% endif %}
+          </div>
+          <div class="caption">{{ cat.first_word }}<br>{{ cat.rest_words }}</div>
         </div>
-        <div class="caption">{{ cat.first_word }}<br>{{ cat.rest_words }}</div>
       </div>
-    </div>
+    </a>
     {% endfor %}
   </div>
 
