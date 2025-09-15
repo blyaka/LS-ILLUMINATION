@@ -42,7 +42,13 @@
                 <a href="{% url 'about' %}">О нас</a>
             </nav>
 
-            <a class="ls-cta" href="#" id="rqOpen">Оставить заявку</a>
+            <a class="glow-btn" href="#" id="rqOpen">
+                <div class="glass-btn">
+                    <p>Оставить заявку</p>
+                </div>
+            </a>
+
+            
         </div>
     </header>
 
@@ -438,6 +444,9 @@
 })();
 </script> -->
 
+
+
+<!-- Скрипт шариков -->
 <script>
 (()=> {
   const cv = document.getElementById('bgCanvasBase');
@@ -551,6 +560,57 @@
     requestAnimationFrame(raf);
     window.lenis = lenis;
   }
+</script>
+
+
+
+
+
+
+<script>
+(() => {
+  const btns = document.querySelectorAll('.glow-btn');
+  if (!btns.length) return;
+
+  const norm360 = v => ((v % 360) + 360) % 360;
+
+  btns.forEach(btn => {
+    let raf = 0, last = 0, vis = 0, target = 0, hover = false;
+
+    function angleTo(el, x, y){
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      let deg = Math.atan2(y - cy, x - cx) * 180/Math.PI;
+      if (deg < 0) deg += 360;
+      return (deg + 90) % 360;
+    }
+
+    function step(ts){
+      const dt = (ts - (last || ts)) / 1000; last = ts;
+      const d  = ((target - vis + 540) % 360) - 180;
+      vis = norm360(vis + d * Math.min(1, dt * 12));
+      btn.style.setProperty('--base-angle', vis + 'deg');
+      if (hover) raf = requestAnimationFrame(step); else raf = 0;
+    }
+
+    function onMove(e){
+      target = angleTo(btn, e.clientX, e.clientY);
+      if (!raf) raf = requestAnimationFrame(step);
+    }
+
+    btn.addEventListener('pointerenter', e => {
+      hover = true;
+      target = angleTo(btn, e.clientX, e.clientY);
+      if (!raf) raf = requestAnimationFrame(step);
+    }, { passive: true });
+
+    btn.addEventListener('pointerleave', () => {
+      hover = false; /* ничего не выключаем */
+    }, { passive: true });
+
+    window.addEventListener('pointermove', e => { if (hover) onMove(e); }, { passive: true });
+  });
+})();
 </script>
 
 

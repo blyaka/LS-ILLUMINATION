@@ -100,33 +100,12 @@
     grid-column: 1 / span 2;
     justify-self: start;
     margin-top: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 16px;
-    border-radius: 32px;
-    border: 1px solid #BC4285;
-    background: rgba(188, 66, 133, 0.1);
+    border: none;
     color: #fff;
     text-decoration: none;
     font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow:
-        0 0 45px rgba(188, 66, 133, 0.6),
-        inset 0 0 45px rgba(188, 66, 133, 0.4);
-    text-shadow:
-        0 0 8px rgba(188, 66, 133, 0.8),
-        0 0 16px rgba(188, 66, 133, 0.6);
-}
-
-.ct-btn:hover {
-    background: rgba(188, 66, 133, 0.2);
-    box-shadow:
-        0 0 25px rgba(188, 66, 133, 0.9),
-        inset 0 0 15px rgba(188, 66, 133, 0.6);
-    text-shadow:
-        0 0 12px rgba(188, 66, 133, 1),
-        0 0 24px rgba(188, 66, 133, 0.8);
+    width: 173px !important;
+    height: 41px !important;
 }
 
 

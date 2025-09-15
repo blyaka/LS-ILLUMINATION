@@ -819,11 +819,27 @@
     <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
     <p class="cw-split__desc">{{ v.description|default:"" }}</p>
     {% if v.m3u8_url %}
-    <button class="cw-split__btn v-open" data-src="{{ v.m3u8_url }}" data-title="{{ v.name|default:'Видео' }}"
+
+
+    <a class="glow-btn v-open cw-split__btn" 
+      data-src="{{ v.m3u8_url }}" 
+      data-title="{{ v.name|default:'Видео' }}"
       data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
-      Смотреть полностью
-    </button>
-    {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
+      <div class="glass-btn">
+        <p>Смотреть полностью</p>
+      </div>
+    </a>
+
+
+    {% else %}
+    <a class="glow-btn v-open cw-split__btn" disabled>
+      <div class="glass-btn">
+        <p>Обрабатывается…</p>
+      </div>
+    </a>
+    {% endif %}
+
+
   </aside>
   <div class="cw-split__media">
     <video class="cw-split__video" preload="none" muted loop playsinline
@@ -842,11 +858,27 @@
     <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
     <p class="cw-split__desc">{{ v.description|default:"" }}</p>
     {% if v.m3u8_url %}
-    <button class="cw-split__btn v-open" data-src="{{ v.m3u8_url }}" data-title="{{ v.name|default:'Видео' }}"
+
+
+    <a class="glow-btn v-open cw-split__btn" 
+      data-src="{{ v.m3u8_url }}" 
+      data-title="{{ v.name|default:'Видео' }}"
       data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
-      Смотреть полностью
-    </button>
-    {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
+      <div class="glass-btn">
+        <p>Смотреть полностью</p>
+      </div>
+    </a>
+
+
+    {% else %}
+    <a class="glow-btn v-open cw-split__btn" disabled>
+      <div class="glass-btn">
+        <p>Обрабатывается…</p>
+      </div>
+    </a>
+    {% endif %}
+
+
   </aside>
 </section>
 {% endif %}
@@ -952,7 +984,13 @@
         <p class="news-desc" id="newsDesc">
           {{ news.0.text|truncatewords:25 }}
         </p>
-        <a class="news-btn" id="newsLink" href="#">Читать далее</a>
+
+        <a class="glow-btn news-btn" href="#" id="newsLink">
+          <div class="glass-btn">
+            <p>Читать далее</p>
+          </div>
+        </a>
+
       </aside>
     </article>
 
@@ -1209,7 +1247,19 @@
           <textarea name="message" rows="6" placeholder="Ваше сообщение"></textarea>
         </label>
 
-        <button class="ct-btn" type="submit">Оставить заявку</button>
+
+        <!-- <a class="glow-btn" type="submit">
+          <div class="glass-btn">
+            <p>Оставить заявку</p>
+          </div>
+        </a> -->
+
+        <button class="glow-btn ct-btn" type="submit">
+          <div class="glass-btn">
+            <p>Оставить заявку</p>
+          </div>
+        </button>
+
       </form>
     </div>
 

@@ -1,4 +1,3 @@
-
 /* ===== Split video ===== */
 .cw-split {
     display: grid;
@@ -38,6 +37,7 @@
     color: var(--text);
     height: 100%;
     box-sizing: border-box;
+    position: relative;
 }
 
 .cw-split__title {
@@ -59,35 +59,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 16px;
-    border-radius: 32px;
-    border: 1px solid #BC4285;
-    background: rgba(188, 66, 133, 0.1);
-    color: #fff;
-    text-decoration: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    box-shadow:
-        0 0 45px rgba(188, 66, 133, 0.6),
-        inset 0 0 45px rgba(188, 66, 133, 0.4);
-    text-shadow:
-        0 0 8px rgba(188, 66, 133, 0.8),
-        0 0 16px rgba(188, 66, 133, 0.6);
+
+    width: 181px !important;
+    height: 21px;
 }
 
-.cw-split__btn:hover {
-    background: rgba(188, 66, 133, 0.2);
-    box-shadow:
-        0 0 25px rgba(188, 66, 133, 0.9),
-        inset 0 0 15px rgba(188, 66, 133, 0.6);
-    text-shadow:
-        0 0 12px rgba(188, 66, 133, 1),
-        0 0 24px rgba(188, 66, 133, 0.8);
-}
 
-.cw-split__btn:active {
-    transform: translateY(0);
-}
+
+
 
 /* ===== Modal player ===== */
 .sv-modal[hidden] {

@@ -1,0 +1,160 @@
+
+
+@property --base-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+}
+
+@property --css-spin {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+}
+
+
+.glow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 32px;
+    background: var(--bg);
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    width: 141px;
+    height: 21px;
+
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+
+    --radius: 32px;
+
+    --base-angle: 0deg;
+    --css-spin: 0deg;
+    --g1: 3%;
+    --g2: 10%;
+    --g3: 12%;
+    --g4: 88%;
+    --g5: 90%;
+    --g6: 97%;
+
+    --glow-outset: clamp(1px, .5vmin, 2px);
+    --glow-blur: clamp(8px, 2vmin, 16px);
+
+    --edge-op: 0;
+    --edge-op: 1;
+    animation: cta-spin 6s linear infinite;
+}
+
+
+
+.glass-btn {
+    position: absolute;
+    inset: calc(var(--border-width) + 1px);
+    border-radius: calc(var(--radius) - var(--border-width) - 1px);
+    padding: 5px;
+    background: linear-gradient(140deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
+    border: 1px solid rgba(255, 255, 255, .08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    place-items: center;
+    z-index: 6;
+    pointer-events: none;
+    display: grid;
+    gap: 0;
+    overflow: clip;
+}
+
+
+.glow-btn::after {
+    content: "";
+    position: absolute;
+    inset: calc(-1 * var(--glow-outset));
+    border-radius: calc(var(--radius) + var(--glow-outset));
+    border: var(--glow-width) solid transparent;
+    background:
+        linear-gradient(#0000, #0000) padding-box,
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            #ffffffff 0%,
+            #ffd2f6ff var(--g1),
+            #ff2bd64d var(--g2),
+            #ff2bd600 var(--g3),
+            #ff2bd600 var(--g4),
+            #ff2bd64d var(--g5),
+            #ffd2f6ff var(--g6),
+            #ffffffff 100%) border-box;
+    filter: blur(var(--blur-eff)) drop-shadow(var(--ds-x) var(--ds-y) var(--ds-blur-eff) var(--ds-color));
+    opacity: var(--layer-op);
+    z-index: 0;
+    pointer-events: none;
+}
+
+
+.glow-btn>.thin {
+    position: absolute;
+    inset: calc(-1 * var(--thin-outset));
+    border-radius: calc(var(--radius) + var(--thin-outset));
+    border: var(--thin-width) solid transparent;
+    background:
+        linear-gradient(#0000, #0000) padding-box,
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            #ffffffff 3%, #ff2bd600 6%, #ff2bd600 93%, #ffffffff 97%) border-box;
+    filter: blur(var(--thin-blur-eff)) drop-shadow(var(--thin-ds-x) var(--thin-ds-y) var(--thin-ds-blur-eff) var(--thin-ds-color));
+    opacity: var(--layer-op);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.glow-btn>.cut {
+    position: absolute;
+    inset: var(--border-width);
+    border-radius: calc(var(--radius) - var(--border-width));
+    background: var(--bg);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.glow-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: var(--border-width);
+    border-radius: inherit;
+    background:
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            #ffffffff 0%,
+            #ffd2f6ff var(--g1),
+            #ff2bd64d var(--g2),
+            #ff2bd600 var(--g3),
+            #ff2bd600 var(--g4),
+            #ff2bd64d var(--g5),
+            #ffd2f6ff var(--g6),
+            #ffffffff 100%) border-box;
+    opacity: var(--layer-op);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.glow-btn:hover {
+    --edge-op: 1;
+    animation-duration: 3s;
+}
+
+@keyframes cta-spin {
+    from {
+        --css-spin: 0deg;
+    }
+
+    to {
+        --css-spin: 360deg;
+    }
+}
