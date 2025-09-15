@@ -1,6 +1,8 @@
 .page-container {
     margin-top: 69px;
     padding: 48px 96px;
+    z-index: 2;
+    position: relative;
 }
 
 .page-title {

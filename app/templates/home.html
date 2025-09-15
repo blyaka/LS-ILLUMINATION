@@ -11,7 +11,8 @@
 
 <section class="ls-hero">
   {% if hero_video %}
-  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%} autoplay muted loop playsinline></video>
+  <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {% endif%}
+    autoplay muted loop playsinline></video>
 
   <script>
     (function () {
@@ -56,10 +57,10 @@
   </div>
 
   <button class="ls-hero__pp" id="ppBtn" aria-label="Воспроизвести/Пауза">
-    <svg class="pp-icon pp-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <svg class="pp-icon pp-play" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
       <path d="M8 5v14l11-7-11-7z" fill="currentColor" />
     </svg>
-    <svg class="pp-icon pp-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+    <svg class="pp-icon pp-pause" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
       <path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor" />
     </svg>
   </button>
@@ -97,31 +98,379 @@
 
 
 
-<section class="cw-portfolio" id="portfolio">
+<section class="middle" id="middle">
+  <canvas id="bgCanvas" class="bgCanvas" aria-hidden="true"></canvas>
   <h2 class="cw-portfolio__title">Портфолио</h2>
 
-  <div class="cw-portfolio__grid">
+  <div id="grid" class="grid">
     {% for cat in categories %}
-    <a class="liquidGlass-wrapper" href="{% url 'portfolio' slug=cat.slug %}">
-      <div class="liquidGlass-effect"></div>
-      <div class="liquidGlass-tint"></div>
-      <div class="liquidGlass-shine"></div>
-      <div class="liquidGlass-text">
-        <figure class="p-card__inner">
-          <div class="p-card__photo">
-            {% if cat.photo.url %}<img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />{% endif %}
-          </div>
-          <figcaption class="p-card__cap">
-            <span>{{ cat.first_word }}</span>
-            <small>{{ cat.rest_words }}</small>
-          </figcaption>
-        </figure>
+    <div class="frame"><i class="thin"></i><i class="cut"></i><canvas class="blobs"></canvas>
+      <div class="glass">
+        <div class="imgWrap">{% if cat.photo.url %}<img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />{% endif %}
+        </div>
+        <div class="caption">{{ cat.first_word }}<br>{{ cat.rest_words }}</div>
       </div>
-    </a>
+    </div>
     {% endfor %}
+  </div>
 
+  <div class="ios-scroller" id="iosScroller" aria-hidden="true">
+    <div></div>
   </div>
 </section>
+
+
+
+<script>
+    (() => {
+      const $ = id => document.getElementById(id);
+      const middle = $('middle');
+      const grid = $('grid');
+
+      /* ======= Константы поведения (оптимальные дефолты) ======= */
+      const CFG = {
+        far: 400, near: 140,
+        gamma: 2.24, boostMult: 1.5, boostPow: 1.2,
+        blurBoost: 1.0, shadowBoost: 1.0, focusGamma: 1.1, spreadMax: 6,
+        opacityGamma: 1.0, edgeBias: 76,
+        hoverSpin: 60,           // deg/s при наведении внутри карточки
+        inertiaFollow: 336,      // мс — инерция слежения
+        inertiaSpin: 280,        // мс — инерция вращения на ховере
+        handoffMs: 250,          // окно плавной стыковки при вход/выходе курсора
+        // Фоновые шары:
+        bgCount: 3, bgSpeed: 80, bgJitter: 0.7,
+        bgC: ['#ff2bd6', '#8b5cf6', '#2bd7ff'], bgR: [320, 260, 380], bgS: [0.60, 0.55, 0.65]
+      };
+
+      /* ======= Карточки ======= */
+      const frames = Array.from(document.querySelectorAll('.frame')).map(el => {
+        const bcv = el.querySelector('canvas.blobs');
+        const bctx = bcv.getContext('2d');
+        return {
+          el, bcv, bctx,
+          rect: el.getBoundingClientRect(), halfW: 0, halfH: 0, radPx: 0,
+          hover: false, spinAngle: 0, visAngle: 0,
+          prevVisAngle: 0, lastDir: 1, handoffUntil: 0, handoffDir: 1
+        };
+      });
+
+      const getRadiusPx = el => {
+        const m = /([0-9.]+)px/.exec(getComputedStyle(el).borderRadius);
+        return m ? +m[1] : 0;
+      };
+
+      let midRect = middle.getBoundingClientRect();
+      function updateGeomAll() {
+        midRect = middle.getBoundingClientRect();
+        for (const f of frames) {
+          f.rect = f.el.getBoundingClientRect();
+          f.halfW = f.rect.width / 2; f.halfH = f.rect.height / 2;
+          f.radPx = getRadiusPx(f.el);
+          // ДПИ-буфер для локального канваса
+          const DPRl = Math.max(1, Math.min(2, devicePixelRatio || 1));
+          const w = Math.max(1, Math.round(f.rect.width * DPRl));
+          const h = Math.max(1, Math.round(f.rect.height * DPRl));
+          if (f.bcv.width !== w || f.bcv.height !== h) {
+            f.bcv.width = w; f.bcv.height = h;
+            f.bctx.setTransform(DPRl, 0, 0, DPRl, 0, 0);
+          }
+        }
+      }
+
+      // SDF расстояние до рамок карточки (скруглённый прямоугольник)
+      function sdfRoundRectFrame(f, px, py) {
+        const cx = f.rect.left + f.halfW, cy = f.rect.top + f.halfH;
+        const x = Math.abs(px - cx) - (f.halfW - f.radPx), y = Math.abs(py - cy) - (f.halfH - f.radPx);
+        const qx = Math.max(x, 0), qy = Math.max(y, 0); const outside = Math.hypot(qx, qy); const inside = Math.min(Math.max(x, y), 0);
+        return outside + inside - f.radPx;
+      }
+
+      const norm360 = v => ((v % 360) + 360) % 360;
+      const angDiff = (a, b) => ((b - a + 540) % 360) - 180;
+      function angleAtFrame(f, x, y) { const cx = f.rect.left + f.halfW, cy = f.rect.top + f.halfH; let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI; if (deg < 0) deg += 360; return (deg + 90) % 360; }
+
+      /* ======= Фоновые шары (только для .middle) ======= */
+      const bgcv = $('bgCanvas'); const bgx = bgcv.getContext('2d');
+      const OFF = document.createElement('canvas'); const OX = OFF.getContext('2d');
+      let DPR = Math.max(1, Math.min(2, devicePixelRatio || 1));
+
+      function resizeOffAndBg() {
+        const w = Math.max(1, Math.round(middle.clientWidth * DPR));
+        const h = Math.max(1, Math.round(middle.clientHeight * DPR));
+        if (OFF.width !== w || OFF.height !== h) { OFF.width = w; OFF.height = h; OX.setTransform(DPR, 0, 0, DPR, 0, 0); }
+        if (bgcv.width !== w || bgcv.height !== h) { bgcv.width = w; bgcv.height = h; bgx.setTransform(1, 0, 0, 1, 0, 0); }
+      }
+
+      const BG = { blobs: [] };
+      function verticalInsetPx() { return Math.max(180, Math.round(Math.max(...CFG.bgR) * 0.75)); }
+      function hexToRgb(hex) { const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return m ? { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) } : { r: 255, g: 255, b: 255 }; }
+      function rgba(r, g, b, a) { return `rgba(${r},${g},${b},${a})`; }
+
+      function ensureBlobs() {
+        const need = Math.max(1, Math.min(3, CFG.bgCount | 0));
+        while (BG.blobs.length < need) BG.blobs.push(makeBlob(BG.blobs.length));
+        while (BG.blobs.length > need) BG.blobs.pop();
+      }
+      function makeBlob(i) {
+        const ang = Math.random() * Math.PI * 2;
+        const W = middle.clientWidth, H = middle.clientHeight, inset = verticalInsetPx();
+        return {
+          i, dir: ang,
+          x: Math.random() * W,
+          y: Math.random() * (H - inset * 2) + inset,
+          get r() { return CFG.bgR[i] || 300; },
+          get soft() { return CFG.bgS[i] || 0.6; },
+          get col() { return CFG.bgC[i] || '#ffffff'; }
+        };
+      }
+
+      function updateBlobs(dt) {
+        const spd = CFG.bgSpeed, jit = CFG.bgJitter, marginX = 200;
+        const W = middle.clientWidth, H = middle.clientHeight, insetY = verticalInsetPx();
+
+        for (const b of BG.blobs) {
+          b.dir += (Math.random() * 2 - 1) * jit * dt;
+          const vx = Math.cos(b.dir) * spd, vy = Math.sin(b.dir) * spd;
+          b.x += vx * dt; b.y += vy * dt;
+
+          // Горизонтальная бесконечность
+          if (b.x < -marginX) b.x = W + marginX;
+          if (b.x > W + marginX) b.x = -marginX;
+
+          // Вертикальные «борта» внутри секции
+          if (b.y < insetY) { b.y = insetY; b.dir = -b.dir + (Math.random() - 0.5) * 0.4; }
+          else if (b.y > H - insetY) { b.y = H - insetY; b.dir = -b.dir + (Math.random() - 0.5) * 0.4; }
+        }
+      }
+
+      function paintOff() {
+        const W = middle.clientWidth, H = middle.clientHeight;
+        OX.clearRect(0, 0, W, H);
+        OX.globalCompositeOperation = 'lighter';
+        for (const b of BG.blobs) {
+          const { r, g, b: bb } = hexToRgb(b.col);
+          const R = b.r, s = Math.max(0, Math.min(1, b.soft));
+          const mid = 0.15 + 0.75 * s;
+          const grd = OX.createRadialGradient(b.x, b.y, 0, b.x, b.y, R);
+          grd.addColorStop(0.0, rgba(r, g, bb, 0.60));
+          grd.addColorStop(mid, rgba(r, g, bb, 0.25));
+          grd.addColorStop(1.0, rgba(r, g, bb, 0.00));
+          OX.fillStyle = grd;
+          OX.beginPath(); OX.arc(b.x, b.y, R, 0, Math.PI * 2); OX.fill();
+        }
+        OX.globalCompositeOperation = 'source-over';
+      }
+
+      function paintBg() { bgx.clearRect(0, 0, bgcv.width, bgcv.height); bgx.drawImage(OFF, 0, 0); }
+
+      function blitToFrames() {
+        for (const f of frames) {
+          const sx = (f.rect.left - midRect.left);
+          const sy = (f.rect.top - midRect.top);
+          const sw = f.rect.width, sh = f.rect.height;
+          f.bctx.clearRect(0, 0, sw, sh);
+          f.bctx.drawImage(OFF, sx * DPR, sy * DPR, sw * DPR, sh * DPR, 0, 0, sw, sh);
+        }
+      }
+
+      /* ======= FOLLOW / INERTIA / EDGE ======= */
+      let raf = null, prevTS = 0, dirty = true;
+      let lastX = innerWidth / 2, lastY = innerHeight / 2;
+
+      function ensure() { if (!raf) raf = requestAnimationFrame(tick); }
+      function requestRender() { dirty = true; ensure(); }
+
+      function computeStrength(d) {
+        const c = CFG;
+        if (d >= c.far) return { S: 0, mid: 0, close: 0, zone: 'far' };
+        if (d > c.near) {
+          const raw = 1 - (d - c.near) / (c.far - c.near);
+          const mid = Math.pow(raw, c.gamma);
+          return { S: mid, mid, close: 0, zone: 'mid' };
+        }
+        const t = (c.near - d) / c.near;
+        const extra = c.boostMult * Math.pow(t, c.boostPow);
+        const S = 1 + extra;
+        const close = Math.min(1, Math.pow(t, c.focusGamma));
+        return { S, mid: 1, close, zone: 'close' };
+      }
+
+      function setStops(el, varNames, values) {
+        for (let i = 0; i < values.length; i++) {
+          el.style.setProperty(varNames[i], values[i].toFixed(3) + '%');
+        }
+      }
+
+      function applyToFrame(f, dEdge) {
+        const el = f.el; const Sinfo = computeStrength(dEdge);
+        let op = 0; if (Sinfo.zone === 'mid') op = Math.pow(Sinfo.S, CFG.opacityGamma); else if (Sinfo.zone === 'close') op = 1;
+        el.style.setProperty('--layer-op', op.toFixed(3));
+
+        const S = Sinfo.S;
+        const blurMult = (S <= 1) ? S : (1 + CFG.blurBoost * (S - 1));
+        const shadowMult = (S <= 1) ? S : (1 + CFG.shadowBoost * (S - 1));
+        el.style.setProperty('--blur-mult', blurMult.toFixed(3));
+        el.style.setProperty('--thin-blur-mult', blurMult.toFixed(3));
+        el.style.setProperty('--ds-blur-mult', shadowMult.toFixed(3));
+        el.style.setProperty('--thin-ds-blur-mult', shadowMult.toFixed(3));
+
+        // Стопы
+        if (Sinfo.zone !== 'close') {
+          setStops(el, ['--g1', '--g2', '--g3', '--g4', '--g5', '--g6'], [3, 10, 12, 88, 90, 97]);
+          setStops(el, ['--b1', '--b2', '--b3', '--b4', '--b5', '--b6'], [3, 12, 14, 86, 88, 97]);
+        } else {
+          const nearPx = CFG.near;
+          const d_bias = Math.min(nearPx, Math.max(0, dEdge + CFG.edgeBias));
+          const t_bias = (nearPx - d_bias) / nearPx;
+          const fcs = Math.min(1, Math.pow(t_bias, CFG.focusGamma));
+          const w = CFG.spreadMax * fcs;
+
+          const baseGlow = [3, 10, 12, 88, 90, 97];
+          const baseEdge = [3, 12, 14, 86, 88, 97];
+          const L = 50 - w, M = 50, R = 50 + w;
+          const nearArr = [L, M, R, 100 - R, 100 - M, 100 - L];
+          const lerp = (a, b, t) => a + (b - a) * t;
+
+          setStops(el, ['--g1', '--g2', '--g3', '--g4', '--g5', '--g6'], baseGlow.map((v, i) => lerp(v, nearArr[i], fcs)));
+          setStops(el, ['--b1', '--b2', '--b3', '--b4', '--b5', '--b6'], baseEdge.map((v, i) => lerp(v, nearArr[i], fcs)));
+        }
+      }
+
+      const getComputedAngle = (el) => { const cs = getComputedStyle(el); const base = parseFloat(cs.getPropertyValue('--base-angle')) || 0; const spin = parseFloat(cs.getPropertyValue('--css-spin')) || 0; return norm360(base + spin); };
+
+      function tick(ts) {
+        const dt = prevTS ? (ts - prevTS) / 1000 : 0; prevTS = ts;
+
+        updateBlobs(dt); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames();
+
+        let anySpin = false, anyLerp = false;
+
+        for (const f of frames) {
+          const dPrev = angDiff(f.prevVisAngle, f.visAngle);
+          if (Math.abs(dPrev) > 0.05) f.lastDir = Math.sign(dPrev);
+          f.prevVisAngle = f.visAngle;
+
+          // расстояние до края (внутри — приравниваем к 0)
+          const signed = sdfRoundRectFrame(f, lastX, lastY);
+          const dEdge = Math.max(0, signed);
+
+          // таргет угла
+          const rawFollow = angleAtFrame(f, lastX, lastY);
+          let target = rawFollow;
+
+          if (f.hover && CFG.hoverSpin > 0) {
+            f.spinAngle = norm360(f.spinAngle + CFG.hoverSpin * dt);
+            target = f.spinAngle;
+            anySpin = true;
+          } else if (!f.hover && performance.now() < f.handoffUntil) {
+            // плавная стыковка направления после выхода
+            const delta = angDiff(f.visAngle, rawFollow);
+            if (f.handoffDir > 0 && delta < 0) target = rawFollow + 360;
+            if (f.handoffDir < 0 && delta > 0) target = rawFollow - 360;
+          }
+
+          // инерция
+          const tauMs = (f.hover && CFG.hoverSpin > 0) ? CFG.inertiaSpin : CFG.inertiaFollow;
+          if (tauMs <= 0) { f.visAngle = norm360(target); }
+          else {
+            const alpha = 1 - Math.exp(- (dt) / Math.max(1e-6, tauMs / 1000));
+            const dA = angDiff(f.visAngle, target);
+            f.visAngle = norm360(f.visAngle + dA * alpha);
+            if (Math.abs(dA) > 0.1) anyLerp = true;
+          }
+
+          f.el.style.setProperty('--base-angle', f.visAngle + 'deg');
+          f.el.style.setProperty('--css-spin', '0deg');
+
+          applyToFrame(f, dEdge);
+        }
+
+        if (dirty || anySpin || anyLerp) { dirty = false; raf = requestAnimationFrame(tick); } else { raf = null; }
+      }
+
+      function onMoveLike(x, y) { lastX = x; lastY = y; requestRender(); }
+
+      // Ховеры/выходы — фиксация направления и «стыковка»
+      frames.forEach(f => {
+        f.el.addEventListener('pointerenter', () => {
+          f.hover = true;
+          const cur = getComputedAngle(f.el);
+          f.visAngle = cur; f.spinAngle = cur;
+          f.lastDir = (CFG.hoverSpin >= 0) ? +1 : -1;
+          ensure();
+        }, { passive: true });
+        f.el.addEventListener('pointerleave', () => {
+          f.hover = false;
+          f.handoffUntil = performance.now() + CFG.handoffMs;
+          f.handoffDir = f.lastDir || (CFG.hoverSpin >= 0 ? +1 : -1);
+          requestRender();
+        }, { passive: true });
+      });
+
+      // Глобальное слежение за указателем
+      addEventListener('pointermove', e => { if (e.clientX != null) onMoveLike(e.clientX, e.clientY); }, { passive: true });
+
+      // Тач: не даём странице скроллиться под пальцем над grid
+      let touchingFrame = false;
+      grid.addEventListener('pointerdown', e => { if (e.target.closest('.frame')) touchingFrame = true; }, { passive: true });
+      grid.addEventListener('pointerup', () => touchingFrame = false, { passive: true });
+      grid.addEventListener('pointercancel', () => touchingFrame = false, { passive: true });
+      addEventListener('touchstart', e => { if (e.target.closest('.frame')) touchingFrame = true; }, { passive: true });
+      addEventListener('touchend', () => touchingFrame = false, { passive: true });
+      addEventListener('touchcancel', () => touchingFrame = false, { passive: true });
+      addEventListener('touchmove', e => { const t = e.touches && e.touches[0]; if (!t) return; if (touchingFrame) e.preventDefault(); onMoveLike(t.clientX, t.clientY); }, { passive: false });
+
+      // Пересчёт геометрии при изменениях
+      function recalc() {
+        updateGeomAll();
+        requestAnimationFrame(() => { updateGeomAll(); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames(); requestRender(); });
+      }
+      const ro = new ResizeObserver(() => recalc());
+      ro.observe(middle); ro.observe(grid); frames.forEach(f => ro.observe(f.el));
+      if (window.visualViewport) {
+        visualViewport.addEventListener('resize', recalc, { passive: true });
+        visualViewport.addEventListener('scroll', recalc, { passive: true });
+      }
+      addEventListener('resize', recalc, { passive: true });
+      addEventListener('scroll', recalc, { passive: true });
+
+      /* ======= iOS micro-jitter/scroll (авто, только Safari iOS) ======= */
+      const ua = navigator.userAgent || "", isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isSafari = /^Apple/i.test(navigator.vendor || "") && !/CriOS|FxiOS|EdgiOS|OPiOS|Mercury/i.test(ua);
+      const scroller = $('iosScroller');
+      let jRAF = null, jLast = 0, jFlip = false, sRAF = null, sLast = 0;
+      function jTick(ts) { if (!jLast || ts - jLast >= 80) { jFlip = !jFlip; grid.style.transform = 'translateZ(0) rotate(' + (jFlip ? 0.01 : 0) + 'deg)'; jLast = ts; } jRAF = requestAnimationFrame(jTick); }
+      function sTick(ts) { if (!sLast || ts - sLast >= 60) { scroller.scrollTop = (scroller.scrollTop === 0 ? 1 : 0); sLast = ts; } sRAF = requestAnimationFrame(sTick); }
+      function startIOSWorkaround() { if (!jRAF) { jLast = 0; jRAF = requestAnimationFrame(jTick); } if (!sRAF) { sLast = 0; sRAF = requestAnimationFrame(sTick); } }
+      function stopIOSWorkaround() { if (jRAF) { cancelAnimationFrame(jRAF); jRAF = null; } if (sRAF) { cancelAnimationFrame(sRAF); sRAF = null; } grid.style.transform = 'translateZ(0)'; }
+      function setupIOSFix() { if (isIOS && isSafari) startIOSWorkaround(); }
+      document.addEventListener('visibilitychange', () => { if (document.hidden) stopIOSWorkaround(); else setupIOSFix(); });
+
+      /* ======= init ======= */
+      function initAngles() {
+        const cx = innerWidth / 2, cy = innerHeight / 2;
+        frames.forEach(f => {
+          const start = angleAtFrame(f, cx, cy);
+          f.visAngle = start; f.spinAngle = start; f.prevVisAngle = start; f.lastDir = 1;
+          f.el.style.setProperty('--base-angle', start + 'deg');
+          f.el.style.setProperty('--css-spin', '0deg');
+        });
+      }
+
+      updateGeomAll(); initAngles();
+      ensureBlobs(); resizeOffAndBg(); paintOff(); paintBg(); blitToFrames();
+      setupIOSFix();
+      // старт рендера
+      (function kick() { lastX = innerWidth / 2; lastY = innerHeight / 2; requestRender(); })();
+    })();
+</script>
+
+
+
+
+
+
+
 
 
 
@@ -269,12 +618,18 @@
     <!-- Overlay -->
     <div class="seq-ov">
       <div class="seq-copy" id="seqCopy">
-        <span class="seq-kicker">Фонтан</span>
-        <h2 class="seq-title">«ТЕАТРАЛЬНЫЙ»</h2>
-        <p class="seq-desc">
+        <span class="seq-kicker reveal">Фонтан</span>
+        <h2 class="seq-title reveal">«ТЕАТРАЛЬНЫЙ»</h2>
+        <p class="seq-desc reveal">
           Где дети считают звёзды.<br />
           Где взрослые снова верят в чудо.<br />
           Где вместе — теплее.
+        </p>
+
+        <p class="seq-desc2 reveal">
+          LED PRO — экономичнее. <br>
+          Безопасные материалы, IP65. <br>
+          Надёжно в снег и ветер.
         </p>
       </div>
 
@@ -298,125 +653,268 @@
 
 
 
+<script>
+  (() => {
+    const s = document.getElementById('seq');
+    const c = document.getElementById('seqCanvas');
+    const x = c.getContext('2d', { alpha:false });
+    const d = Math.min(2, window.devicePixelRatio || 1);
+
+    const copyStart = document.getElementById('seqCopy');       
+    const ov = document.querySelector('.seq-ov');
+    const artL = document.getElementById('artL');
+    const artR = document.getElementById('artR');
+    const scheme = document.getElementById('seqScheme');
+    const seqImg = document.getElementById('seqImg');
+
+    const k1 = copyStart.querySelector('.seq-kicker');
+    const t1 = copyStart.querySelector('.seq-title');
+    const d1 = copyStart.querySelector('.seq-desc');
+    const d2orig = copyStart.querySelector('.seq-desc2'); 
+
+    const copyFinal = copyStart.cloneNode(true);
+    copyFinal.id = 'seqCopyFinal';
+    copyFinal.classList.add('seq-copy--final');
+    copyFinal.querySelector('.seq-desc')?.remove();
+    d2orig?.remove();
+    ov.appendChild(copyFinal);
+
+    const k2 = copyFinal.querySelector('.seq-kicker');
+    const t2 = copyFinal.querySelector('.seq-title');
+    const d2 = copyFinal.querySelector('.seq-desc2');
+
+    [k1,t1,d1,k2,t2,d2].forEach(el => { el.classList.add('reveal'); });
+
+    function resize(){
+      c.width = Math.floor(innerWidth * d);
+      c.height = Math.floor(innerHeight * d);
+      c.style.width = '100vw'; c.style.height = '100vh';
+      x.setTransform(d, 0, 0, d, 0, 0);
+      snap(cur);
+    }
+
+    const N = 60;
+    const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5,'0')}.webp`;
+    const G = new Array(N);
+    let tgt = 0, cur = 0, raf = 0, last = -1;
+
+    const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+    const smooth = (a,b,t) => clamp((t - a) / (b - a), 0, 1);
+
+    function draw(img){
+      const cw = c.width / d, ch = c.height / d;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const s = Math.max(cw/iw, ch/ih), w = iw*s, h = ih*s;
+      x.clearRect(0,0,cw,ch);
+      x.drawImage(img, (cw-w)/2, (ch-h)/2, w, h);
+    }
+
+    function snap(f){
+      const idx = clamp(Math.round(f), 0, N-1);
+      if (idx === last) return;
+      const im = G[idx];
+      if (!im || !im.complete) return;
+      last = idx; draw(im);
+    }
+
+    let entered = false;
+
+    function progressFromScroll(){
+      const r = s.getBoundingClientRect();
+      const m = s.offsetHeight - innerHeight;
+      const y = Math.min(m, Math.max(0, -r.top));
+      tgt = m ? (y / m) * (N - 1) : 0;
+
+      const SHOW_AT = 0.85;                     // позже триггерим: 85% экрана
+      const MIN_VIS_VH = 0.55;                  // должно быть видно >=55% ВЬЮПОРТА
+
+      const topReached   = r.top <= innerHeight * SHOW_AT;
+      const visiblePx    = Math.min(innerHeight, r.bottom) - Math.max(0, r.top);
+      const enoughInView = visiblePx >= innerHeight * MIN_VIS_VH;  
+
+      if (!entered && topReached && enoughInView) {
+        entered = true;
+        [k1, t1, d1].forEach(el => el.classList.add('show'));
+      }
+
+      if (entered && (r.bottom <= 0 || r.top >= innerHeight)) {
+        entered = false;
+        [k1, t1, d1, k2, t2, d2].forEach(el => el.classList.remove('show'));
+      }
+
+      if (!raf) raf = requestAnimationFrame(loop);
+    }
+
+
+    function updateOverlay(p){
+      artL.style.opacity = 1 - smooth(0.40, 0.55, p);
+      artR.style.opacity =       smooth(0.55, 0.70, p);
+
+      const vis = smooth(0.80, 0.95, p);
+      scheme.style.opacity = vis;
+      scheme.style.transform = `translateY(${16*(1-vis)}px)`;
+      seqImg.classList.toggle('show', p > 0.80);
+
+      if (!entered) {
+        [k1,t1,d1,k2,t2,d2].forEach(el => el.classList.remove('show'));
+        return;
+      }
+
+      const hideStart = smooth(0.48, 0.60, p) > 0.5;
+      [k1, t1, d1].forEach(el => el.classList.toggle('show', !hideStart));
+
+      const showFinal = smooth(0.58, 0.70, p) > 0.5;
+      [k2, t2, d2].forEach(el => el.classList.toggle('show', showFinal));
+
+      k2.classList.toggle('right', p >= 0.62);
+    }
+
+
+    function loop(){
+      raf = 0;
+      cur += (tgt - cur) * 0.2;
+      snap(cur);
+      updateOverlay(cur / (N-1));
+      if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(loop);
+    }
+
+    G[0] = new Image(); G[0].src = U(0);
+    G[0].onload = () => { snap(0); updateOverlay(0); };
+    for (let i=1;i<N;i++){ G[i] = new Image(); G[i].decoding='async'; G[i].src = U(i); }
+
+    resize();
+    addEventListener('resize', () => { resize(); progressFromScroll(); });
+    addEventListener('scroll', progressFromScroll, { passive:true });
+    progressFromScroll();
+  })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 {% for v in block_videos %}
-  {% if forloop.counter|divisibleby:2 %}
-  <section class="cw-split right">
-    <aside class="cw-split__aside">
-      <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
-      <p class="cw-split__desc">{{ v.description|default:"" }}</p>
-      {% if v.m3u8_url %}
-      <button class="cw-split__btn v-open"
-              data-src="{{ v.m3u8_url }}"
-              data-title="{{ v.name|default:'Видео' }}"
-              data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
-        Смотреть полностью
-      </button>
-      {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
-    </aside>
-    <div class="cw-split__media">
-    <video class="cw-split__video"
-          preload="none" muted loop playsinline
-          poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
-          data-src="{{ v.m3u8_url }}" data-kind="hls"></video>
-    </div>
-  </section>
-  {% else %}
-  <section class="cw-split">
-    <div class="cw-split__media">
-    <video class="cw-split__video"
-          preload="none" muted loop playsinline
-          poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
-          data-src="{{ v.m3u8_url }}" data-kind="hls"></video>
-    </div>
-    <aside class="cw-split__aside">
-      <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
-      <p class="cw-split__desc">{{ v.description|default:"" }}</p>
-      {% if v.m3u8_url %}
-      <button class="cw-split__btn v-open"
-              data-src="{{ v.m3u8_url }}"
-              data-title="{{ v.name|default:'Видео' }}"
-              data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
-        Смотреть полностью
-      </button>
-      {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
-    </aside>
-  </section>
-  {% endif %}
+{% if forloop.counter|divisibleby:2 %}
+<section class="cw-split right">
+  <aside class="cw-split__aside">
+    <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
+    <p class="cw-split__desc">{{ v.description|default:"" }}</p>
+    {% if v.m3u8_url %}
+    <button class="cw-split__btn v-open" data-src="{{ v.m3u8_url }}" data-title="{{ v.name|default:'Видео' }}"
+      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
+      Смотреть полностью
+    </button>
+    {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
+  </aside>
+  <div class="cw-split__media">
+    <video class="cw-split__video" preload="none" muted loop playsinline
+      poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
+      data-src="{{ v.m3u8_url }}" data-kind="hls"></video>
+  </div>
+</section>
+{% else %}
+<section class="cw-split">
+  <div class="cw-split__media">
+    <video class="cw-split__video" preload="none" muted loop playsinline
+      poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
+      data-src="{{ v.m3u8_url }}" data-kind="hls"></video>
+  </div>
+  <aside class="cw-split__aside">
+    <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
+    <p class="cw-split__desc">{{ v.description|default:"" }}</p>
+    {% if v.m3u8_url %}
+    <button class="cw-split__btn v-open" data-src="{{ v.m3u8_url }}" data-title="{{ v.name|default:'Видео' }}"
+      data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
+      Смотреть полностью
+    </button>
+    {% else %}<button class="cw-split__btn" disabled>Обрабатывается…</button>{% endif %}
+  </aside>
+</section>
+{% endif %}
 {% endfor %}
 
 
 
 <script>
-(() => {
-  const vids = document.querySelectorAll('.cw-split__video[data-src]');
-  const st = new WeakMap();
-  const DETACH = 2000;
-  const NEAR_MARGIN = '800px 0px';
+  (() => {
+    const vids = document.querySelectorAll('.cw-split__video[data-src]');
+    const st = new WeakMap();
+    const DETACH = 2000;
+    const NEAR_MARGIN = '800px 0px';
 
-  async function attach(v){
-    const s = st.get(v) || {};
-    const src = v.dataset.src;
-    if (!src) return;
+    async function attach(v) {
+      const s = st.get(v) || {};
+      const src = v.dataset.src;
+      if (!src) return;
 
-    v.muted = true; v.loop = true; v.playsInline = true;
+      v.muted = true; v.loop = true; v.playsInline = true;
 
-    if (!s.againBound){
-      v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(()=>{}); });
-      s.againBound = true;
+      if (!s.againBound) {
+        v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(() => { }); });
+        s.againBound = true;
+      }
+
+      if (!s.attached) {
+        if (v.canPlayType('application/vnd.apple.mpegurl')) {
+          v.src = src; s.hls = null; s.attached = true;
+        } else if (window.Hls && Hls.isSupported()) {
+          const h = new Hls({ maxBufferLength: 6, autoStartLoad: true });
+          h.loadSource(src); h.attachMedia(v); s.hls = h; s.attached = true;
+        } else {
+          v.src = src; s.hls = null; s.attached = true;
+        }
+        st.set(v, s);
+      }
+      try { await v.play(); } catch { }
     }
 
-    if (!s.attached){
-      if (v.canPlayType('application/vnd.apple.mpegurl')) {
-        v.src = src; s.hls = null; s.attached = true;
-      } else if (window.Hls && Hls.isSupported()) {
-        const h = new Hls({ maxBufferLength: 6, autoStartLoad: true });
-        h.loadSource(src); h.attachMedia(v); s.hls = h; s.attached = true;
-      } else {
-        v.src = src; s.hls = null; s.attached = true;
-      }
+    function pause(v) {
+      try { v.pause(); } catch { }
+    }
+
+    function detach(v) {
+      const s = st.get(v);
+      if (!s || !s.attached) return;
+      pause(v);
+      if (s.hls) { try { s.hls.destroy(); } catch { } }
+      v.removeAttribute('src'); v.load();
+      s.attached = false; s.hls = null;
       st.set(v, s);
     }
-    try { await v.play(); } catch {}
-  }
 
-  function pause(v){
-    try { v.pause(); } catch {}
-  }
-
-  function detach(v){
-    const s = st.get(v);
-    if (!s || !s.attached) return;
-    pause(v);
-    if (s.hls) { try { s.hls.destroy(); } catch {} }
-    v.removeAttribute('src'); v.load();
-    s.attached = false; s.hls = null;
-    st.set(v, s);
-  }
-
-  const io = new IntersectionObserver((entries) => {
-    const vh = window.innerHeight || document.documentElement.clientHeight;
-    for (const e of entries) {
-      const v = e.target;
-      if (e.isIntersecting) { attach(v); continue; }
-      const r = e.boundingClientRect;
-      const far = (r.bottom < -DETACH) || (r.top > vh + DETACH);
-      if (far) detach(v); else pause(v);
-    }
-  }, { root:null, rootMargin: NEAR_MARGIN, threshold: 0 });
-
-  vids.forEach(v => { st.set(v, { attached:false, hls:null, againBound:false }); io.observe(v); });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) return;
-    vids.forEach(v => {
-      const r = v.getBoundingClientRect();
+    const io = new IntersectionObserver((entries) => {
       const vh = window.innerHeight || document.documentElement.clientHeight;
-      const near = (r.bottom > -800) && (r.top < vh + 800);
-      if (near) attach(v);
+      for (const e of entries) {
+        const v = e.target;
+        if (e.isIntersecting) { attach(v); continue; }
+        const r = e.boundingClientRect;
+        const far = (r.bottom < -DETACH) || (r.top > vh + DETACH);
+        if (far) detach(v); else pause(v);
+      }
+    }, { root: null, rootMargin: NEAR_MARGIN, threshold: 0 });
+
+    vids.forEach(v => { st.set(v, { attached: false, hls: null, againBound: false }); io.observe(v); });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) return;
+      vids.forEach(v => {
+        const r = v.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        const near = (r.bottom > -800) && (r.top < vh + 800);
+        if (near) attach(v);
+      });
     });
-  });
-})();
+  })();
 </script>
 
 
@@ -677,6 +1175,7 @@
   <div class="cw-contacts__wrap">
     <!-- Левая колонка: форма -->
     <div class="ct-form">
+      <p>Контакты</p>
       <h2 class="ct-title">Мы на связи!</h2>
       <p class="ct-sub">Оставьте заявку или свяжитесь с нами</p>
 
@@ -715,49 +1214,49 @@
       })();
     </script>
 
-<script>
-(() => {
-  const n = document.getElementById('name-bot');
+    <script>
+      (() => {
+        const n = document.getElementById('name-bot');
 
-  n.addEventListener('input', () => {
-    n.value = n.value.replace(/[0-9]/g, '');
-  });
-})();
-</script>
+        n.addEventListener('input', () => {
+          n.value = n.value.replace(/[0-9]/g, '');
+        });
+      })();
+    </script>
 
 
-<script>
-(() => {
-  const input = document.getElementById('phone-bot');
+    <script>
+      (() => {
+        const input = document.getElementById('phone-bot');
 
-  input.addEventListener('input', () => {
-    let v = input.value.replace(/\D/g, '');
-    if (!v) { input.value = ''; return; }
+        input.addEventListener('input', () => {
+          let v = input.value.replace(/\D/g, '');
+          if (!v) { input.value = ''; return; }
 
-    if (v[0] === '7') {
-      v = '7' + v.slice(1);
-      input.value = format(v, true);
-    }
-    else if (v[0] === '8') {
-      input.value = format(v, false);
-    }
-    else {
-      input.value = format(v, true);
-    }
-  });
+          if (v[0] === '7') {
+            v = '7' + v.slice(1);
+            input.value = format(v, true);
+          }
+          else if (v[0] === '8') {
+            input.value = format(v, false);
+          }
+          else {
+            input.value = format(v, true);
+          }
+        });
 
-  function format(digits, plus) {
-    const p = digits.padEnd(11, '_').slice(0, 11);
-    const part1 = p.slice(1, 4);
-    const part2 = p.slice(4, 7);
-    const part3 = p.slice(7, 9);
-    const part4 = p.slice(9, 11);
+        function format(digits, plus) {
+          const p = digits.padEnd(11, '_').slice(0, 11);
+          const part1 = p.slice(1, 4);
+          const part2 = p.slice(4, 7);
+          const part3 = p.slice(7, 9);
+          const part4 = p.slice(9, 11);
 
-    return (plus ? '+7' : '8') +
-      ` (${part1}) ${part2}-${part3}-${part4}`.replace(/[_-]+$/,'');
-  }
-})();
-</script>
+          return (plus ? '+7' : '8') +
+            ` (${part1}) ${part2}-${part3}-${part4}`.replace(/[_-]+$/, '');
+        }
+      })();
+    </script>
 
     <!-- Правая колонка: контакты -->
     <aside class="ct-info">
@@ -788,15 +1287,19 @@
         </li>
       </ul>
 
-      <div class="ct-hours">
-        <div class="ct-hours__ico" aria-hidden="true">
-          <svg width="28" height="28">
-            <use xlink:href="{% static 'images/icons.svg' %}#icon-time"></use>
-          </svg>
-        </div>
-        <div class="ct-hours__text">
-          <div>Пн-Пт с 10:00 до 18:00</div>
-          <div class="muted">Сб-Вс — выходные дни</div>
+      <div class="hours-container">
+        <p>Время работы:</p>
+
+        <div class="ct-hours">
+          <div class="ct-hours__ico" aria-hidden="true">
+            <svg width="28" height="28">
+              <use xlink:href="{% static 'images/icons.svg' %}#icon-time"></use>
+            </svg>
+          </div>
+          <div class="ct-hours__text">
+            <div>Пн-Пт с 10:00 до 18:00</div>
+            <div class="muted">Сб-Вс — выходные дни</div>
+          </div>
         </div>
       </div>
     </aside>
@@ -833,10 +1336,10 @@
       const im = new Image();
       im.decoding = 'async';
       im.src = cur.img;
-      await im.decode().catch(()=>{});
+      await im.decode().catch(() => { });
       img.src = im.src;
 
-      dateEl.innerHTML  = cur.date;
+      dateEl.innerHTML = cur.date;
       titleEl.innerHTML = (cur.title || '').replace(/\n/g, '<br>');
       descEl.textContent = cur.desc || '';
 
@@ -851,7 +1354,7 @@
       nmTitle.innerHTML = (n.title || '').replace(/\n/g, '<br>');
       nmDate.innerHTML = n.date || '';
       nmImg.src = n.img || img.src;
-      nmImg.alt = (n.title || '').replace(/<[^>]+>/g,'').trim() || 'Новость';
+      nmImg.alt = (n.title || '').replace(/<[^>]+>/g, '').trim() || 'Новость';
       nmBody.innerHTML = n.body && n.body.trim()
         ? n.body
         : (n.desc ? `<p>${n.desc}</p>` : '');
@@ -885,99 +1388,7 @@
 
 
 
-<script>
-  (() => {
-    const s = document.getElementById('seq');
-    const c = document.getElementById('seqCanvas');
-    const x = c.getContext('2d', { alpha: false });
-    const d = Math.min(2, window.devicePixelRatio || 1);
 
-    const copy = document.getElementById('seqCopy');
-    const artL = document.getElementById('artL');
-    const artR = document.getElementById('artR');
-    const scheme = document.getElementById('seqScheme');
-    const seqImg = document.getElementById('seqImg');  // Вторая картинка
-    const desc = document.querySelector('.seq-desc');
-
-    const N = 60;
-    const U = i => `/static/images/sequence/final_00000_${String(i).padStart(5, '0')}.webp`;
-    const G = new Array(N);
-    let tgt = 0, cur = 0, raf = 0, last = -1;
-
-    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-    const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    const smooth = (a, b, t) => clamp((t - a) / (b - a), 0, 1);
-
-    function resize() {
-      c.width = Math.floor(innerWidth * d);
-      c.height = Math.floor(innerHeight * d);
-      c.style.width = '100vw'; c.style.height = '100vh';
-      x.setTransform(d, 0, 0, d, 0, 0);
-      snap(cur);
-    }
-
-    function draw(img) {
-      const cw = c.width / d, ch = c.height / d;
-      const iw = img.naturalWidth, ih = img.naturalHeight;
-      const s = Math.max(cw / iw, ch / ih), w = iw * s, h = ih * s;
-      x.clearRect(0, 0, cw, ch);
-      x.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
-    }
-
-    function snap(f) {
-      const idx = clamp(Math.round(f), 0, N - 1);
-      if (idx === last) return;
-      const im = G[idx];
-      if (!im || !im.complete) return;
-      last = idx; draw(im);
-    }
-
-    function progressFromScroll() {
-      const r = s.getBoundingClientRect();
-      const m = s.offsetHeight - innerHeight;
-      const y = Math.min(m, Math.max(0, -r.top));
-      tgt = m ? (y / m) * (N - 1) : 0;
-      if (!raf) raf = requestAnimationFrame(loop);
-    }
-
-    function updateOverlay(p) {
-      const t = ease(p);
-      const moveX = innerWidth * 0.66;
-      const moveY = innerHeight * 0.32;
-      copy.style.transform = `translate(${moveX * t}px, ${-moveY * t}px)`;
-
-      artL.style.opacity = 1 - smooth(0.40, 0.55, p);
-      artR.style.opacity = smooth(0.55, 0.70, p);
-
-      const vis = smooth(0.80, 0.95, p);
-      scheme.style.opacity = vis;
-      scheme.style.transform = `translateY(${16 * (1 - vis)}px)`;
-
-      // Для второй картинки: плавно проявляем
-      if (p > 0.8) {
-        seqImg.classList.add('show');
-      } else {
-        seqImg.classList.remove('show');
-      }
-    }
-
-    function loop() {
-      raf = 0;
-      cur += (tgt - cur) * 0.2;
-      snap(cur);
-      updateOverlay(cur / (N - 1));
-      if (Math.abs(tgt - cur) > 0.001) raf = requestAnimationFrame(loop);
-    }
-
-    G[0] = new Image(); G[0].src = U(0); G[0].onload = () => { snap(0); updateOverlay(0); };
-    for (let i = 1; i < N; i++) { G[i] = new Image(); G[i].decoding = 'async'; G[i].src = U(i); }
-
-    resize();
-    addEventListener('resize', () => { resize(); progressFromScroll(); });
-    addEventListener('scroll', progressFromScroll, { passive: true });
-  })();
-
-</script>
 
 
 

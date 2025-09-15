@@ -7,26 +7,83 @@
     --accent: #BC4285;
     --accent2: #C80570;
     --cookie-color: #FB19C3;
-    --bubble-color:#560E61;
+    --bubble-color: #560E61;
     --grad: linear-gradient(90deg, #FB19C3 0.01%, #FF45F3 50.01%, #602BFF 100%);
 
     --radius: 25px;
     --radius2: 20px;
 
 
-    --font-sans:  Helvetica, sans-serif;
+    --font-sans: Helvetica, sans-serif;
 
     --grid3-1: repeat(3, 1fr);
 
 
-    
-    --font-h1: 2rem; 
-    --font-h2: 1.75rem; 
-    --font-h3: 1.5rem; 
-    --font-main: 1rem; 
-    --font-small: 0.75rem; 
+
+    --font-h1: 2rem;
+    --font-h2: 1.75rem;
+    --font-h3: 1.5rem;
+    --font-main: 1rem;
+    --font-small: 0.75rem;
 
     --font-weight-light: 300;
     --font-weight-bold: 600;
     --font-weight-ultrabold: 900;
+
+
+
+    /* Геометрия */
+    --frame-w: 582px;
+    --frame-h: 375px;
+    --gap-x: 30px;
+    --gap-y: 30px;
+    --radius: 16px;
+    --img-radius: 11px;
+
+    /* Обводки/свечение */
+    --border-width: 1px;
+    --thin-width: 1px;
+    --thin-outset: 0px;
+    --glow-width: clamp(2px, .6vmin, 3px);
+    --glow-outset: clamp(1px, .5vmin, 2px);
+
+    /* Блюры/тени (адаптив) */
+    --blur: clamp(6px, 1.8vmin, 10px);
+    --thin-blur: clamp(4px, 1.2vmin, 6px);
+    --ds-blur: clamp(18px, 5vmin, 30.1px);
+    --thin-ds-blur: clamp(12px, 3.4vmin, 20.7px);
+
+    /* Тени — фуксия */
+    --ds-x: 0px;
+    --ds-y: 0px;
+    --ds-color: #ff00b8;
+    --thin-ds-x: 0px;
+    --thin-ds-y: 0px;
+    --thin-ds-color: #ff41cf;
+
+
+    /* Динамика слоёв */
+    --layer-op: 1;
+    --blur-mult: 1;
+    --thin-blur-mult: 1;
+    --ds-blur-mult: 1;
+    --thin-ds-blur-mult: 1;
+    --blur-eff: calc(var(--blur) * var(--blur-mult));
+    --thin-blur-eff: calc(var(--thin-blur) * var(--thin-blur-mult));
+    --ds-blur-eff: calc(var(--ds-blur) * var(--ds-blur-mult));
+    --thin-ds-blur-eff: calc(var(--thin-ds-blur) * var(--thin-ds-blur-mult));
+
+}
+
+
+@property --base-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+}
+
+@property --css-spin {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
 }
