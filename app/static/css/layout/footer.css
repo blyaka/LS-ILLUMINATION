@@ -14,3 +14,13 @@
 }
 
 
+.by {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+}
+
+.by img {
+    width: 25px;
+}
