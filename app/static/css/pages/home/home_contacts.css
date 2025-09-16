@@ -89,6 +89,7 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-sizing: border-box;
+    resize: none;
 }
 
 .ct-field input::placeholder,
