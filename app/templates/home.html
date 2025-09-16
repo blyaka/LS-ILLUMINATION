@@ -473,6 +473,32 @@
     setupIOSFix();
     // старт рендера
     (function kick() { lastX = innerWidth / 2; lastY = innerHeight / 2; requestRender(); })();
+
+    // === Оптимизация: стоп рендера вне экрана ===
+(() => {
+  const section = document.getElementById('middle');
+  if (!section) return;
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        // снова запускаем цикл
+        requestRender();
+      } else {
+        // стопаем всё, когда секция не видна
+        if (raf) {
+          cancelAnimationFrame(raf);
+          raf = null;
+        }
+      }
+    });
+  }, { root: null, threshold: 0.05 }); // хотя бы 5% секции в зоне
+
+  io.observe(section);
+})();
+
+
+
   })();
 </script>
 
