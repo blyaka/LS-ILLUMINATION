@@ -110,3 +110,16 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+
+class PDFFile(models.Model):
+    name = models.CharField('Название', max_length=50)
+    file = models.FileField('ПДФ', upload_to='pdf/')
+
+    class Meta:
+        verbose_name = 'PDF файл'
+        verbose_name_plural = 'PDF файлы'
+
+    def __str__(self):
+        return self.name

@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.utils.html import format_html
 from django.urls import path
 from django.shortcuts import redirect
-from .models import Video, News
+from .models import Video, News, PDFFile
 from django.utils.module_loading import import_string
 import threading
 
@@ -52,3 +52,9 @@ class NewsAdmin(admin.ModelAdmin):
     list_filter  = ("created_at",)
     search_fields = ("title", "text")
     date_hierarchy = "created_at"
+
+
+@admin.register(PDFFile)
+class PDFFileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'file')
+    search_fields = ('name',)
