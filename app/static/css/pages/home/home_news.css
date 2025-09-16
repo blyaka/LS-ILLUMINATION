@@ -121,16 +121,16 @@
 
 .news-title {
     margin: 0 0 8px;
-    font-size: 34px;
+    font-size: 40px;
     line-height: 1.05;
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-light);
 }
 
 .news-desc {
     margin: 0 0 16px;
     opacity: .9;
-    font-size: 14px;
-    max-width: 34ch
+    font-size: 18px;
+    font-weight: var(--font-weight-light);
 }
 
 .news-btn {
