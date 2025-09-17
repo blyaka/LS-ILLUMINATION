@@ -348,6 +348,7 @@ html.rq-lock body {
 }
 
 .rq-field>span {
+    display: flex;
     font-size: .95rem;
     opacity: .95;
 }
@@ -367,7 +368,7 @@ html.rq-lock body {
 
 .rq-field textarea {
     border-radius: 16px;
-    resize: vertical;
+    resize: none;
     min-height: 120px;
 }
 
@@ -381,6 +382,32 @@ html.rq-lock body {
     box-shadow: 0 0 0 3px rgba(255, 69, 243, .18);
     background: rgba(255, 255, 255, .08);
 }
+
+
+
+.rq-field--file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.rq-file-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.rq-file-icon {
+    width: 18px;
+    height: 18px;
+}
+
+
+
 
 .rq-bottom {
     display: grid;

@@ -168,6 +168,27 @@
                     <textarea name="message" rows="4"></textarea>
                 </label>
 
+
+                <label class="rq-field rq-field--file">
+                    <input type="file" name="file" id="rqFile" hidden>
+                    <span class="rq-file-label" id="rqFileLabel" onclick="document.getElementById('rqFile').click()">
+                        <img src="{% static 'images/clip.png' %}" alt="Прикрепить файл" class="rq-file-icon">
+                        Прикрепить файл
+                    </span>
+                </label>
+
+                <script>
+                  document.getElementById('rqFile').addEventListener('change', function() {
+                      const label = document.getElementById('rqFileLabel');
+                      if (this.files.length > 0) {
+                          label.innerHTML = '<img src="{% static "images/clip.png" %}" class="rq-file-icon">' + this.files[0].name;
+                      } else {
+                          label.innerHTML = '<img src="{% static "images/clip.png" %}" class="rq-file-icon"> Прикрепить файл';
+                      }
+                  });
+                </script>
+
+
                 <div class="rq-bottom">
                     <label class="rq-check">
                         <input type="checkbox" required>
@@ -266,77 +287,98 @@
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const rqOpen = document.getElementById('rqOpen');
-            const rqModal = document.getElementById('rqModal');
-            const rqUnder = document.getElementById('rqUnderlay');
-            const rqClose = document.getElementById('rqClose');
+      document.addEventListener('DOMContentLoaded', () => {
+          const rqOpen = document.getElementById('rqOpen');
+          const rqModal = document.getElementById('rqModal');
+          const rqUnder = document.getElementById('rqUnderlay');
+          const rqClose = document.getElementById('rqClose');
 
-            const rqShow = () => {
-                rqUnder.hidden = false; rqModal.hidden = false;
-                rqModal.getBoundingClientRect();
-                rqUnder.classList.add('show');
-                rqModal.classList.add('show');
-                document.documentElement.classList.add('rq-lock');
-            };
-            const rqHide = () => {
-                rqUnder.classList.remove('show');
-                rqModal.classList.remove('show');
-                const done = () => { rqUnder.hidden = true; rqModal.hidden = true; rqModal.removeEventListener('transitionend', done); };
-                rqModal.addEventListener('transitionend', done);
-                document.documentElement.classList.remove('rq-lock');
-            };
+          const rqShow = () => {
+              rqUnder.hidden = false; rqModal.hidden = false;
+              rqModal.getBoundingClientRect();
+              rqUnder.classList.add('show');
+              rqModal.classList.add('show');
+              document.documentElement.classList.add('rq-lock');
+          };
+          const rqHide = () => {
+              rqUnder.classList.remove('show');
+              rqModal.classList.remove('show');
+              const done = () => { 
+                  rqUnder.hidden = true; 
+                  rqModal.hidden = true; 
+                  rqModal.removeEventListener('transitionend', done); 
+              };
+              rqModal.addEventListener('transitionend', done);
+              document.documentElement.classList.remove('rq-lock');
+          };
 
-            rqOpen?.addEventListener('click', e => { e.preventDefault(); rqShow(); });
-            rqClose?.addEventListener('click', rqHide);
-            rqUnder?.addEventListener('click', rqHide);
-            document.addEventListener('keydown', e => e.key === 'Escape' && rqModal.classList.contains('show') && rqHide());
+          rqOpen?.addEventListener('click', e => { e.preventDefault(); rqShow(); });
+          rqClose?.addEventListener('click', rqHide);
+          rqUnder?.addEventListener('click', rqHide);
+          
+          // --- Заявка ---
+          const rqCard = rqModal?.querySelector('.rq-card');
+          rqCard?.addEventListener('click', e => e.stopPropagation());      // клики внутри карточки не всплывают
+          rqModal?.addEventListener('click', e => {                          // клик по фону секции = закрыть
+            if (rqCard && !rqCard.contains(e.target)) rqHide();
+          });
 
-            const pfOpen = document.getElementById('pfOpen');
-            const pfPanel = document.getElementById('pfPanel');
-            const pfUnder = document.getElementById('pfUnderlay');
+          document.addEventListener('keydown', e => e.key === 'Escape' && rqModal.classList.contains('show') && rqHide());
 
-            const pfShow = () => { pfUnder.classList.add('show'); pfPanel.getBoundingClientRect(); pfPanel.classList.add('show'); };
-            const pfHide = () => { pfPanel.classList.remove('show'); pfUnder.classList.remove('show'); };
+          const pfOpen = document.getElementById('pfOpen');
+          const pfPanel = document.getElementById('pfPanel');
+          const pfUnder = document.getElementById('pfUnderlay');
 
-            pfOpen?.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); });
-            pfUnder?.addEventListener('click', pfHide);
-            document.addEventListener('keydown', e => e.key === 'Escape' && pfHide());
+          const pfShow = () => { pfUnder.classList.add('show'); pfPanel.getBoundingClientRect(); pfPanel.classList.add('show'); };
+          const pfHide = () => { pfPanel.classList.remove('show'); pfUnder.classList.remove('show'); };
 
-            const ctOpen = document.getElementById('ctOpen');
-            const ctModal = document.getElementById('ctModal');
-            const ctClose = document.getElementById('ctClose');
-            const under = document.getElementById('rqUnderlay');
+          pfOpen?.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); });
+          pfUnder?.addEventListener('click', pfHide);
+          pfPanel?.addEventListener('click', e => e.stopPropagation()); // ← тоже стопим внутри
+          document.addEventListener('keydown', e => e.key === 'Escape' && pfHide());
 
-            const openCt = () => {
-                under.hidden = false; ctModal.hidden = false;
-                ctModal.getBoundingClientRect();
-                under.classList.add('show');
-                ctModal.classList.add('show');
-                document.documentElement.classList.add('rq-lock');
-            };
-            const closeCt = () => {
-                ctModal.classList.remove('show');
-                under.classList.remove('show');
-                const done = () => {
-                    ctModal.hidden = true;
-                    under.hidden = true;
-                    ctModal.removeEventListener('transitionend', done);
-                };
-                ctModal.addEventListener('transitionend', done);
-                document.documentElement.classList.remove('rq-lock');
-            };
+          const ctOpen = document.getElementById('ctOpen');
+          const ctModal = document.getElementById('ctModal');
+          const ctClose = document.getElementById('ctClose');
+          const under = document.getElementById('rqUnderlay');
 
-            ctOpen?.addEventListener('click', e => { e.preventDefault(); openCt(); });
-            ctClose?.addEventListener('click', closeCt);
-            under?.addEventListener('click', () => {
-                if (ctModal.classList.contains('show')) closeCt();
-                if (rqModal.classList.contains('show')) rqHide();
-            });
-            document.addEventListener('keydown', e => {
-                if (e.key === 'Escape' && ctModal.classList.contains('show')) closeCt();
-            });
-        });
+          const openCt = () => {
+              under.hidden = false; ctModal.hidden = false;
+              ctModal.getBoundingClientRect();
+              under.classList.add('show');
+              ctModal.classList.add('show');
+              document.documentElement.classList.add('rq-lock');
+          };
+          const closeCt = () => {
+              ctModal.classList.remove('show');
+              under.classList.remove('show');
+              const done = () => {
+                  ctModal.hidden = true;
+                  under.hidden = true;
+                  ctModal.removeEventListener('transitionend', done);
+              };
+              ctModal.addEventListener('transitionend', done);
+              document.documentElement.classList.remove('rq-lock');
+          };
+
+          ctOpen?.addEventListener('click', e => { e.preventDefault(); openCt(); });
+          ctClose?.addEventListener('click', closeCt);
+          under?.addEventListener('click', () => {
+              if (ctModal.classList.contains('show')) closeCt();
+              if (rqModal.classList.contains('show')) rqHide();
+          });
+        
+          // --- Контакты ---
+          const ctCard = ctModal?.querySelector('.rq-card');
+          ctCard?.addEventListener('click', e => e.stopPropagation());
+          ctModal?.addEventListener('click', e => {
+            if (ctCard && !ctCard.contains(e.target)) closeCt();
+          });
+
+          document.addEventListener('keydown', e => {
+              if (e.key === 'Escape' && ctModal.classList.contains('show')) closeCt();
+          });
+      });
     </script>
 
 
