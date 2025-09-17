@@ -623,6 +623,7 @@
       player.removeAttribute('src'); player.load();
       modal.hidden = true;
       document.body.style.overflow = '';
+      window.dispatchEvent(new Event('video-player:close'));
     }
 
     document.addEventListener('click', (e) => {
@@ -913,77 +914,130 @@
 {% endfor %}
 
 
-
 <script>
-  (() => {
-    const vids = document.querySelectorAll('.cw-split__video[data-src]');
-    const st = new WeakMap();
-    const DETACH = 2000;
-    const NEAR_MARGIN = '800px 0px';
+(() => {
+  const vids = document.querySelectorAll('.cw-split__video[data-src]');
+  const st = new WeakMap();
+  const DETACH = 2000;
+  const NEAR_MARGIN = '800px 0px';
+  let modalSrc = null;
 
-    async function attach(v) {
-      const s = st.get(v) || {};
-      const src = v.dataset.src;
-      if (!src) return;
+  async function attach(v) {
+    if (modalSrc && v.dataset.src === modalSrc) return;
 
-      v.muted = true; v.loop = true; v.playsInline = true;
+    const s = st.get(v) || {};
+    const src = v.dataset.src;
+    if (!src) return;
 
-      if (!s.againBound) {
-        v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(() => { }); });
-        s.againBound = true;
-      }
+    v.muted = true; v.loop = true; v.playsInline = true;
 
-      if (!s.attached) {
-        if (v.canPlayType('application/vnd.apple.mpegurl')) {
-          v.src = src; s.hls = null; s.attached = true;
-        } else if (window.Hls && Hls.isSupported()) {
-          const h = new Hls({ maxBufferLength: 6, autoStartLoad: true });
-          h.loadSource(src); h.attachMedia(v); s.hls = h; s.attached = true;
-        } else {
-          v.src = src; s.hls = null; s.attached = true;
-        }
-        st.set(v, s);
-      }
-      try { await v.play(); } catch { }
+    if (!s.againBound) {
+      v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(() => {}); });
+      s.againBound = true;
     }
 
-    function pause(v) {
-      try { v.pause(); } catch { }
-    }
-
-    function detach(v) {
-      const s = st.get(v);
-      if (!s || !s.attached) return;
-      pause(v);
-      if (s.hls) { try { s.hls.destroy(); } catch { } }
-      v.removeAttribute('src'); v.load();
-      s.attached = false; s.hls = null;
+    if (!s.attached) {
+      if (v.canPlayType('application/vnd.apple.mpegurl')) {
+        v.src = src; s.hls = null; s.attached = true;
+      } else if (window.Hls && Hls.isSupported()) {
+        const h = new Hls({ maxBufferLength: 6, autoStartLoad: true });
+        h.loadSource(src); h.attachMedia(v); s.hls = h; s.attached = true;
+      } else {
+        v.src = src; s.hls = null; s.attached = true;
+      }
       st.set(v, s);
     }
+    try { await v.play(); } catch {}
+  }
 
-    const io = new IntersectionObserver((entries) => {
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      for (const e of entries) {
-        const v = e.target;
-        if (e.isIntersecting) { attach(v); continue; }
-        const r = e.boundingClientRect;
-        const far = (r.bottom < -DETACH) || (r.top > vh + DETACH);
-        if (far) detach(v); else pause(v);
-      }
-    }, { root: null, rootMargin: NEAR_MARGIN, threshold: 0 });
+  function pause(v) { try { v.pause(); } catch {} }
 
-    vids.forEach(v => { st.set(v, { attached: false, hls: null, againBound: false }); io.observe(v); });
+  function detach(v) {
+    const s = st.get(v);
+    if (!s || !s.attached) return;
+    pause(v);
+    if (s.hls) { try { s.hls.destroy(); } catch {} }
+    v.removeAttribute('src'); v.load();
+    s.attached = false; s.hls = null;
+    st.set(v, s);
+  }
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) return;
-      vids.forEach(v => {
-        const r = v.getBoundingClientRect();
-        const vh = window.innerHeight || document.documentElement.clientHeight;
-        const near = (r.bottom > -800) && (r.top < vh + 800);
-        if (near) attach(v);
-      });
+  const pausedByModal = new WeakSet();
+
+  function pauseBgVideos() {
+    vids.forEach(v => {
+      if (!v.paused) { pause(v); pausedByModal.add(v); }
     });
-  })();
+  }
+
+  function resumeBgVideos() {
+    vids.forEach(v => {
+      if (!pausedByModal.has(v)) return;
+      const r = v.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const near = (r.bottom > -800) && (r.top < vh + 800);
+      if (near) attach(v);
+      pausedByModal.delete(v);
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.v-open[data-src], .v-card[data-src]');
+    if (!btn) return;
+
+    modalSrc = btn.dataset.src || null;
+    pauseBgVideos();
+
+    const host = btn.closest('.cw-split');
+    const cand = host ? host.querySelector('.cw-split__video[data-src]') : null;
+    if (cand && cand.dataset.src === modalSrc) detach(cand);
+  });
+
+  window.addEventListener('video-player:close', () => {
+    const prev = modalSrc;
+    modalSrc = null;
+    resumeBgVideos();
+
+    if (prev) {
+      vids.forEach(v => {
+        if (v.dataset.src === prev) {
+          const r = v.getBoundingClientRect();
+          const vh = window.innerHeight || document.documentElement.clientHeight;
+          const near = (r.bottom > -800) && (r.top < vh + 800);
+          if (near) attach(v);
+        }
+      });
+    }
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    for (const e of entries) {
+      const v = e.target;
+      if (e.isIntersecting) {
+        if (modalSrc && v.dataset.src === modalSrc) { pause(v); continue; }
+        attach(v);
+        continue;
+      }
+      const r = e.boundingClientRect;
+      const far = (r.bottom < -DETACH) || (r.top > vh + DETACH);
+      if (far) detach(v); else pause(v);
+    }
+  }, { root: null, rootMargin: NEAR_MARGIN, threshold: 0 });
+
+  vids.forEach(v => { st.set(v, { attached:false, hls:null, againBound:false }); io.observe(v); });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    vids.forEach(v => {
+      if (modalSrc && v.dataset.src === modalSrc) return;
+      const r = v.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const near = (r.bottom > -800) && (r.top < vh + 800);
+      if (near) attach(v);
+    });
+  });
+})();
 </script>
 
 
