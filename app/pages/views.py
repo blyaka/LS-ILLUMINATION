@@ -37,35 +37,30 @@ def AboutPage(request):
 
 
 
+
+
 def PortfolioPage(request, slug):
     category = get_object_or_404(
         Category.objects.prefetch_related(
-            Prefetch('subcategories', queryset=Subcategory.objects.order_by('order')),
+            Prefetch(
+                'subcategories',
+                queryset=Subcategory.objects.order_by('order').prefetch_related(
+                    Prefetch('cases', queryset=Case.objects.order_by('order'))
+                )
+            ),
             Prefetch('cases', queryset=Case.objects.filter(subcategory__isnull=True).order_by('order')),
         ),
         slug=slug
     )
 
-    subcategories = list(category.subcategories.all())
-
-    cases_sub_qs = (
-        Case.objects.filter(subcategory__category=category)
-        .select_related('subcategory')
-        .order_by('subcategory__order', 'order')
-    )
-    cases_by_sub = {}
-    for c in cases_sub_qs:
-        cases_by_sub.setdefault(c.subcategory, []).append(c)
-
-    direct_cases = list(category.cases.all())
-
-    use_grouped = bool(subcategories) or bool(cases_by_sub)
+    subcategories = category.subcategories.all()
+    direct_cases = category.cases.all()
+    use_grouped = subcategories.exists() or direct_cases.exists()
 
     ctx = {
         "today": timezone.now(),
         "category": category,
         "subcategories": subcategories,
-        "cases_by_sub": cases_by_sub,
         "direct_cases": direct_cases,
         "use_grouped": use_grouped,
     }
