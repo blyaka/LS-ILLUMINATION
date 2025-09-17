@@ -21,6 +21,7 @@
     align-items: center;
 }
 
-.by img {
-    width: 25px;
+span {
+    display: grid;
+    place-items: center;
 }
