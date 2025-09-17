@@ -378,6 +378,13 @@
           document.addEventListener('keydown', e => {
               if (e.key === 'Escape' && ctModal.classList.contains('show')) closeCt();
           });
+
+          const pdfBtn = document.getElementById('pdfBtn');
+          pdfBtn?.addEventListener('click', e => {
+            e.preventDefault();
+            rqShow();
+          });
+
       });
     </script>
 
