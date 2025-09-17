@@ -24,56 +24,54 @@
     </div>
   {% endif %}
 
-  {% if use_grouped %}
-    {# Блоки по подкатегориям #}
-    {% for sub in subcategories %}
-      {% with cases=cases_by_sub|get_item:sub %}
-        {% if cases %}
-          <section class="portfolio-section">
-            <h2 class="subcategory-title">{{ sub.name }}</h2>
-            <div class="portfolio-grid">
-              {% for case in cases %}
-                <a class="card" href="#">
-                  <div class="card_photo">
-                    <img src="{{ case.photo.url }}" alt="{{ case.name }}">
-                  </div>
-                </a>
-              {% endfor %}
-            </div>
-          </section>
-        {% endif %}
-      {% endwith %}
-    {% endfor %}
-
-    {# Прямые кейсы категории, если есть вместе с подкатегориями #}
-    {% if direct_cases %}
-      <section class="portfolio-section">
-        <h2 class="subcategory-title">Без подкатегории</h2>
-        <div class="portfolio-grid">
-          {% for case in direct_cases %}
-            <a class="card" href="#">
-              <div class="card_photo">
-                <img src="{{ case.photo.url }}" alt="{{ case.name }}">
-              </div>
-            </a>
-          {% endfor %}
-        </div>
-      </section>
-    {% endif %}
-  {% else %}
-    {# Старое поведение: плоская сетка #}
-    <div class="portfolio-grid">
-      {% for case in direct_cases %}
-        <a class="card" href="#">
-          <div class="card_photo">
-            <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+{% if use_grouped %}
+  {% for sub in subcategories %}
+    {% with cases=sub.cases.all %}
+      {% if cases %}
+        <section class="portfolio-section">
+          <h2 class="subcategory-title">{{ sub.name }}</h2>
+          <div class="portfolio-grid">
+            {% for case in cases %}
+              <a class="card" href="#">
+                <div class="card_photo">
+                  <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+                </div>
+              </a>
+            {% endfor %}
           </div>
-        </a>
-      {% empty %}
-        <p>Здесь пока нет кейсов.</p>
-      {% endfor %}
-    </div>
+        </section>
+      {% endif %}
+    {% endwith %}
+  {% endfor %}
+
+  {% if direct_cases %}
+    <section class="portfolio-section">
+      <h2 class="subcategory-title">Без подкатегории</h2>
+      <div class="portfolio-grid">
+        {% for case in direct_cases %}
+          <a class="card" href="#">
+            <div class="card_photo">
+              <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
   {% endif %}
+{% else %}
+  <div class="portfolio-grid">
+    {% for case in direct_cases %}
+      <a class="card" href="#">
+        <div class="card_photo">
+          <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+        </div>
+      </a>
+    {% empty %}
+      <p>Здесь пока нет кейсов.</p>
+    {% endfor %}
+  </div>
+{% endif %}
+
 </div>
 
 {# Модалка — без изменений #}
