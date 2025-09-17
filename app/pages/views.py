@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from content.models import Video, News
-from cases.models import Category, Case
+from cases.models import Category, Case, Subcategory
 from django.utils import timezone
+from django.db.models import Prefetch
 
 
 def HomePage(request):
@@ -34,17 +35,42 @@ def AboutPage(request):
 
     return render(request, 'about.html', ctx)
 
+
+
 def PortfolioPage(request, slug):
-    category = get_object_or_404(Category, slug=slug)
-    cases = category.cases.all().order_by("order")
+    category = get_object_or_404(
+        Category.objects.prefetch_related(
+            Prefetch('subcategories', queryset=Subcategory.objects.order_by('order')),
+            Prefetch('cases', queryset=Case.objects.filter(subcategory__isnull=True).order_by('order')),
+        ),
+        slug=slug
+    )
+
+    subcategories = list(category.subcategories.all())
+
+    cases_sub_qs = (
+        Case.objects.filter(subcategory__category=category)
+        .select_related('subcategory')
+        .order_by('subcategory__order', 'order')
+    )
+    cases_by_sub = {}
+    for c in cases_sub_qs:
+        cases_by_sub.setdefault(c.subcategory, []).append(c)
+
+    direct_cases = list(category.cases.all())
+
+    use_grouped = bool(subcategories) or bool(cases_by_sub)
 
     ctx = {
         "today": timezone.now(),
-        'category': category,
-        'cases': cases,
+        "category": category,
+        "subcategories": subcategories,
+        "cases_by_sub": cases_by_sub,
+        "direct_cases": direct_cases,
+        "use_grouped": use_grouped,
     }
-
     return render(request, 'portfolio.html', ctx)
+
 
 
 

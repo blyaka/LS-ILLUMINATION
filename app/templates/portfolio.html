@@ -1,6 +1,5 @@
 {% extends '_base.html' %}
 {% load static %}
-
 {% load categories_tags %}
 
 {% block styles %}
@@ -8,63 +7,95 @@
 {% endblock %}
 
 {% block content %}
-
 <div class="page-container">
+  <div class="page-title">
+    <h1>Портфолио</h1>
+    <p class="about-meta">Санкт-Петербург • {{ today|date:"j E Y" }}</p>
+  </div>
 
-    <div class="page-title">
-        <h1>Портфолио</h1>
-        <p class="about-meta">Санкт-Петербург • {{ today|date:"j E Y" }}</p>
-    </div>
+  <div class="category-name">
+    <h1>{{ category.name }}</h1>
+  </div>
 
-    <div class="category-name">
-        <h1>{{ category.name }}</h1>
-    </div>
-
-    {% next_category categories category as next_cat %}
-    {% if next_cat %}
+  {% next_category categories category as next_cat %}
+  {% if next_cat %}
     <div class="next-btn-container">
-        <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn">
-            <p>Следующая категория ></p>
-        </a>
+      <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn"><p>Следующая категория ></p></a>
     </div>
-    {% endif %}
+  {% endif %}
 
-    <div class="portfolio-grid">
-        {% for case in cases %}
-        <a class="card" href="#">
-            <div class="card_photo">
-                <img src="{{case.photo.url}}" alt="{{case.name}}" />
+  {% if use_grouped %}
+    {# Блоки по подкатегориям #}
+    {% for sub in subcategories %}
+      {% with cases=cases_by_sub|get_item:sub %}
+        {% if cases %}
+          <section class="portfolio-section">
+            <h2 class="subcategory-title">{{ sub.name }}</h2>
+            <div class="portfolio-grid">
+              {% for case in cases %}
+                <a class="card" href="#">
+                  <div class="card_photo">
+                    <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+                  </div>
+                </a>
+              {% endfor %}
             </div>
-        </a>
-        {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+    {% endfor %}
 
-
-    </div>
-
-</div>
-
-<!-- Модалка для просмотра изображения -->
-<div class="image-modal" id="imageModal" hidden>
-    <div class="image-modal__overlay" id="modalOverlay"></div>
-    <button class="image-modal__close" id="modalClose">×</button>
-    <div class="image-modal__content">
-        <div class="image-modal__nav">
-            <button class="image-modal__prev" id="modalPrev">
-                <svg width="33" height="58" fill="none">
-                    <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
-                </svg>
-            </button>
-            <img id="modalImg" src="" alt="Large image">
-            <button class="image-modal__next" id="modalNext">
-                <svg width="33" height="58" fill="none">
-                    <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
-                </svg>
-            </button>
+    {# Прямые кейсы категории, если есть вместе с подкатегориями #}
+    {% if direct_cases %}
+      <section class="portfolio-section">
+        <h2 class="subcategory-title">Без подкатегории</h2>
+        <div class="portfolio-grid">
+          {% for case in direct_cases %}
+            <a class="card" href="#">
+              <div class="card_photo">
+                <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+              </div>
+            </a>
+          {% endfor %}
         </div>
+      </section>
+    {% endif %}
+  {% else %}
+    {# Старое поведение: плоская сетка #}
+    <div class="portfolio-grid">
+      {% for case in direct_cases %}
+        <a class="card" href="#">
+          <div class="card_photo">
+            <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+          </div>
+        </a>
+      {% empty %}
+        <p>Здесь пока нет кейсов.</p>
+      {% endfor %}
     </div>
+  {% endif %}
 </div>
 
-
+{# Модалка — без изменений #}
+<div class="image-modal" id="imageModal" hidden>
+  <div class="image-modal__overlay" id="modalOverlay"></div>
+  <button class="image-modal__close" id="modalClose">×</button>
+  <div class="image-modal__content">
+    <div class="image-modal__nav">
+      <button class="image-modal__prev" id="modalPrev">
+        <svg width="33" height="58" fill="none">
+          <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+        </svg>
+      </button>
+      <img id="modalImg" src="" alt="Large image">
+      <button class="image-modal__next" id="modalNext">
+        <svg width="33" height="58" fill="none">
+          <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
 (() => {
@@ -90,7 +121,6 @@
       requestAnimationFrame(() => { modalImg.style.opacity = 1; });
     };
     pre.src = src;
-
     const next = images[(i + 1) % images.length]?.src;
     const prev = images[(i - 1 + images.length) % images.length]?.src;
     if (next) { const n = new Image(); n.src = next; }
@@ -104,24 +134,18 @@
     modal.style.opacity = 1;
     document.body.style.overflow = 'hidden';
   }
-
   function closeModal() {
     openFlag = false;
     modal.style.opacity = 0;
     modal.hidden = true;
     document.body.style.overflow = '';
   }
-
   function next() { setImage(i + 1); }
   function prev() { setImage(i - 1); }
 
   cards.forEach((card, idx) => {
-    card.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal(idx);
-    });
+    card.addEventListener('click', (e) => { e.preventDefault(); openModal(idx); });
   });
-
   modalClose.addEventListener('click', closeModal);
   modalOverlay.addEventListener('click', closeModal);
   modalNext.addEventListener('click', next);
@@ -135,11 +159,4 @@
   });
 })();
 </script>
-
-
-
-
-
-
-
 {% endblock %}

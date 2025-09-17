@@ -33,8 +33,6 @@ class Subcategory(models.Model):
     )
     slug = models.SlugField('Слаг', max_length=120, unique=True)
     name = models.CharField('Название', max_length=120)
-    photo = models.ImageField('Фото', upload_to='portfolio/subcategories/', blank=True)
-    icon = models.ImageField('Иконка', upload_to='portfolio/subcategories/', blank=True)
     order = models.PositiveIntegerField('Порядок', default=0, db_index=True)
 
     class Meta:
