@@ -236,3 +236,30 @@
     user-select: none
 }
 
+
+
+
+
+
+
+
+
+@media (max-width:1100px) {
+    .news-wrap {
+        grid-template-columns: 70px 1fr 70px;
+        height: auto
+    }
+
+    .news-main {
+        grid-template-columns: 1fr;
+        gap: 18px
+    }
+
+    .news-side {
+        display: none
+    }
+
+    .news-title {
+        font-size: 26px
+    }
+}

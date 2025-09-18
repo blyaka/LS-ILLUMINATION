@@ -183,3 +183,25 @@
 .ct-hours__text .muted {
     opacity: .8;
 }
+
+
+
+
+
+
+/* adapt */
+@media (max-width: 980px) {
+    .cw-contacts__wrap {
+        grid-template-columns: 1fr;
+    }
+
+    .ct-grid-last {
+        grid-template-columns: 1fr;
+    }
+
+    .ct-btn {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        text-align: center;
+    }
+}

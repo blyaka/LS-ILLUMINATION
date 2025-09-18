@@ -124,3 +124,24 @@
     cursor: pointer;
     backdrop-filter: blur(8px);
 }
+
+
+
+
+
+
+@media (max-width: 1024px) {
+    .cw-split {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    .cw-split__aside {
+        padding-inline: 4px;
+    }
+
+    .cw-split__btn {
+        justify-self: stretch;
+        text-align: center;
+    }
+}

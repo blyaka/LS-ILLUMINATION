@@ -154,3 +154,32 @@
 .seq-kicker.right {
     text-align: right;
 }
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+    .seq-art--left {
+        left: 16px;
+    }
+
+    .seq-art--right {
+        right: 16px;
+    }
+
+    .seq-copy {
+        left: 16px;
+        top: 24vh;
+        max-width: 80vw;
+    }
+
+    .seq-scheme {
+        right: 16px;
+        width: min(240px, 44vw);
+    }
+}
+

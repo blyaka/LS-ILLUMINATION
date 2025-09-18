@@ -1,0 +1,61 @@
+.cw-trust {
+    padding: 164px 0;
+    text-align: center
+}
+
+.cw-trust__title {
+    color: #fff;
+    margin: 0 237px 40px;
+    font-size: 40px;
+    text-align: left;
+    font-weight: var(--font-weight-light);
+}
+
+.trust-view {
+    --max: 300px;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-inline: var(--pad);
+    padding-block: calc((var(--max) - var(--item)) / 2);
+}
+
+
+.trust-item img {
+    max-width: 70%;
+    max-height: 70%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    display: block
+}
+
+.trust-track {
+    display: flex;
+    gap: 0;
+    will-change: transform;
+    align-items: center;
+    transform: translate3d(0, 0, 0);
+}
+
+.trust-item {
+    flex: 0 0 var(--item);
+    width: var(--item);
+    height: var(--item);
+    border-radius: 50%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transform: scale(var(--k, 1));
+    margin-inline: calc(var(--gap)/2 + var(--extra, 0px));
+    border: 3px solid color-mix(in oklab, #FF058E calc(var(--b, 0)*100%), transparent);
+}
+
+.trust-item img {
+    max-width: 70%;
+    max-height: 70%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    display: block;
+}

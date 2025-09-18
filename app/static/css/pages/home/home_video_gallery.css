@@ -1,0 +1,212 @@
+.v-modal__dialog {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(16px, 3vw, 32px);
+}
+
+.v-modal__frame {
+    position: relative;
+    flex: auto auto;
+    width: min(1100px, 96vw);
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .6);
+}
+
+#vPlayer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cw-videos {
+    padding: 96px 0px;
+}
+
+.cw-videos__marquee {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.cw-videos__track {
+    --gap: clamp(16px, 2vw, 28px);
+    --dur: 40s;
+    display: flex;
+    gap: var(--gap);
+    align-items: flex-start;
+    width: max-content;
+    will-change: transform;
+    animation: cw-marquee var(--dur) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cw-videos__track {
+        animation: none;
+    }
+}
+
+@keyframes cw-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.cw-videos__title {
+    color: var(--text);
+    font-size: var(--font-h1);
+    font-weight: var(--font-weight-light);
+    text-align: left;
+    max-width: 1280px;
+    padding: 24px 74px 56px;
+    position: relative;
+}
+
+.v-card {
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text);
+    flex: 0 0 auto;
+    width: min(420px, 48vw);
+}
+
+.v-card__thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
+}
+
+.v-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    filter: brightness(.9) saturate(1.05);
+    transition: transform .35s ease, filter .35s ease;
+}
+
+.v-card__play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+}
+
+.v-card__play::before {
+    content: "";
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--accent2);
+    display: grid;
+    place-items: center;
+}
+
+.v-card__play::after {
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-width: 12px 0 12px 18px;
+    border-color: transparent transparent transparent #fff;
+    transform: translateX(2px);
+}
+
+.v-card:hover img {
+    transform: scale(1.03);
+    filter: brightness(1) saturate(1.1);
+}
+
+.v-card__title {
+    display: block;
+    margin-top: 14px;
+    font-size: clamp(1rem, .8rem + .6vw, 1.25rem);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* модалка */
+.v-modal[hidden] {
+    display: none;
+}
+
+.v-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.v-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .6);
+    backdrop-filter: blur(2px);
+}
+
+.v-modal__dialog {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(16px, 3vw, 32px);
+}
+
+.v-modal__frame {
+    width: min(1100px, 96vw);
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+}
+
+.v-modal__frame iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+.v-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, .2);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+}
+
+.v-modal__close:hover {
+    background: rgba(255, 255, 255, .16);
+}

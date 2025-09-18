@@ -143,3 +143,22 @@
 .ls-hero__pp.is-playing .pp-pause {
     display: block;
 }
+
+
+
+
+
+@media (max-width: 768px) {
+    .ls-hero__stats {
+        bottom: 28px;
+        gap: 28px;
+    }
+
+    .ls-hero__pp {
+        left: 16px;
+        bottom: 16px;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+    }
+}
