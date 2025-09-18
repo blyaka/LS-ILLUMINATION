@@ -71,3 +71,8 @@ def PortfolioPage(request, slug):
 
 def Custom404(request, exception):
             return render(request, '404.html', status=404)
+
+
+
+def TestPage(request):
+    return render(request, 'index.html')

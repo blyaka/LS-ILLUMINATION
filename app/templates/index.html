@@ -1,0 +1,423 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+
+<body>
+
+    <div class="bg-bubbles" aria-hidden="true"></div>
+
+
+<script>
+    (() => {
+    const layer = document.querySelector('.bg-bubbles');
+    if (!layer) return;
+
+
+    const docSize = () => ({
+        w: document.documentElement.clientWidth,
+        h: Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+        document.documentElement.offsetHeight,
+        document.body.offsetHeight
+        )
+    });
+    function resizeLayer(){
+        const {h} = docSize();
+        layer.style.height = h + 'px';
+        layer.style.width  = '100%';
+    }
+    resizeLayer();
+    addEventListener('resize', resizeLayer, {passive:true});
+    setInterval(resizeLayer, 600);
+
+
+    const DIAM = 350, JITTER = 10;
+    const MIN_SPEED = 20;    
+    const MAX_SPEED = 60;
+    const WANDER    = 25;   
+
+    const PER_VIEW = 5;   
+    const bubbles = [];
+
+    function wantCount(){ return Math.max(PER_VIEW, Math.ceil(docSize().h / innerHeight) * PER_VIEW); }
+
+    function makeBubble(){
+        const d = DIAM + (Math.random()*2-1)*JITTER, r = d/2;
+        const el = document.createElement('div');
+        el.className = 'bubble';
+        el.style.width = el.style.height = d + 'px';
+        layer.appendChild(el);
+
+        const {w,h} = docSize();
+        const ang = Math.random()*Math.PI*2;
+        const sp0 = MIN_SPEED + Math.random()*(MAX_SPEED - MIN_SPEED);
+        return {
+        el, r,
+        x: r + Math.random()*(w - d),
+        y: r + Math.random()*(h - d),
+        vx: Math.cos(ang)*sp0,
+        vy: Math.sin(ang)*sp0
+        };
+    }
+
+    function ensureCount(){
+        const need = wantCount();
+        while (bubbles.length < need) bubbles.push(makeBubble());
+        while (bubbles.length > need) bubbles.pop().el.remove();
+    }
+    ensureCount();
+
+    let last = performance.now();
+    function tick(t){
+        const dt = Math.min(0.05, (t - last)/1000); last = t;
+        const {w,h} = docSize();
+
+        for (const b of bubbles){
+        b.vx += (Math.random()*2-1) * WANDER * dt;
+        b.vy += (Math.random()*2-1) * WANDER * dt;
+
+        let sp = Math.hypot(b.vx, b.vy) || 1;
+        if (sp < MIN_SPEED){
+            const k = MIN_SPEED / sp; b.vx *= k; b.vy *= k;
+        } else if (sp > MAX_SPEED){
+            const k = MAX_SPEED / sp; b.vx *= k; b.vy *= k;
+        }
+
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+
+
+        if (b.x - b.r < 0)    { b.x = b.r;     b.vx *= -1; }
+        if (b.x + b.r > w)    { b.x = w - b.r; b.vx *= -1; }
+        if (b.y - b.r < 0)    { b.y = b.r;     b.vy *= -1; }
+        if (b.y + b.r > h)    { b.y = h - b.r; b.vy *= -1; }
+
+
+        b.el.style.transform = `translate3d(${(b.x - b.r)}px, ${(b.y - b.r)}px, 0)`;
+        }
+
+        requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+    <h1> PAGE NAME </h1>
+
+    <section class="main">
+        <div class="grid">
+            <a class="card-link" href="">
+
+                <div class="card">
+                    <div class="card-border"></div>
+
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+
+            <a class="card-link" href="">
+                <div class="card">
+                    <div class="card-border"></div>
+                    <div class="card-image">
+                        <img src="{% static 'images/portfolio.jpg' %}" alt="Фотка карточки">
+                    </div>
+                    <div class="card-text">
+                        <p>Описание карточки</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+
+
+
+    <script>
+        (() => {
+            const norm360 = v => ((v % 360) + 360) % 360;
+            document.querySelectorAll('.card').forEach(card => {
+                let raf = 0, last = 0, vis = 0, target = 0, hover = false;
+                const link = card.closest('.card-link');
+
+                function angleTo(el, x, y) {
+                    const r = el.getBoundingClientRect();
+                    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+                    let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+                    if (deg < 0) deg += 360;
+                    return (deg + 90) % 360;
+                }
+
+                function step(ts) {
+                    const dt = (ts - (last || ts)) / 1000; last = ts;
+                    const d = ((target - vis + 540) % 360) - 180;
+                    vis = norm360(vis + d * Math.min(1, dt * 12));
+                    const v = vis + 'deg';
+                    card.style.setProperty('--base-angle', v);
+                    if (link) link.style.setProperty('--base-angle', v);
+                    if (hover) raf = requestAnimationFrame(step); else raf = 0;
+                }
+
+                card.addEventListener('mouseenter', () => { hover = true; if (!raf) raf = requestAnimationFrame(step); }, { passive: true });
+                card.addEventListener('mouseleave', () => { hover = false; }, { passive: true });
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                    card.style.setProperty('--x', x + 'px');
+                    card.style.setProperty('--y', y + 'px');
+                    target = angleTo(card, e.clientX, e.clientY);
+                    if (!raf) raf = requestAnimationFrame(step);
+                }, { passive: true });
+            });
+        })();
+
+    </script>
+
+
+
+    <script>
+        (() => {
+            const cards = [...document.querySelectorAll('.grid .card')];
+            const links = cards.map(c => c.closest('.card-link'));
+            const cols = 3; 
+
+            function clearNeighbors(i) {
+                const up = i - cols;
+                const down = i + cols;
+                const left = (i % cols !== 0) ? i - 1 : -1;
+                const right = (i % cols !== cols - 1) ? i + 1 : -1;
+
+                const zero = (idx, varOnLink, varOnCard) => {
+                    if (idx < 0 || !links[idx]) return;
+                    links[idx].style.setProperty(varOnLink, '0');
+                    const card = links[idx].querySelector('.card');
+                    if (card) card.style.setProperty(varOnCard, '0');
+                };
+
+                zero(up, '--nb-bottom-a', '--nb-bottom-border');
+                zero(down, '--nb-top-a', '--nb-top-border');
+
+                zero(left, '--nb-right-a', '--nb-right-border');
+                zero(right, '--nb-left-a', '--nb-left-border');
+            }
+
+
+            cards.forEach((card, i) => {
+                card.addEventListener('mousemove', (e) => {
+                    const r = card.getBoundingClientRect();
+                    const y = (e.clientY - r.top) / r.height;
+                    const x = (e.clientX - r.left) / r.width; 
+
+                    const topAlpha = y < 0.35 ? (0.35 - y) / 0.35 * 0.5 : 0;
+                    const botAlpha = y > 0.65 ? (y - 0.65) / 0.35 * 0.5 : 0;
+                    const leftAlpha = x < 0.35 ? (0.35 - x) / 0.35 * 0.5 : 0;
+                    const rightAlpha = x > 0.65 ? (x - 0.65) / 0.35 * 0.5 : 0;
+
+                    if (links[i - cols]) {
+                        links[i - cols].style.setProperty('--nb-bottom-a', topAlpha.toFixed(3));
+                        links[i - cols].querySelector('.card')
+                            ?.style.setProperty('--nb-bottom-border', (topAlpha * 0.8).toFixed(3));
+                    }
+
+                    if (links[i + cols]) {
+                        links[i + cols].style.setProperty('--nb-top-a', botAlpha.toFixed(3));
+                        links[i + cols].querySelector('.card')
+                            ?.style.setProperty('--nb-top-border', (botAlpha * 0.8).toFixed(3));
+                    }
+
+                    if (i % cols !== 0 && links[i - 1]) {
+                        links[i - 1].style.setProperty('--nb-right-a', leftAlpha.toFixed(3));
+                        links[i - 1].querySelector('.card')
+                            ?.style.setProperty('--nb-right-border', (leftAlpha * 0.8).toFixed(3));
+                    }
+
+                    if (i % cols !== cols - 1 && links[i + 1]) {
+                        links[i + 1].style.setProperty('--nb-left-a', rightAlpha.toFixed(3));
+                        links[i + 1].querySelector('.card')
+                            ?.style.setProperty('--nb-left-border', (rightAlpha * 0.8).toFixed(3));
+                    }
+
+
+                    if (!topAlpha && links[i - cols]) links[i - cols].style.setProperty('--nb-bottom-a', '0');
+                    if (!botAlpha && links[i + cols]) links[i + cols].style.setProperty('--nb-top-a', '0');
+                    if (!leftAlpha && i % cols !== cols - 1 && links[i + 1]) links[i + 1].style.setProperty('--nb-left-a', '0');
+                    if (!rightAlpha && i % cols !== 0 && links[i - 1]) links[i - 1].style.setProperty('--nb-right-a', '0');
+                }, { passive: true });
+
+                card.addEventListener('mouseleave', () => clearNeighbors(i), { passive: true });
+            });
+        })();
+    </script>
+
+
+
+
+
+
+
+
+
+    <section class="second">
+
+        <a class="btn" href="">
+            <div class="bubble-layer bubble-1"></div>
+            <div class="bubble-layer bubble-2"></div>
+            <div class="bubble-layer bubble-3"></div>
+            <div class="bubble-layer bubble-4"></div>
+            <div class="bubble-layer bubble-5"></div>
+            <div class="bubble-layer bubble-6"></div>
+            <div class="bubble-layer bubble-7"></div>
+            <p>Кнопка для теста</p>
+        </a>
+
+
+        <a class="btn2" href="">
+            Кнопка для теста
+        </a>
+
+
+        <div class="glowing-box glowing-box-active" style="--animation-speed:2s">
+            <div class="glowing-box-animations">
+                <div class="glowing-box-glow"></div>
+                <div class="glowing-box-stars-masker">
+                    <div class="glowing-box-stars"></div>
+                </div>
+            </div>
+            <div class="glowing-box-borders-masker">
+                <div class="glowing-box-borders"></div>
+            </div>
+            <button class="glowing-box-button">
+                <span class="glowing-span">Minimalist Glow Button</span>
+            </button>
+        </div>
+
+
+    </section>
+
+
+
+</body>
+
+
+<!-- Свечение фонариком -->
+<script>
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--x', `${x}px`);
+            card.style.setProperty('--y', `${y}px`);
+        });
+    });
+</script>
+
+
+</html>
