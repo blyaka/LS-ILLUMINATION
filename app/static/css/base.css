@@ -166,3 +166,38 @@ body {
         display: none;
     }
 } */
+
+
+
+
+.cookie-mobile-p {
+    display: none;
+}
+
+@media (max-width: 767px) {
+
+    .cookie-banner {
+        width: calc(100% - 140px);
+    }
+
+    .cookie-desktop-h,
+    .cookie-desktop-p {
+        display: none;
+    }
+
+    .cookie-mobile-p {
+        display: unset;
+    }
+
+    .cookie-banner__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .cookie-btn {
+        flex: 1;
+    }
+}
