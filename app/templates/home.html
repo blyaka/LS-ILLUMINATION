@@ -104,6 +104,9 @@
 
 
 
+
+/
+<!-- РАЗДЕЛ ПОРТФОЛИО -->
 <section class="main">
     <h1> Портфолио </h1>
 
@@ -127,6 +130,9 @@
         </div>
 </section>
 
+
+
+<!-- Скрпиты карточек -->
 <script>
   (() => {
       const norm360 = v => ((v % 360) + 360) % 360;
@@ -165,8 +171,6 @@
       });
   })();
 </script>
-
-
 
 <script>
   (() => {
@@ -240,8 +244,7 @@
           card.addEventListener('mouseleave', () => clearNeighbors(i), { passive: true });
       });
   })();
-
-  </script>
+</script>
 
 
 
@@ -338,13 +341,6 @@
     observer.observe(modal, { attributes: true, attributeFilter: ['hidden'] });
   })();
 </script>
-
-
-
-
-
-
-
 
 <script>
   (() => {
@@ -945,123 +941,28 @@
     const track = document.getElementById('trustTrack');
     if (!view || !track) return;
 
-    const cfg = { cols: 7, gap: 56, min: 180, max: 300, speed: 0.7 };
+    let SPEED = 1;
+    let offset = 0;
+    let raf = 0;
 
-    let itemW = 0, gap = cfg.gap, step = 0, offset = 0;
-    let nodes = [], cycleLen = 0;
-
-    function dupOnce() {
-      const kids = Array.from(track.children);
-      for (let t = 0; t < 20; t++) track.append(...kids.map(n => n.cloneNode(true)));
-      nodes = Array.from(track.children);
-    }
-
-    let M = 0, idxH = -1;
-    function findKhimki() {
-      const kids = Array.from(track.children);
-      M = kids.length / 2;
-      for (let i = 0; i < M; i++) {
-        const img = kids[i].querySelector('img');
-        if (img && /khimki/i.test(img.src)) { idxH = i; break; }
-      }
-    }
-
-    function setSize() {
-      const pad = parseFloat(getComputedStyle(view).getPropertyValue('--pad')) || 0;
-      const vw = view.clientWidth - pad * 2;
-
-      gap = cfg.gap;
-      itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
-      itemW = Math.max(cfg.min, Math.min(cfg.max, itemW));
-
-      const need = itemW * cfg.cols + gap * (cfg.cols - 1);
-      if (need > vw) {
-        gap = Math.max(12, gap - (need - vw) / (cfg.cols - 1));
-        itemW = (vw - gap * (cfg.cols - 1)) / cfg.cols;
-      }
-
-      step = itemW + gap;
-      cycleLen = nodes.length / 2 * step;
-
-      view.style.setProperty('--item', itemW + 'px');
-      view.style.setProperty('--gap', gap + 'px');
-    }
-
-    function paint() {
-      const cx = view.clientWidth / 2;
-      const sigma = step * 0.9;
-      const kMax = cfg.max / itemW;
-
-      const M = nodes.length / 2;
-
-      let sumExtra = 0;
-      for (let j = 0; j < M; j++) {
-        const center = offset + j * step + itemW / 2;
-        const d = Math.abs(center - cx);
-        const f = Math.exp(-(d * d) / (2 * sigma * sigma));
-        const k = 1 + (kMax - 1) * f;
-        sumExtra += (k - 1) * itemW / 2;
-      }
-      const liveCycleLen = M * (itemW + gap) + 2 * sumExtra;
-
-      for (let i = 0; i < nodes.length; i++) {
-        const center = offset + i * step + itemW / 2;
-        const d = Math.abs(center - cx);
-        const f = Math.exp(-(d * d) / (2 * sigma * sigma));
-        const k = 1 + (kMax - 1) * f;
-        const extra = (k - 1) * itemW / 2;
-        const b = Math.pow(f, 6);
-
-        nodes[i].style.setProperty('--k', k.toFixed(4));
-        nodes[i].style.setProperty('--extra', extra.toFixed(2) + 'px');
-        nodes[i].style.setProperty('--b', b.toFixed(4));
-      }
-
-      return liveCycleLen;
-    }
-
+    track.innerHTML += track.innerHTML;
+    const totalWidth = track.scrollWidth / 2;
 
     function frame() {
-      offset -= cfg.speed;
-
-      const L0 = (nodes.length / 2) * step;
-      const cx = view.clientWidth / 2;
-      const centerIdx = Math.round((cx - offset - itemW / 2) / step) % M;
-      const norm = (centerIdx + M) % M;
-      const safe = (idxH === -1) || (Math.abs(norm - idxH) > 2 && Math.abs(norm - (idxH + M)) > 2);
-      if (offset <= -L0 && safe) offset += L0;
-
-      const liveLen = paint();
-
-      const x = Math.round(offset * 60) / 60;
-      track.style.transform = `translate3d(${x}px,0,0)`;
-
+      offset -= SPEED;
+      if (offset <= -totalWidth) offset = 0;
+      track.style.transform = `translate3d(${offset}px,0,0)`;
       raf = requestAnimationFrame(frame);
     }
 
-
-
-    dupOnce();
-    findKhimki();
-    setSize();
-    view.style.setProperty('--max', cfg.max + 'px');
-
-    const BASE_SPEED = 0.7;
-
-    let raf = 0, running = false;
     function start() {
-      if (running) return;
-      running = true;
-      cfg.speed = BASE_SPEED;
-      offset = 0;
+      if (raf) return;
       raf = requestAnimationFrame(frame);
     }
+
     function stop() {
-      if (!running) return;
-      running = false;
       cancelAnimationFrame(raf);
       raf = 0;
-      cfg.speed = BASE_SPEED;
     }
 
     const io = new IntersectionObserver((entries) => {
@@ -1069,28 +970,14 @@
         if (e.isIntersecting) start();
         else stop();
       }
-    }, { root: null, rootMargin: '300px 0px 300px 0px', threshold: 0 });
+    }, { root: null, rootMargin: '100px' });
     io.observe(view);
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) return stop();
-      const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
-      if (r.top < vh + 300 && r.bottom > -300) start();
-    });
-
-    addEventListener('resize', setSize, { passive: true });
-
-
-    view.addEventListener('mouseenter', () => { if (running) cfg.speed = 0 });
-    view.addEventListener('mouseleave', () => { if (running) cfg.speed = 0.7 });
-
-    (() => {
-      const r = view.getBoundingClientRect(), vh = innerHeight || document.documentElement.clientHeight;
-      if (r.top < vh + 300 && r.bottom > -300) start();
-    })();
-
+    view.addEventListener('mouseenter', () => SPEED = 0);
+    view.addEventListener('mouseleave', () => SPEED = 1);
 
   })();
+
 </script>
 
 

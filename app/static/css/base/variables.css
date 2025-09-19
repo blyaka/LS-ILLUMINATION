@@ -14,7 +14,8 @@
     --radius2: 20px;
 
 
-    --font-sans: Helvetica, sans-serif;
+    --font-sans: "TRYGrtsk-Regular", sans-serif;
+    --font-sans-bold: "TRYGrtsk-SemiBoldTera", sans-serif;
 
     --grid3-1: repeat(3, 1fr);
 

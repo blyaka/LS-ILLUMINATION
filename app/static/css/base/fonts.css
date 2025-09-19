@@ -1,0 +1,20 @@
+@font-face {
+	font-family: 'TRYGrtsk-SemiBoldTera';
+	src: url('../fonts/trygrtsk-semiboldtera.eot'); /* IE 9 Compatibility Mode */
+	src: url('../fonts/trygrtsk-semiboldtera.eot?#iefix') format('embedded-opentype'), /* IE < 9 */
+		url('../fonts/trygrtsk-semiboldtera.woff2') format('woff2'), /* Super Modern Browsers */
+		url('../fonts/trygrtsk-semiboldtera.woff') format('woff'), /* Firefox >= 3.6, any other modern browser */
+		url('../fonts/trygrtsk-semiboldtera.ttf') format('truetype'), /* Safari, Android, iOS */
+		url('../fonts/trygrtsk-semiboldtera.svg#trygrtsk-semiboldtera') format('svg'); /* Chrome < 4, Legacy iOS */
+}
+
+
+@font-face {
+	font-family: 'TRYGrtsk-Regular';
+	src: url('../fonts/trygrtsk-regular.eot'); /* IE 9 Compatibility Mode */
+	src: url('../fonts/trygrtsk-regular.eot?#iefix') format('embedded-opentype'), /* IE < 9 */
+		url('../fonts/trygrtsk-regular.woff2') format('woff2'), /* Super Modern Browsers */
+		url('../fonts/trygrtsk-regular.woff') format('woff'), /* Firefox >= 3.6, any other modern browser */
+		url('../fonts/trygrtsk-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+		url('../fonts/trygrtsk-regular.svg#trygrtsk-regular') format('svg'); /* Chrome < 4, Legacy iOS */
+}

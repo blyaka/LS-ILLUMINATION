@@ -35,22 +35,59 @@
     will-change: transform;
     align-items: center;
     transform: translate3d(0, 0, 0);
+    gap: 40px;
+
 }
 
 .trust-item {
-    flex: 0 0 var(--item);
-    width: var(--item);
-    height: var(--item);
+    flex: 0 0 200px;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     background: #000;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     overflow: hidden;
-    transform: scale(var(--k, 1));
-    margin-inline: calc(var(--gap)/2 + var(--extra, 0px));
-    border: 3px solid color-mix(in oklab, #FF058E calc(var(--b, 0)*100%), transparent);
 }
+
+.trust-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #000;
+}
+
+.trust-item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+
+    background:
+        conic-gradient(from 75deg,
+            transparent 0deg,
+            rgba(255, 255, 255, 0.2) 20deg,
+            rgba(255, 255, 255, 1) 62deg,
+            rgba(255, 255, 255, 0.2) 105deg,
+            transparent 125deg 360deg),
+        conic-gradient(from 255deg,
+            transparent 0deg,
+            rgba(255, 255, 255, 0.2) 20deg,
+            rgba(255, 255, 255, 1) 62deg,
+            rgba(255, 255, 255, 0.2) 105deg,
+            transparent 125deg 360deg);
+
+    -webkit-mask: radial-gradient(farthest-side,
+            transparent calc(100% - 3px), #000 100%);
+    mask: radial-gradient(farthest-side,
+            transparent calc(100% - 3px), #000 100%);
+
+    filter: blur(4px);
+    pointer-events: none;
+}
+
 
 .trust-item img {
     max-width: 70%;
