@@ -26,3 +26,21 @@ span {
     display: grid;
     place-items: center;
 }
+
+
+@media (max-width: 767px) {
+    .ls-footer {
+        flex-direction: column-reverse;
+        padding: 264px 60px 43px;
+    }
+
+    .footer-comp-name {
+        margin-bottom: 24px;
+    }
+
+    .by {
+        position: absolute;
+        bottom: 43px;
+        right: 40px;
+    }
+}

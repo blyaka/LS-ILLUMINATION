@@ -85,3 +85,57 @@ li {
     object-fit: cover;
     border-radius: var(--radius);
 }
+
+
+@media (max-width: 767px) {
+    .about-title {
+        font-size: 2rem;
+    }
+
+    .about-sub {
+        font-size: 1.25rem;
+    }
+
+    .about-block {
+        padding: 0px 24px;
+    }
+
+    .about-block h1 {
+        text-align: center;
+    }
+
+    .about-block-image {
+        padding: 24px 0px;
+    }
+
+    .about-img {
+        border-radius: 0px;
+    }
+
+    .about-img img {
+        border-radius: 0px;
+    }
+
+    ol {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    ol li {
+        position: relative;
+        font-size: 1.25rem;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    ol li::before {
+        counter-increment: item;
+        content: counter(item) ".";
+        font-weight: bold;
+    }
+
+    ol {
+        counter-reset: item;
+    }
+
+}
