@@ -1,242 +1,296 @@
 
-/* Секция Портфолио */
-.cw-portfolio {
-    position: relative;
-    padding: 96px;
+@property --base-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
 }
 
-.cw-portfolio__title {
+@property --css-spin {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+}
+
+
+
+:root {
+    --primary: 250 66% 61%;
+
+    --glow1: rgba(200, 5, 112, 1);
+    --glow2: rgba(255, 50, 180, 0.9);
+    --glow3: rgba(150, 0, 255, 0.9);
+
+    --g1: 3%;
+    --g2: 10%;
+    --g3: 12%;
+    --g4: 88%;
+    --g5: 90%;
+    --g6: 97%;
+}
+
+
+
+.main {
+    padding: 50px 96px;
+}
+
+h1 {
+    color: white;
+    font-size: 40px;
     text-align: center;
-    font-size: clamp(1.6rem, 1.2rem + 2vw, 2rem);
-    margin-bottom: clamp(24px, 3vw, 36px);
-    color: var(--text);
+    padding: 50px 0px;
 }
 
-/* Средний блок-сцена */
-.middle {
-    --pad-extra: 350px;
-    /* паддинги сверху/снизу */
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 56px;
-    padding-bottom: 0px;
-}
-
-/* Фоновый канвас — только внутри middle */
-.bgCanvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    display: block;
-}
 
 .grid {
-    position: relative;
-    z-index: 1;
     display: grid;
-    grid-template-columns: repeat(3, var(--frame-w));
-    grid-auto-rows: var(--frame-h);
-    column-gap: var(--gap-x);
-    row-gap: var(--gap-y);
-    place-items: center;
-    will-change: transform;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
 }
 
-.frame {
-    --base-angle: 0deg;
-    --css-spin: 0deg;
-    width: var(--frame-w);
-    height: var(--frame-h);
+.card-link {
+    text-decoration: none;
     position: relative;
-    border-radius: var(--radius);
-    background: transparent;
-    overflow: visible;
-    isolation: isolate;
-    touch-action: none;
+    display: block;
+    --radius: 22px;
+    animation: cta-spin 8s linear infinite;
 }
 
-/* Широкий glow */
-.frame::after {
+.card-link::after {
     content: "";
     position: absolute;
-    inset: calc(-1 * var(--glow-outset));
-    border-radius: calc(var(--radius) + var(--glow-outset));
-    border: var(--glow-width) solid transparent;
+    inset: -16px;
+    border-radius: calc(var(--radius) + 16px);
     background:
-        linear-gradient(#0000, #0000) padding-box,
         conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
-            #ffffffff 0%,
-            #ffd2f6ff var(--g1),
-            #ff2bd64d var(--g2),
-            #ff2bd600 var(--g3),
-            #ff2bd600 var(--g4),
-            #ff2bd64d var(--g5),
-            #ffd2f6ff var(--g6),
-            #ffffffff 100%) border-box;
-    filter: blur(var(--blur-eff)) drop-shadow(var(--ds-x) var(--ds-y) var(--ds-blur-eff) var(--ds-color));
-    opacity: var(--layer-op);
+            rgba(255, 210, 251, 1) 0%,
+            rgba(255, 158, 236, 1) 4%,
+            rgba(255, 43, 214, 1) 8%,
+            rgba(255, 0, 204, 0.4) 12%,
+            rgba(255, 0, 204, 0) 20%,
+            rgba(255, 43, 214, 1) 60%,
+            rgba(255, 164, 237, 1) 70%,
+            rgba(252, 196, 255, 1) 100%);
+    filter: blur(28px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+    transition: opacity .25s;
+}
+
+.card-link:hover::after {
+    opacity: 1;
+}
+
+
+
+
+.card-link::before {
+    content: "";
+    position: absolute;
+    inset: -24px;
+    border-radius: calc(var(--radius) + 24px);
+    pointer-events: none;
     z-index: 0;
-    pointer-events: none;
-}
-
-/* Тонкий слой */
-.frame>.thin {
-    position: absolute;
-    inset: calc(-1 * var(--thin-outset));
-    border-radius: calc(var(--radius) + var(--thin-outset));
-    border: var(--thin-width) solid transparent;
     background:
-        linear-gradient(#0000, #0000) padding-box,
-        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
-            #ffffffff 3%, #ff2bd600 6%, #ff2bd600 93%, #ffffffff 97%) border-box;
-    filter: blur(var(--thin-blur-eff)) drop-shadow(var(--thin-ds-x) var(--thin-ds-y) var(--thin-ds-blur-eff) var(--thin-ds-color));
-    opacity: var(--layer-op);
-    z-index: 2;
-    pointer-events: none;
+        radial-gradient(120% 60% at 50% 0%, rgba(255, 43, 214, var(--nb-top-a, 0)) 0%, rgba(255, 43, 214, 0) 60%),
+        radial-gradient(120% 60% at 50% 100%, rgba(255, 43, 214, var(--nb-bottom-a, 0)) 0%, rgba(255, 43, 214, 0) 60%),
+        radial-gradient(140% 120% at 0% 50%, rgba(255, 43, 214, var(--nb-left-a, 0)) 0%, rgba(255, 43, 214, 0) 60%),
+        radial-gradient(140% 120% at 100% 50%, rgba(255, 43, 214, var(--nb-right-a, 0)) 0%, rgba(255, 43, 214, 0) 60%);
+    filter: blur(32px);
+    transition: filter .2s ease;
 }
 
-/* Пломба внутри */
-.frame>.cut {
-    position: absolute;
-    inset: var(--border-width);
-    border-radius: calc(var(--radius) - var(--border-width));
-    background: var(--bg);
-    z-index: 3;
-    pointer-events: none;
+
+.card {
+    position: relative;
+    z-index: 1;
 }
 
-/* Локальный blit фоновых шаров внутрь карточки */
-.frame>canvas.blobs {
-    position: absolute;
-    inset: var(--border-width);
-    border-radius: calc(var(--radius) - var(--border-width));
-    z-index: 4;
-    pointer-events: none;
-    display: block;
-    width: 100%;
-    height: 100%;
+
+
+
+
+
+
+.card {
+    --radius: 22px;
+    --padding: 8px;
+    --nested-radius: calc(var(--radius) - var(--padding));
+
+    position: relative;
+    border-radius: var(--radius);
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(54px) brightness(1.1);
+    padding: var(--padding);
+
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow:
+        inset 0.4px 0.4px 0 rgba(255, 255, 255, .2),
+        inset -0.4px -0.4px 0 rgba(255, 255, 255, .2),
+        inset 0 2px 0 rgba(255, 43, 214, var(--nb-top-border, 0)),
+        inset 0 -2px 0 rgba(255, 43, 214, var(--nb-bottom-border, 0)),
+        0 -6px 16px rgba(255, 43, 214, var(--nb-top-border, 0)),
+        0 6px 16px rgba(255, 43, 214, var(--nb-bottom-border, 0)),
+        inset 2px 0 0 rgba(255, 43, 214, var(--nb-left-border, 0)),
+        inset -2px 0 0 rgba(255, 43, 214, var(--nb-right-border, 0)),
+        -8px 0 16px rgba(255, 43, 214, var(--nb-left-border, 0)),
+        8px 0 16px rgba(255, 43, 214, var(--nb-right-border, 0));
+    animation: none;
 }
 
-/* Острая 1px-обводка */
-.frame::before {
+.card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    animation-duration: 3s;
+}
+
+.card::before {
     content: "";
     position: absolute;
     inset: 0;
-    padding: var(--border-width);
+    background: radial-gradient(circle 120px at var(--x, 50%) var(--y, 50%),
+            rgba(255, 255, 200, .55), transparent 80%);
+    opacity: 0;
+    filter: blur(40px);
+    transition: opacity .25s;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+
+.card-border {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background:
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            rgba(255, 210, 251, 1) 0%,
+            rgba(255, 158, 236, 1) 4%,
+            rgba(255, 43, 214, 1) 8%,
+            rgba(255, 0, 204, 0.4) 12%,
+            rgba(255, 0, 204, 0) 20%,
+            rgba(255, 43, 214, 1) 60%,
+            rgba(255, 164, 237, 1) 70%,
+            rgba(252, 196, 255, 1) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity .25s;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.card-border::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
     border-radius: inherit;
     background:
         conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
-            #ffffff 0%,
-            #ffd2f6 var(--b1),
-            #ff2bd64d var(--b2),
-            #ff2bd600 var(--b3),
-            #ff2bd600 var(--b4),
-            #ff2bd64d var(--b5),
-            #ffd2f6 var(--b6),
-            #ffffff 100%);
-    opacity: var(--layer-op);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    z-index: 5;
-    pointer-events: none;
+            rgba(255, 210, 251, 1) 0%,
+            rgba(255, 158, 236, 1) 4%,
+            rgba(255, 43, 214, 1) 8%,
+            rgba(255, 0, 204, 0.4) 12%,
+            rgba(255, 0, 204, 0) 20%,
+            rgba(255, 43, 214, 1) 60%,
+            rgba(255, 164, 237, 1) 70%,
+            rgba(252, 196, 255, 1) 100%);
+    filter: blur(25px);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity .25s;
 }
 
-/* Стеклянная подложка с паддингом 5px */
-.glass {
+.card:hover .card-border,
+.card:hover .card-border::before {
+    opacity: 1;
+}
+
+
+
+.card::after {
+    content: "";
     position: absolute;
-    inset: calc(var(--border-width) + 1px);
-    border-radius: calc(var(--radius) - var(--border-width) - 1px);
-    padding: 5px;
-    background: linear-gradient(140deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
-    border: 1px solid rgba(255, 255, 255, .08);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 6;
-    pointer-events: none;
-    display: grid;
-    grid-template-rows: 1fr 84px;
-    gap: 0;
-    overflow: clip;
+    inset: -5px;
+    border-radius: inherit;
+    background: conic-gradient(from 0deg,
+            var(--glow1), var(--glow2), var(--glow3), var(--glow1));
+    filter: blur(25px);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity .3s;
 }
 
-.imgWrap {
-    border-radius: var(--img-radius);
+.card:hover::after {
+    opacity: 1;
+    animation: spinGlow 6s linear infinite;
+}
+
+
+@keyframes cta-spin {
+    from {
+        --css-spin: 0deg;
+    }
+
+    to {
+        --css-spin: 360deg;
+    }
+}
+
+@keyframes spinGlow {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+
+.card:hover .card-image {
+    transform: scale(0.99);
+    transition: transform 0.3s ease-in-out;
+}
+
+.card:hover .card-text {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+}
+
+
+
+
+.card-image {
+    scale: 1;
+    aspect-ratio: 16/11;
+    border-radius: var(--nested-radius);
     overflow: hidden;
-    min-height: 0;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.75),
+        inset 0.4px 0.4px 0 rgba(255, 255, 255, .2),
+        inset -0.4px -0.4px 0 rgb(255, 255, 255);
+    transition: transform 0.3s ease-in-out;
 }
 
-.imgWrap img {
+
+
+.card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-drag: none;
 }
 
-.caption {
-    height: 84px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.card-text {
+    color: white;
     text-align: center;
-    padding: 0 10px;
-    line-height: 1.2;
-    font-size: var(--font-main);
-    font-weight: 500;
-    color: #e9e9ea;
-    white-space: pre-line;
-    pointer-events: none;
+    padding: 16px;
+    font-size: 16px;
+    transition: transform 0.3s ease-in-out;
 }
-
-/* iOS микроскроллер для перерисовки */
-.ios-scroller {
-    position: fixed;
-    left: -9999px;
-    bottom: 0;
-    width: 1px;
-    height: 1px;
-    overflow: auto;
-    will-change: scroll-position;
-}
-
-.ios-scroller>div {
-    width: 1px;
-    height: 4px;
-}
-
-
-
-
-
-
-
-@media (max-width: 1024px) {
-    .cw-portfolio__grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 640px) {
-    .cw-portfolio__grid {
-        grid-template-columns: 1fr;
-    }
-
-    .p-card__inner {
-        grid-template-rows: auto 60px;
-    }
-}
-
 

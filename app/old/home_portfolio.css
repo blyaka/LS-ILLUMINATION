@@ -1,0 +1,242 @@
+
+/* Секция Портфолио */
+.cw-portfolio {
+    position: relative;
+    padding: 96px;
+}
+
+.cw-portfolio__title {
+    text-align: center;
+    font-size: clamp(1.6rem, 1.2rem + 2vw, 2rem);
+    margin-bottom: clamp(24px, 3vw, 36px);
+    color: var(--text);
+}
+
+/* Средний блок-сцена */
+.middle {
+    --pad-extra: 350px;
+    /* паддинги сверху/снизу */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 56px;
+    padding-bottom: 0px;
+}
+
+/* Фоновый канвас — только внутри middle */
+.bgCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+}
+
+.grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, var(--frame-w));
+    grid-auto-rows: var(--frame-h);
+    column-gap: var(--gap-x);
+    row-gap: var(--gap-y);
+    place-items: center;
+    will-change: transform;
+}
+
+.frame {
+    --base-angle: 0deg;
+    --css-spin: 0deg;
+    width: var(--frame-w);
+    height: var(--frame-h);
+    position: relative;
+    border-radius: var(--radius);
+    background: transparent;
+    overflow: visible;
+    isolation: isolate;
+    touch-action: none;
+}
+
+/* Широкий glow */
+.frame::after {
+    content: "";
+    position: absolute;
+    inset: calc(-1 * var(--glow-outset));
+    border-radius: calc(var(--radius) + var(--glow-outset));
+    border: var(--glow-width) solid transparent;
+    background:
+        linear-gradient(#0000, #0000) padding-box,
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            #ffffffff 0%,
+            #ffd2f6ff var(--g1),
+            #ff2bd64d var(--g2),
+            #ff2bd600 var(--g3),
+            #ff2bd600 var(--g4),
+            #ff2bd64d var(--g5),
+            #ffd2f6ff var(--g6),
+            #ffffffff 100%) border-box;
+    filter: blur(var(--blur-eff)) drop-shadow(var(--ds-x) var(--ds-y) var(--ds-blur-eff) var(--ds-color));
+    opacity: var(--layer-op);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Тонкий слой */
+.frame>.thin {
+    position: absolute;
+    inset: calc(-1 * var(--thin-outset));
+    border-radius: calc(var(--radius) + var(--thin-outset));
+    border: var(--thin-width) solid transparent;
+    background:
+        linear-gradient(#0000, #0000) padding-box,
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            #ffffffff 3%, #ff2bd600 6%, #ff2bd600 93%, #ffffffff 97%) border-box;
+    filter: blur(var(--thin-blur-eff)) drop-shadow(var(--thin-ds-x) var(--thin-ds-y) var(--thin-ds-blur-eff) var(--thin-ds-color));
+    opacity: var(--layer-op);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Пломба внутри */
+.frame>.cut {
+    position: absolute;
+    inset: var(--border-width);
+    border-radius: calc(var(--radius) - var(--border-width));
+    background: var(--bg);
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* Локальный blit фоновых шаров внутрь карточки */
+.frame>canvas.blobs {
+    position: absolute;
+    inset: var(--border-width);
+    border-radius: calc(var(--radius) - var(--border-width));
+    z-index: 4;
+    pointer-events: none;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Острая 1px-обводка */
+.frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: var(--border-width);
+    border-radius: inherit;
+    background:
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            #ffffff 0%,
+            #ffd2f6 var(--b1),
+            #ff2bd64d var(--b2),
+            #ff2bd600 var(--b3),
+            #ff2bd600 var(--b4),
+            #ff2bd64d var(--b5),
+            #ffd2f6 var(--b6),
+            #ffffff 100%);
+    opacity: var(--layer-op);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Стеклянная подложка с паддингом 5px */
+.glass {
+    position: absolute;
+    inset: calc(var(--border-width) + 1px);
+    border-radius: calc(var(--radius) - var(--border-width) - 1px);
+    padding: 5px;
+    background: linear-gradient(140deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
+    border: 1px solid rgba(255, 255, 255, .08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 6;
+    pointer-events: none;
+    display: grid;
+    grid-template-rows: 1fr 84px;
+    gap: 0;
+    overflow: clip;
+}
+
+.imgWrap {
+    border-radius: var(--img-radius);
+    overflow: hidden;
+    min-height: 0;
+}
+
+.imgWrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.caption {
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 10px;
+    line-height: 1.2;
+    font-size: var(--font-main);
+    font-weight: 500;
+    color: #e9e9ea;
+    white-space: pre-line;
+    pointer-events: none;
+}
+
+/* iOS микроскроллер для перерисовки */
+.ios-scroller {
+    position: fixed;
+    left: -9999px;
+    bottom: 0;
+    width: 1px;
+    height: 1px;
+    overflow: auto;
+    will-change: scroll-position;
+}
+
+.ios-scroller>div {
+    width: 1px;
+    height: 4px;
+}
+
+
+
+
+
+
+
+@media (max-width: 1024px) {
+    .cw-portfolio__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .cw-portfolio__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .p-card__inner {
+        grid-template-rows: auto 60px;
+    }
+}
+
+
