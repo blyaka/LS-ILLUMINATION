@@ -14,6 +14,4 @@ class MaxSizeUploadHandler(FileUploadHandler):
         return raw_data
 
     def file_complete(self, file_size):
-        if file_size and file_size > self.max_bytes:
-            raise StopUpload(connection_reset=True)
-        raise StopFutureHandlers()
+        return None
