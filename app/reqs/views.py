@@ -1,7 +1,6 @@
-# reqs/views.py
 from django.conf import settings
 from django.core.cache import cache
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -11,25 +10,28 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.contrib.sites.shortcuts import get_current_site
 
+from django.core.files.uploadhandler import MemoryFileUploadHandler
+from .upload_handlers import MaxSizeUploadHandler
+
 from .forms import RequestForm
 from .models import Request, ReqsRecipient
+
+import threading
+import logging
+log = logging.getLogger(__name__)
 
 RATE_PER_30S = 1
 RATE_PER_HOUR = 5
 WINDOW_SHORT = 30
 WINDOW_LONG = 3600
 
-# def _client_ip(request):
-#     xff = request.META.get('HTTP_X_FORWARDED_FOR')
-#     return xff.split(',')[0].strip() if xff else request.META.get('REMOTE_ADDR','0.0.0.0')
+MAX_MAIL_FILE = 12 * 1024 * 1024  # 12 MB для формы заявок
 
 def _client_ip(request):
     ip = request.META.get('HTTP_X_REAL_IP')
-    if ip:
-        return ip.strip()
+    if ip: return ip.strip()
     xff = request.META.get('HTTP_X_FORWARDED_FOR')
-    if xff:
-        return xff.split(',')[0].strip()
+    if xff: return xff.split(',')[0].strip()
     return request.META.get('REMOTE_ADDR', '0.0.0.0')
 
 def _rate_key(ip, kind): return f'reqs:{kind}:{ip}'
@@ -50,13 +52,6 @@ def _recipients():
         return emails
     return getattr(settings, 'REQS_EMAILS', None) or [getattr(settings, 'DEFAULT_FROM_EMAIL')]
 
-
-import threading
-import logging
-from django.core.mail import EmailMultiAlternatives, get_connection
-
-log = logging.getLogger(__name__)
-
 def _send_async(message):
     try:
         message.send(fail_silently=False)
@@ -69,26 +64,37 @@ def submit_request(request):
     if not _check_rate(ip):
         return HttpResponseBadRequest('Too many requests.')
 
-    form = RequestForm(request.POST)
+    # Ранний отсев по заголовку, чтобы не держать соединение зря
+    cl = request.META.get('CONTENT_LENGTH')
+    if cl:
+        try:
+            if int(cl) > MAX_MAIL_FILE:
+                return HttpResponseBadRequest('File too large.')
+        except ValueError:
+            pass
+
+    # Локально ограничиваем аплоад файла для этой вьюхи до 12 МБ
+    request.upload_handlers = [
+        MaxSizeUploadHandler(request, max_bytes=MAX_MAIL_FILE),
+        MemoryFileUploadHandler(request),
+        *request.upload_handlers,  # оставим прочие как fallback (TemporaryFileUploadHandler и т.д.)
+    ]
+
+    form = RequestForm(request.POST, request.FILES)
     if not form.is_valid():
         return HttpResponseBadRequest('Invalid data.')
 
     obj = form.save(commit=False)
     obj.save()
 
-    from django.contrib.sites.shortcuts import get_current_site
     site = get_current_site(request)
-    ctx = {
-        'obj': obj,
-        'when': timezone.localtime(obj.created_at),
-        'site': site.name,
-    }
+    ctx = {'obj': obj, 'when': timezone.localtime(obj.created_at), 'site': site.name}
 
     subject = f"Заявка с сайта {site.name}: {obj.name} — {obj.phone}"
     html = render_to_string('reqs/email_request.html', ctx)
     text = render_to_string('reqs/email_request.txt', ctx) or strip_tags(html)
 
-    conn = get_connection(timeout=settings.EMAIL_TIMEOUT)
+    conn = get_connection(timeout=getattr(settings, 'EMAIL_TIMEOUT', 30))
     msg = EmailMultiAlternatives(
         subject=subject,
         body=text,
@@ -99,9 +105,10 @@ def submit_request(request):
     )
     msg.attach_alternative(html, "text/html")
 
-    # не ждём SMTP — шлём в фоне
-    threading.Thread(target=_send_async, args=(msg,), daemon=True).start()
+    f = form.cleaned_data.get('file')
+    if f:
+        msg.attach(f.name, f.read(), getattr(f, 'content_type', 'application/octet-stream'))
 
+    threading.Thread(target=_send_async, args=(msg,), daemon=True).start()
     back = request.META.get('HTTP_REFERER') or reverse('home')
     return redirect(back)
-
