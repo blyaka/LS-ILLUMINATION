@@ -167,12 +167,6 @@ EMAIL_USE_TLS      = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("true",
 EMAIL_USE_SSL      = os.environ.get("EMAIL_USE_SSL", "False").lower() in ("true", "1", "yes")
 EMAIL_TIMEOUT      = int(os.environ.get("EMAIL_TIMEOUT", "10"))
 
-FILE_UPLOAD_HANDLERS = [
-    'reqs.upload_handlers.MaxSizeUploadHandler',
-    'django.core.files.uploadhandler.MemoryFileUploadHandler',
-    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-]
-
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 256 * 1024 * 1024 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 256 * 1024 * 1024
