@@ -6,7 +6,7 @@
 .cw-trust__title {
     color: #fff;
     margin: 0 237px 40px;
-    font-size: 40px;
+    font-size: var(--font-h1);
     text-align: left;
     font-weight: var(--font-weight-light);
 }

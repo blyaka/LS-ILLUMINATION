@@ -42,6 +42,7 @@
 }
 
 .ls-hero__title {
+    font-family: var(--font-sans);
     font-size: clamp(2rem, 4vw + 1rem, 4rem);
     font-weight: var(--font-weight-bold);
     letter-spacing: .01em;

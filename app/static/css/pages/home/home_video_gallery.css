@@ -63,12 +63,13 @@
 }
 
 .cw-videos__title {
+    font-family: var(--font-sans-bold);
     color: var(--text);
     font-size: var(--font-h1);
     font-weight: var(--font-weight-light);
     text-align: left;
     max-width: 1280px;
-    padding: 24px 74px 56px;
+    padding: 24px 170px 56px;
     position: relative;
 }
 
