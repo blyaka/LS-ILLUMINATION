@@ -17,60 +17,63 @@
     <h1>{{ category.name }}</h1>
   </div>
 
-  {% next_category categories category as next_cat %}
-  {% if next_cat %}
-    <div class="next-btn-container">
-      <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn"><p>Следующая категория ></p></a>
-    </div>
-  {% endif %}
 
-{% if use_grouped %}
+  {% if use_grouped %}
   {% for sub in subcategories %}
-    {% with cases=sub.cases.all %}
-      {% if cases %}
-        <section class="portfolio-section">
-          <h2 class="subcategory-title">{{ sub.name }}</h2>
-          <div class="portfolio-grid">
-            {% for case in cases %}
-              <a class="card" href="#">
-                <div class="card_photo">
-                  <img src="{{ case.photo.url }}" alt="{{ case.name }}">
-                </div>
-              </a>
-            {% endfor %}
-          </div>
-        </section>
-      {% endif %}
-    {% endwith %}
-  {% endfor %}
-
-  {% if direct_cases %}
-    <section class="portfolio-section">
-      <h2 class="subcategory-title">Без подкатегории</h2>
-      <div class="portfolio-grid">
-        {% for case in direct_cases %}
-          <a class="card" href="#">
-            <div class="card_photo">
-              <img src="{{ case.photo.url }}" alt="{{ case.name }}">
-            </div>
-          </a>
-        {% endfor %}
-      </div>
-    </section>
-  {% endif %}
-{% else %}
-  <div class="portfolio-grid">
-    {% for case in direct_cases %}
+  {% with cases=sub.cases.all %}
+  {% if cases %}
+  <section class="portfolio-section">
+    <h2 class="subcategory-title">{{ sub.name }}</h2>
+    <div class="portfolio-grid">
+      {% for case in cases %}
       <a class="card" href="#">
         <div class="card_photo">
           <img src="{{ case.photo.url }}" alt="{{ case.name }}">
         </div>
       </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% endwith %}
+  {% endfor %}
+
+  {% if direct_cases %}
+  <section class="portfolio-section">
+    <h2 class="subcategory-title">Без подкатегории</h2>
+    <div class="portfolio-grid">
+      {% for case in direct_cases %}
+      <a class="card" href="#">
+        <div class="card_photo">
+          <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% else %}
+  <div class="portfolio-grid">
+    {% for case in direct_cases %}
+    <a class="card" href="#">
+      <div class="card_photo">
+        <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+      </div>
+    </a>
     {% empty %}
-      <p>Здесь пока нет кейсов.</p>
+    <p>Здесь пока нет кейсов.</p>
     {% endfor %}
   </div>
-{% endif %}
+  {% endif %}
+
+  {% next_category categories category as next_cat %}
+  {% if next_cat %}
+  <div class="next-btn-container">
+    <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn">
+      <p>Следующая категория ></p>
+    </a>
+  </div>
+  {% endif %}
 
 </div>
 
@@ -96,65 +99,65 @@
 </div>
 
 <script>
-(() => {
-  const modal = document.getElementById('imageModal');
-  const modalImg = document.getElementById('modalImg');
-  const modalClose = document.getElementById('modalClose');
-  const modalPrev = document.getElementById('modalPrev');
-  const modalNext = document.getElementById('modalNext');
-  const modalOverlay = document.getElementById('modalOverlay');
+  (() => {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalClose = document.getElementById('modalClose');
+    const modalPrev = document.getElementById('modalPrev');
+    const modalNext = document.getElementById('modalNext');
+    const modalOverlay = document.getElementById('modalOverlay');
 
-  const cards = Array.from(document.querySelectorAll('.portfolio-grid .card'));
-  const images = cards.map(c => c.querySelector('.card_photo img'));
-  let i = 0, openFlag = false;
+    const cards = Array.from(document.querySelectorAll('.portfolio-grid .card'));
+    const images = cards.map(c => c.querySelector('.card_photo img'));
+    let i = 0, openFlag = false;
 
-  function setImage(idx) {
-    i = (idx + images.length) % images.length;
-    const src = images[i].src;
-    modalImg.style.opacity = 0;
-    const pre = new Image();
-    pre.onload = () => {
-      modalImg.src = src;
-      modalImg.alt = images[i].alt || 'Фото';
-      requestAnimationFrame(() => { modalImg.style.opacity = 1; });
-    };
-    pre.src = src;
-    const next = images[(i + 1) % images.length]?.src;
-    const prev = images[(i - 1 + images.length) % images.length]?.src;
-    if (next) { const n = new Image(); n.src = next; }
-    if (prev) { const p = new Image(); p.src = prev; }
-  }
+    function setImage(idx) {
+      i = (idx + images.length) % images.length;
+      const src = images[i].src;
+      modalImg.style.opacity = 0;
+      const pre = new Image();
+      pre.onload = () => {
+        modalImg.src = src;
+        modalImg.alt = images[i].alt || 'Фото';
+        requestAnimationFrame(() => { modalImg.style.opacity = 1; });
+      };
+      pre.src = src;
+      const next = images[(i + 1) % images.length]?.src;
+      const prev = images[(i - 1 + images.length) % images.length]?.src;
+      if (next) { const n = new Image(); n.src = next; }
+      if (prev) { const p = new Image(); p.src = prev; }
+    }
 
-  function openModal(idx) {
-    openFlag = true;
-    setImage(idx);
-    modal.hidden = false;
-    modal.style.opacity = 1;
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal() {
-    openFlag = false;
-    modal.style.opacity = 0;
-    modal.hidden = true;
-    document.body.style.overflow = '';
-  }
-  function next() { setImage(i + 1); }
-  function prev() { setImage(i - 1); }
+    function openModal(idx) {
+      openFlag = true;
+      setImage(idx);
+      modal.hidden = false;
+      modal.style.opacity = 1;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      openFlag = false;
+      modal.style.opacity = 0;
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    }
+    function next() { setImage(i + 1); }
+    function prev() { setImage(i - 1); }
 
-  cards.forEach((card, idx) => {
-    card.addEventListener('click', (e) => { e.preventDefault(); openModal(idx); });
-  });
-  modalClose.addEventListener('click', closeModal);
-  modalOverlay.addEventListener('click', closeModal);
-  modalNext.addEventListener('click', next);
-  modalPrev.addEventListener('click', prev);
+    cards.forEach((card, idx) => {
+      card.addEventListener('click', (e) => { e.preventDefault(); openModal(idx); });
+    });
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', closeModal);
+    modalNext.addEventListener('click', next);
+    modalPrev.addEventListener('click', prev);
 
-  document.addEventListener('keydown', (e) => {
-    if (!openFlag) return;
-    if (e.key === 'Escape') { e.preventDefault(); closeModal(); }
-    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
-  });
-})();
+    document.addEventListener('keydown', (e) => {
+      if (!openFlag) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeModal(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    });
+  })();
 </script>
 {% endblock %}

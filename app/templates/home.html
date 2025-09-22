@@ -105,7 +105,7 @@
 
 
 
-/
+
 <!-- РАЗДЕЛ ПОРТФОЛИО -->
 <section class="main">
     <h1> Портфолио </h1>
@@ -448,6 +448,9 @@
 
     <!-- Overlay -->
     <div class="seq-ov">
+      <div class="seq-fade seq-fade--top"></div>
+      <div class="seq-fade seq-fade--bottom"></div>
+
       <div class="seq-copy" id="seqCopy">
         <span class="seq-kicker reveal">Фонтан</span>
         <h2 class="seq-title reveal">«ТЕАТРАЛЬНЫЙ»</h2>
@@ -497,6 +500,10 @@
     const artR = document.getElementById('artR');
     const scheme = document.getElementById('seqScheme');
     const seqImg = document.getElementById('seqImg');
+
+    const fTop = ov.querySelector('.seq-fade--top');
+    const fBot = ov.querySelector('.seq-fade--bottom');
+
 
     const k1 = copyStart.querySelector('.seq-kicker');
     const t1 = copyStart.querySelector('.seq-title');
@@ -578,6 +585,11 @@
 
 
     function updateOverlay(p) {
+      const topA = 1 - smooth(0.00, 0.08, p);  // виден только в самом начале
+      const botA =       smooth(0.92, 1.00, p); // виден только в самом конце
+      if (fTop) fTop.style.opacity = topA.toFixed(3);
+      if (fBot) fBot.style.opacity = botA.toFixed(3);
+
       artL.style.opacity = 1 - smooth(0.40, 0.55, p);
       artR.style.opacity = smooth(0.55, 0.70, p);
 
@@ -1130,6 +1142,7 @@
       </div>
     </aside>
   </div>
+  
 </section>
 
 
