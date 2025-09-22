@@ -2,12 +2,12 @@
 .cw-contacts {
     position: relative;
     isolation: isolate;
-    padding: clamp(40px, 6vw, 80px) clamp(16px, 6vw, 96px);
+    padding: 96px 96px 256px;
     color: var(--text);
     background:
         radial-gradient(120% 80% at 50% 10%, rgba(255, 88, 220, .08), transparent 60%),
         #0a0711;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0,0,0) 50%, rgba(0, 0, 0, 0) 100%); 
+    background: linear-gradient(0deg, rgba(3, 8, 23, 0) 0%, rgba(3, 8, 23) 50%, rgba(3, 8, 23, 0) 100%); 
     overflow-x: clip;
 }
 
