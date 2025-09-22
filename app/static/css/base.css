@@ -25,7 +25,6 @@ body {
     font-family: Helvetica, sans-serif;
     font-family: var(--font-sans);
     background-color: var(--bg);
-    /* overflow-x: hidden; */
 }
 
 
@@ -170,15 +169,6 @@ body {
 
 
 
-.rq-underlay[hidden],
-.rq-underlay:not(.show) {
-  display: none !important;
-}
-
-.rq-modal[hidden],
-.pf-panel:not(.show) {
-  display: none !important;
-}
 
 
 .cookie-mobile-p {

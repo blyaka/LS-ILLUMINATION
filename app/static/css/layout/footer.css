@@ -29,8 +29,17 @@ span {
 }
 
 
+.galaxy-root {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
 
-
+.ls-footer>*:not(.galaxy-root) {
+    position: relative;
+    z-index: 2;
+}
 
 @media (max-width: 767px) {
     .ls-footer {
@@ -48,4 +57,3 @@ span {
         right: 40px;
     }
 }
-
