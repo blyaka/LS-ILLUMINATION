@@ -51,11 +51,20 @@
         <a href="{% url 'about' %}">О нас</a>
       </nav>
 
-      <a class="glow-btn" href="#" id="rqOpen">
+      <!-- <a class="glow-btn" href="#" id="rqOpen">
         <div class="glass-btn">
           <p>Оставить заявку</p>
         </div>
+      </a> -->
+
+
+      <a href="#" id="rqOpen" class="btn-link">
+        <div class="btn-glow">
+          <div class="btn-border"></div>
+          <div class="btn-text"><p>Оставить заявку</p></div>
+        </div>
       </a>
+
 
       <!-- ПРАВО: конверт (мобилка) -->
       <button class="hdr-icon hdr-mail" id="hdrMail" aria-label="Открыть контакты">
@@ -949,6 +958,10 @@
 
 
 
+
+
+
+  <!-- Lenis -->
   <script src="https://unpkg.com/lenis@1.3.11/dist/lenis.min.js"></script>
   <script>
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -956,10 +969,8 @@
 
       window.addEventListener("wheel", function detectDevice(e) {
         if (Math.abs(e.deltaY) >= 50) {
-          // Считаем, что это колесо мыши
           useLenis = true;
         } else {
-          // Считаем, что это тачпад → отключаем
           useLenis = false;
         }
 
@@ -988,7 +999,66 @@
 
 
 
-  <script>
+
+
+  <!-- Новый скрипт кнопок -->
+<script>
+(() => {
+  const norm360 = v => ((v % 360) + 360) % 360;
+  const angleTo = (el, x, y) => {
+    const r = el.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+    if (deg < 0) deg += 360;
+    return (deg + 90) % 360;
+  };
+
+  document.querySelectorAll('.btn-glow').forEach(btn => {
+    let raf = 0, last = 0, vis = 0, target = 0, frozen = false;
+    const link = btn.closest('.btn-link');
+
+    function step(ts){
+      const dt = (ts - (last || ts)) / 1000; last = ts;
+      const d = ((target - vis + 540) % 360) - 180;
+      vis = norm360(vis + d * Math.min(1, dt * 12));
+      const v = vis + 'deg';
+      btn.style.setProperty('--base-angle', v);
+      if (link) link.style.setProperty('--base-angle', v);
+      if (!frozen) raf = requestAnimationFrame(step); else raf = 0;
+    }
+
+    btn.addEventListener('mouseenter', () => {
+      frozen = true;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    }, {passive:true});
+
+    btn.addEventListener('mouseleave', () => {
+      frozen = false;
+      if (!raf) raf = requestAnimationFrame(step);
+    }, {passive:true});
+
+    btn.addEventListener('mousemove', e => {
+      if (frozen) return;
+      const r = btn.getBoundingClientRect();
+      btn.style.setProperty('--x', (e.clientX - r.left) + 'px');
+      btn.style.setProperty('--y', (e.clientY - r.top) + 'px');
+      target = angleTo(btn, e.clientX, e.clientY);
+      if (!raf) raf = requestAnimationFrame(step);
+    }, {passive:true});
+
+    raf = requestAnimationFrame(step);
+  });
+})();
+</script>
+
+
+
+
+
+
+
+  <!-- Старый скрипт кнопок -->
+  <!-- <script>
     (() => {
       const btns = document.querySelectorAll('.glow-btn');
       if (!btns.length) return;
@@ -1026,13 +1096,13 @@
         }, { passive: true });
 
         btn.addEventListener('pointerleave', () => {
-          hover = false; /* ничего не выключаем */
+          hover = false;
         }, { passive: true });
 
         window.addEventListener('pointermove', e => { if (hover) onMove(e); }, { passive: true });
       });
     })();
-  </script>
+  </script> -->
 
 
 

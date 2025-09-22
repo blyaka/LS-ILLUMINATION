@@ -172,79 +172,6 @@
   })();
 </script>
 
-<script>
-  (() => {
-      const cards = [...document.querySelectorAll('.grid .card')];
-      const links = cards.map(c => c.closest('.card-link'));
-      const cols = 3; 
-
-      function clearNeighbors(i) {
-          const up = i - cols;
-          const down = i + cols;
-          const left = (i % cols !== 0) ? i - 1 : -1;
-          const right = (i % cols !== cols - 1) ? i + 1 : -1;
-
-          const zero = (idx, varOnLink, varOnCard) => {
-              if (idx < 0 || !links[idx]) return;
-              links[idx].style.setProperty(varOnLink, '0');
-              const card = links[idx].querySelector('.card');
-              if (card) card.style.setProperty(varOnCard, '0');
-          };
-
-          zero(up, '--nb-bottom-a', '--nb-bottom-border');
-          zero(down, '--nb-top-a', '--nb-top-border');
-
-          zero(left, '--nb-right-a', '--nb-right-border');
-          zero(right, '--nb-left-a', '--nb-left-border');
-      }
-
-
-      cards.forEach((card, i) => {
-          card.addEventListener('mousemove', (e) => {
-              const r = card.getBoundingClientRect();
-              const y = (e.clientY - r.top) / r.height;
-              const x = (e.clientX - r.left) / r.width; 
-
-              const topAlpha = y < 0.35 ? (0.35 - y) / 0.35 * 0.5 : 0;
-              const botAlpha = y > 0.65 ? (y - 0.65) / 0.35 * 0.5 : 0;
-              const leftAlpha = x < 0.35 ? (0.35 - x) / 0.35 * 0.5 : 0;
-              const rightAlpha = x > 0.65 ? (x - 0.65) / 0.35 * 0.5 : 0;
-
-              if (links[i - cols]) {
-                  links[i - cols].style.setProperty('--nb-bottom-a', topAlpha.toFixed(3));
-                  links[i - cols].querySelector('.card')
-                      ?.style.setProperty('--nb-bottom-border', (topAlpha * 0.8).toFixed(3));
-              }
-
-              if (links[i + cols]) {
-                  links[i + cols].style.setProperty('--nb-top-a', botAlpha.toFixed(3));
-                  links[i + cols].querySelector('.card')
-                      ?.style.setProperty('--nb-top-border', (botAlpha * 0.8).toFixed(3));
-              }
-
-              if (i % cols !== 0 && links[i - 1]) {
-                  links[i - 1].style.setProperty('--nb-right-a', leftAlpha.toFixed(3));
-                  links[i - 1].querySelector('.card')
-                      ?.style.setProperty('--nb-right-border', (leftAlpha * 0.8).toFixed(3));
-              }
-
-              if (i % cols !== cols - 1 && links[i + 1]) {
-                  links[i + 1].style.setProperty('--nb-left-a', rightAlpha.toFixed(3));
-                  links[i + 1].querySelector('.card')
-                      ?.style.setProperty('--nb-left-border', (rightAlpha * 0.8).toFixed(3));
-              }
-
-
-              if (!topAlpha && links[i - cols]) links[i - cols].style.setProperty('--nb-bottom-a', '0');
-              if (!botAlpha && links[i + cols]) links[i + cols].style.setProperty('--nb-top-a', '0');
-              if (!leftAlpha && i % cols !== cols - 1 && links[i + 1]) links[i + 1].style.setProperty('--nb-left-a', '0');
-              if (!rightAlpha && i % cols !== 0 && links[i - 1]) links[i - 1].style.setProperty('--nb-right-a', '0');
-          }, { passive: true });
-
-          card.addEventListener('mouseleave', () => clearNeighbors(i), { passive: true });
-      });
-  })();
-</script>
 
 
 
@@ -655,20 +582,24 @@
     {% if v.m3u8_url %}
 
 
-    <a class="glow-btn v-open cw-split__btn" 
+
+
+    <a class="btn-link v-open cw-split__btn" 
       data-src="{{ v.m3u8_url }}" 
       data-title="{{ v.name|default:'Видео' }}"
       data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
-      <div class="glass-btn">
-        <p>Смотреть полностью</p>
+      <div class="btn-glow">
+        <div class="btn-border"></div>
+        <div class="btn-text"><p>Смотреть полностью</p></div>
       </div>
     </a>
 
 
     {% else %}
-    <a class="glow-btn v-open cw-split__btn" disabled>
-      <div class="glass-btn">
-        <p>Обрабатывается…</p>
+    <a class="btn-link v-open cw-split__btn" disabled>
+      <div class="btn-glow">
+        <div class="btn-border"></div>
+        <div class="btn-text"><p>Обрабатывается ...</p></div>
       </div>
     </a>
     {% endif %}
@@ -696,20 +627,22 @@
     {% if v.m3u8_url %}
 
 
-    <a class="glow-btn v-open cw-split__btn" 
+    <a class="btn-link v-open cw-split__btn" 
       data-src="{{ v.m3u8_url }}" 
       data-title="{{ v.name|default:'Видео' }}"
       data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
-      <div class="glass-btn">
-        <p>Смотреть полностью</p>
+      <div class="btn-glow">
+        <div class="btn-border"></div>
+        <div class="btn-text"><p>Смотреть полностью</p></div>
       </div>
     </a>
 
 
     {% else %}
-    <a class="glow-btn v-open cw-split__btn" disabled>
-      <div class="glass-btn">
-        <p>Обрабатывается…</p>
+    <a class="btn-link v-open cw-split__btn" disabled>
+      <div class="btn-glow">
+        <div class="btn-border"></div>
+        <div class="btn-text"><p>Обрабатывается ...</p></div>
       </div>
     </a>
     {% endif %}
@@ -874,10 +807,11 @@
           {{ news.0.text|truncatewords:25 }}
         </p>
 
-        <a class="glow-btn news-btn" href="#" id="newsLink">
-          <div class="glass-btn">
-            <p>Читать далее</p>
-          </div>
+        <a class="btn-link news-btn" href="#" id="newsLink">
+        <div class="btn-glow">
+          <div class="btn-border"></div>
+          <div class="btn-text"><p>Читать далее</p></div>
+        </div>
         </a>
 
       </aside>
@@ -1035,9 +969,10 @@
           </div>
         </a> -->
 
-        <button class="glow-btn ct-btn" type="submit">
-          <div class="glass-btn">
-            <p>Оставить заявку</p>
+        <button class="btn-link ct-btn" type="submit">
+          <div class="btn-glow">
+            <div class="btn-border"></div>
+            <div class="btn-text"><p>Оставить заявку</p></div>
           </div>
         </button>
 
