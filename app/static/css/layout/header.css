@@ -289,35 +289,173 @@ html.rq-lock body {
 }
 
 
-.rq-card {
-    position: relative;
-    width: min(680px, 92vw);
-    border-radius: 50px;
-    padding: 32px;
-    background: #0308174D;
-    border: 2px solid transparent;
-    background-clip: padding-box, border-box;
-    box-shadow: 0 20px 80px rgba(0, 0, 0, .45);
-    isolation: isolate;
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+
+
+
+
+/* чтобы анимация крутила конус так же, как на кнопке */
+@property --base-angle {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
 }
 
+@property --css-spin {
+    syntax: "<angle>";
+    inherits: true;
+    initial-value: 0deg;
+}
+
+@keyframes cta-spin {
+    from {
+        --css-spin: 0deg;
+    }
+
+    to {
+        --css-spin: 360deg;
+    }
+}
+
+/* те же кастом-свойства и анимация ты уже подключил — оставляем */
+.rq-card {
+    --radius: 50px;
+    /* твой радиус у модалки */
+    position: relative;
+    border-radius: var(--radius);
+    overflow: visible;
+    /* чтобы ореол не резался */
+    isolation: isolate;
+    animation: cta-spin 6s linear infinite;
+    /* крутится ВСЕГДА как .btn-link */
+    z-index: 0;
+    padding: 40px;
+}
+
+/* СВЕТЯЩИЙСЯ КОНТУР — 1в1 как .btn-border */
 .rq-card::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 2px;
-    background: linear-gradient(0deg, #C80570, #C80570);
-    -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
+    background:
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            rgba(255, 210, 251, 1) 0%,
+            rgba(255, 158, 236, 1) 4%,
+            rgba(255, 43, 214, 1) 8%,
+            rgba(255, 0, 204, 0.4) 12%,
+            rgba(255, 0, 204, 0) 20%,
+            rgba(255, 43, 214, 1) 60%,
+            rgba(255, 164, 237, 1) 70%,
+            rgba(252, 196, 255, 1) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
+    opacity: .85;
+    /* как на кнопке без ховера */
     pointer-events: none;
-    opacity: .95;
+    z-index: 2;
 }
+
+/* ВНЕШНИЙ ОРЕОЛ — 1в1 как .btn-border::before / .btn-link::after */
+.rq-card::after {
+    content: "";
+    position: absolute;
+    inset: -16px;
+    border-radius: inherit;
+    background:
+        conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
+            rgba(255, 210, 251, 1) 0%,
+            rgba(255, 158, 236, 1) 4%,
+            rgba(255, 43, 214, 1) 8%,
+            rgba(255, 0, 204, 0.4) 12%,
+            rgba(255, 0, 204, 0) 20%,
+            rgba(255, 43, 214, 1) 60%,
+            rgba(255, 164, 237, 1) 70%,
+            rgba(252, 196, 255, 1) 100%);
+    filter: blur(25px);
+    opacity: .35;
+    /* как у кнопки всегда */
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* контент модалки — поверх всего */
+.rq-card>* {
+    position: relative;
+    z-index: 3;
+}
+
+
+/* контейнер-оверлей — во весь экран, центрирует содержимое */
+.rq-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+}
+
+/* сама карточка — маленькое окно */
+.rq-card {
+    position: relative;
+    /* важно для ::before/::after */
+    width: min(680px, 92vw);
+    /* не даём растягиваться */
+    max-width: 680px;
+    /* подстраховка */
+    box-sizing: border-box;
+}
+
+/* подсветка по кромке — только на псевдоэлементах */
+.rq-card::before,
+.rq-card::after {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+/* карточку не обрезаем, создаём стек */
+.rq-card {
+    position: relative;
+    z-index: 0;
+    overflow: visible;
+    /* было hidden — из-за этого glow резался */
+    isolation: isolate;
+}
+
+/* контур пусть остаётся поверх */
+.rq-card::before {
+    z-index: 2;
+}
+
+/* ореол — не ниже фона, но ниже контента */
+.rq-card::after {
+    z-index: 1;
+    /* было -1 */
+    inset: -16px;
+    /* чтобы выходил за край */
+    filter: blur(28px);
+    pointer-events: none;
+}
+
+/* контент внутри карточки держим выше glow/бордера */
+.rq-card>* {
+    position: relative;
+    z-index: 3;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 .rq-title {
     text-align: center;
@@ -530,6 +668,7 @@ html.rq-lock body {
 
 .rq-card.contacts-modal {
     width: min(580px, 92vw);
+    padding: 20px;
 }
 
 .ct-col {
