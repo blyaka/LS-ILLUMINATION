@@ -489,65 +489,67 @@
 
   <div class="rq-underlay" id="rqUnderlay" hidden></div>
   <section class="rq-modal" id="rqModal" role="dialog" aria-modal="true" aria-labelledby="rqTitle" hidden>
-    <div class="rq-card">
-      <button class="rq-close" type="button" id="rqClose" aria-label="Закрыть">×</button>
-      <h2 class="rq-title" id="rqTitle">Напишите нам</h2>
-
-      <form class="rq-form" method="post" action="{% url 'req_submit' %}">
-        {% csrf_token %}
-        <input type="hidden" name="hp" value="">
-        <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
-
-        <div class="rq-row rq-row--3">
-          <label class="rq-field">
-            <span>Ваше имя*</span>
-            <input type="text" name="name" id="rqName" required>
+    <div class="rq-wrap">
+      <div class="rq-card">
+        <button class="rq-close" type="button" id="rqClose" aria-label="Закрыть">×</button>
+        <h2 class="rq-title" id="rqTitle">Напишите нам</h2>
+  
+        <form class="rq-form" method="post" action="{% url 'req_submit' %}">
+          {% csrf_token %}
+          <input type="hidden" name="hp" value="">
+          <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
+  
+          <div class="rq-row rq-row--3">
+            <label class="rq-field">
+              <span>Ваше имя*</span>
+              <input type="text" name="name" id="rqName" required>
+            </label>
+            <label class="rq-field">
+              <span>Телефон*</span>
+              <input type="tel" name="phone" inputmode="tel" placeholder="+7" id="rqPhone" required>
+            </label>
+            <label class="rq-field">
+              <span>E-mail</span>
+              <input type="email" name="email">
+            </label>
+          </div>
+  
+          <label class="rq-field rq-field--area">
+            <span>Сообщение</span>
+            <textarea name="message" rows="4"></textarea>
           </label>
-          <label class="rq-field">
-            <span>Телефон*</span>
-            <input type="tel" name="phone" inputmode="tel" placeholder="+7" id="rqPhone" required>
+  
+  
+          <label class="rq-field rq-field--file">
+            <input type="file" name="file" id="rqFile" hidden>
+            <span class="rq-file-label" id="rqFileLabel" onclick="document.getElementById('rqFile').click()">
+              <img src="{% static 'images/clip.png' %}" alt="Прикрепить файл" class="rq-file-icon">
+              Прикрепить файл
+            </span>
           </label>
-          <label class="rq-field">
-            <span>E-mail</span>
-            <input type="email" name="email">
-          </label>
-        </div>
-
-        <label class="rq-field rq-field--area">
-          <span>Сообщение</span>
-          <textarea name="message" rows="4"></textarea>
-        </label>
-
-
-        <label class="rq-field rq-field--file">
-          <input type="file" name="file" id="rqFile" hidden>
-          <span class="rq-file-label" id="rqFileLabel" onclick="document.getElementById('rqFile').click()">
-            <img src="{% static 'images/clip.png' %}" alt="Прикрепить файл" class="rq-file-icon">
-            Прикрепить файл
-          </span>
-        </label>
-
-        <script>
-          document.getElementById('rqFile').addEventListener('change', function () {
-            const label = document.getElementById('rqFileLabel');
-            if (this.files.length > 0) {
-              label.innerHTML = '<img src="{% static "images/clip.png" %}" class="rq-file-icon">' + this.files[0].name;
-            } else {
-              label.innerHTML = '<img src="{% static "images/clip.png" %}" class="rq-file-icon"> Прикрепить файл';
-            }
-          });
-        </script>
-
-
-        <div class="rq-bottom">
-          <label class="rq-check">
-            <input type="checkbox" required>
-            <i></i>
-            <span>Нажимая кнопку отправить, вы соглашаетесь с политикой обработки персональных данных</span>
-          </label>
-          <button class="rq-submit" type="submit">Отправить</button>
-        </div>
-      </form>
+  
+          <script>
+            document.getElementById('rqFile').addEventListener('change', function () {
+              const label = document.getElementById('rqFileLabel');
+              if (this.files.length > 0) {
+                label.innerHTML = '<img src="{% static "images/clip.png" %}" class="rq-file-icon">' + this.files[0].name;
+              } else {
+                label.innerHTML = '<img src="{% static "images/clip.png" %}" class="rq-file-icon"> Прикрепить файл';
+              }
+            });
+          </script>
+  
+  
+          <div class="rq-bottom">
+            <label class="rq-check">
+              <input type="checkbox" required>
+              <i></i>
+              <span>Нажимая кнопку отправить, вы соглашаетесь с политикой обработки персональных данных</span>
+            </label>
+            <button class="rq-submit" type="submit">Отправить</button>
+          </div>
+        </form>
+      </div>
     </div>
   </section>
 
@@ -597,36 +599,38 @@
   </script>
 
   <section class="rq-modal" id="ctModal" role="dialog" aria-modal="true" aria-labelledby="ctTitle" hidden>
-    <div class="rq-card contacts-modal">
-      <button class="rq-close" type="button" id="ctClose" aria-label="Закрыть">×</button>
-      <h2 class="rq-title" id="ctTitle">Контакты</h2>
-
-      <div class="ct-grid">
-        <div class="ct-col">
-          <div class="ct-item">
-            <span class="ct-label">Телефон</span>
-            <div class="ct-val">+7 (812) 642-03-65</div>
-          </div>
-          <div class="ct-item">
-            <span class="ct-label">Адрес</span>
-            <div class="ct-val">г. Санкт-Петербург,<br>улица Ломоносова, 28</div>
-          </div>
-          <div class="ct-item">
-            <span class="ct-label">E-mail*</span>
-            <div class="ct-val"><a href="mailto:info@multidekor.ru">info@multidekor.ru</a></div>
-          </div>
-        </div>
-
-        <div class="ct-col">
-          <div class="ct-item">
-            <span class="ct-label">Время работы:</span>
-            <div class="ct-val">
-              Пн–Пт<br>с 10:00 до 18:00
+    <div class="rq-wrap">
+      <div class="rq-card contacts-modal">
+        <button class="rq-close" type="button" id="ctClose" aria-label="Закрыть">×</button>
+        <h2 class="rq-title" id="ctTitle">Контакты</h2>
+  
+        <div class="ct-grid">
+          <div class="ct-col">
+            <div class="ct-item">
+              <span class="ct-label">Телефон</span>
+              <div class="ct-val">+7 (812) 642-03-65</div>
+            </div>
+            <div class="ct-item">
+              <span class="ct-label">Адрес</span>
+              <div class="ct-val">г. Санкт-Петербург,<br>улица Ломоносова, 28</div>
+            </div>
+            <div class="ct-item">
+              <span class="ct-label">E-mail*</span>
+              <div class="ct-val"><a href="mailto:info@multidekor.ru">info@multidekor.ru</a></div>
             </div>
           </div>
-          <div class="ct-item">
-            <div class="ct-val" style="margin-top:16px">
-              Сб–Вс<br>Выходные дни
+  
+          <div class="ct-col">
+            <div class="ct-item">
+              <span class="ct-label">Время работы:</span>
+              <div class="ct-val">
+                Пн–Пт<br>с 10:00 до 18:00
+              </div>
+            </div>
+            <div class="ct-item">
+              <div class="ct-val" style="margin-top:16px">
+                Сб–Вс<br>Выходные дни
+              </div>
             </div>
           </div>
         </div>
