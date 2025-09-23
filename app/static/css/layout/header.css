@@ -564,16 +564,16 @@ html.rq-lock body {
 
 .rq-close {
     position: absolute;
+    display: grid;
+    place-items: center;
     top: -34px;
     right: -34px;
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     border: none;
     background: rgba(255, 255, 255, .06);
     color: #fff;
-    font-size: 20px;
-    line-height: 30px;
     text-align: center;
     cursor: pointer;
     box-shadow: 0 2px 16px rgba(0, 0, 0, .35);
@@ -590,17 +590,17 @@ html.rq-lock body {
     border-radius: inherit;
     padding: 2px;
     background: conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
-        rgba(255, 210, 251, 1) 0%,
-        rgba(255, 158, 236, 1) 4%,
-        rgba(255, 43, 214, 1) 8%,
-        rgba(255, 0, 204, 0.4) 12%,
-        rgba(255, 0, 204, 0) 20%,
-        rgba(255, 43, 214, 1) 60%,
-        rgba(255, 164, 237, 1) 70%,
-        rgba(252, 196, 255, 1) 100%);
+            rgba(255, 210, 251, 1) 0%,
+            rgba(255, 158, 236, 1) 4%,
+            rgba(255, 43, 214, 1) 8%,
+            rgba(255, 0, 204, 0.4) 12%,
+            rgba(255, 0, 204, 0) 20%,
+            rgba(255, 43, 214, 1) 60%,
+            rgba(255, 164, 237, 1) 70%,
+            rgba(252, 196, 255, 1) 100%);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
-            mask-composite: exclude;
+    mask-composite: exclude;
     opacity: .9;
     pointer-events: none;
     z-index: 1;
@@ -612,14 +612,14 @@ html.rq-lock body {
     inset: -8px;
     border-radius: inherit;
     background: conic-gradient(from calc(var(--base-angle) + var(--css-spin)) at 50% 50%,
-        rgba(255, 210, 251, 1) 0%,
-        rgba(255, 158, 236, 1) 4%,
-        rgba(255, 43, 214, 1) 8%,
-        rgba(255, 0, 204, 0.4) 12%,
-        rgba(255, 0, 204, 0) 20%,
-        rgba(255, 43, 214, 1) 60%,
-        rgba(255, 164, 237, 1) 70%,
-        rgba(252, 196, 255, 1) 100%);
+            rgba(255, 210, 251, 1) 0%,
+            rgba(255, 158, 236, 1) 4%,
+            rgba(255, 43, 214, 1) 8%,
+            rgba(255, 0, 204, 0.4) 12%,
+            rgba(255, 0, 204, 0) 20%,
+            rgba(255, 43, 214, 1) 60%,
+            rgba(255, 164, 237, 1) 70%,
+            rgba(252, 196, 255, 1) 100%);
     filter: blur(12px);
     opacity: .5;
     pointer-events: none;

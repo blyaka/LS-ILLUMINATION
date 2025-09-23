@@ -491,7 +491,11 @@
   <section class="rq-modal" id="rqModal" role="dialog" aria-modal="true" aria-labelledby="rqTitle" hidden>
     <div class="rq-wrap">
       <div class="rq-card">
-        <button class="rq-close" type="button" id="rqClose" aria-label="Закрыть">×</button>
+        <button class="rq-close" type="button" id="rqClose" aria-label="Закрыть">
+          <svg width="22" height="22" viewBox="0 0 22 22">
+            <use xlink:href="{% static 'images/icons.svg' %}#icon-close"></use>
+          </svg>
+        </button>
         <h2 class="rq-title" id="rqTitle">Напишите нам</h2>
   
         <form class="rq-form" method="post" action="{% url 'req_submit' %}">
@@ -601,7 +605,11 @@
   <section class="rq-modal" id="ctModal" role="dialog" aria-modal="true" aria-labelledby="ctTitle" hidden>
     <div class="rq-wrap">
       <div class="rq-card contacts-modal">
-        <button class="rq-close" type="button" id="ctClose" aria-label="Закрыть">×</button>
+        <button class="rq-close" type="button" id="ctClose" aria-label="Закрыть">
+          <svg width="22" height="22" viewBox="0 0 22 22">
+            <use xlink:href="{% static 'images/icons.svg' %}#icon-close"></use>
+          </svg>
+        </button>
         <h2 class="rq-title" id="ctTitle">Контакты</h2>
   
         <div class="ct-grid">
