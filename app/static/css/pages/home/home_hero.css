@@ -73,6 +73,46 @@
     gap: 6px;
 }
 
+.ls-hero__stat {
+    opacity: 0;
+    transform: translateY(22px);
+    will-change: transform, opacity;
+}
+
+@keyframes hero-rise {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ls-hero__stats.is-inview .ls-hero__stat {
+    animation: hero-rise .6s ease-out both;
+}
+
+.ls-hero__stats.is-inview .ls-hero__stat:nth-child(2) {
+    animation-delay: .08s;
+}
+
+.ls-hero__stats.is-inview .ls-hero__stat:nth-child(3) {
+    animation-delay: .16s;
+}
+
+/* уважение к reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .ls-hero__stat {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
+}
+
+
 .ls-hero__stat span {
     font-size: clamp(1.8rem, 2.8vw + 1rem, 2.8rem);
     font-weight: var(--font-weight-bold);

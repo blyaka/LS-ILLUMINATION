@@ -75,6 +75,24 @@
 </section>
 
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.querySelector('.ls-hero__stats');
+    if(!el) return;
+
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting){
+        el.classList.add('is-inview');
+        io.disconnect();
+      }
+    }, { threshold: 0.3 });
+
+    io.observe(el);
+  });
+</script>
+
+
+
 
 
 
