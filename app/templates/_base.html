@@ -51,7 +51,9 @@
       <a href="#!" class="btn-link js-rq-open">
         <div class="btn-glow">
           <div class="btn-border"></div>
-          <div class="btn-text"><p>Оставить заявку</p></div>
+          <div class="btn-text">
+            <p>Оставить заявку</p>
+          </div>
         </div>
       </a>
     </div>
@@ -99,7 +101,9 @@
       <a href="#!" class="btn-link js-rq-open">
         <div class="btn-glow">
           <div class="btn-border"></div>
-          <div class="btn-text"><p>Оставить заявку</p></div>
+          <div class="btn-text">
+            <p>Оставить заявку</p>
+          </div>
         </div>
       </a>
 
@@ -116,38 +120,38 @@
 
 
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const fixedHeader = document.querySelector('.ls-header--fixed');
-    const isHome = document.body.classList.contains('is-home');
+    document.addEventListener('DOMContentLoaded', () => {
+      const fixedHeader = document.querySelector('.ls-header--fixed');
+      const isHome = document.body.classList.contains('is-home');
 
-    if (isHome){
-      const reveal = () => {
-        if (window.scrollY > 1000) fixedHeader.classList.add('show');
-        else fixedHeader.classList.remove('show');
-      };
-      window.addEventListener('scroll', reveal, { passive:true });
-      reveal();
-    } else {
-      // не главная: сразу показываем, без transition
-      fixedHeader.classList.add('show');
-    }
-  });
+      if (isHome) {
+        const reveal = () => {
+          if (window.scrollY > 1000) fixedHeader.classList.add('show');
+          else fixedHeader.classList.remove('show');
+        };
+        window.addEventListener('scroll', reveal, { passive: true });
+        reveal();
+      } else {
+        // не главная: сразу показываем, без transition
+        fixedHeader.classList.add('show');
+      }
+    });
   </script>
 
 
 
 
 
-      <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          document.getElementById('hdrMenu')?.addEventListener('click', e => {
-            e.preventDefault(); document.getElementById('pfOpen')?.click();
-          });
-          document.getElementById('hdrMail')?.addEventListener('click', e => {
-            e.preventDefault(); document.getElementById('ctOpen')?.click();
-          });
-        });
-      </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('hdrMenu')?.addEventListener('click', e => {
+        e.preventDefault(); document.getElementById('pfOpen')?.click();
+      });
+      document.getElementById('hdrMail')?.addEventListener('click', e => {
+        e.preventDefault(); document.getElementById('ctOpen')?.click();
+      });
+    });
+  </script>
 
   <div class="pf-underlay" id="pfUnderlay"></div>
   <section class="pf-panel" id="pfPanel" role="dialog" aria-modal="true">
@@ -198,12 +202,12 @@
 
 
 
-<script type="module">
-  import * as OGL from 'https://cdn.skypack.dev/ogl';
-  const { Renderer, Program, Mesh, Triangle, Color, Vec3 } = OGL;
-  const V3 = Color || Vec3; // в одних версиях есть Color, в других только Vec3
+  <script type="module">
+    import * as OGL from 'https://cdn.skypack.dev/ogl';
+    const { Renderer, Program, Mesh, Triangle, Color, Vec3 } = OGL;
+    const V3 = Color || Vec3; // в одних версиях есть Color, в других только Vec3
 
-  const vertexShader = `
+    const vertexShader = `
   attribute vec2 uv;
   attribute vec2 position;
 
@@ -216,7 +220,7 @@
   `;
 
 
-  const fragmentShader = `
+    const fragmentShader = `
   precision highp float;
 
   uniform float uTime;
@@ -372,135 +376,135 @@
   }
   `;
 
-  function mountGalaxy(container, o = {}) {
-    const d = Object.assign({
-      focal:[0.5,0.5], 
-      rotation:[1.0,0.0], 
-      starSpeed:0.5, 
-      density:1,
-      hueShift:140, 
-      disableAnimation:false, 
-      speed:1.0,
-      mouseInteraction:true, 
-      glowIntensity:0.3,
-      saturation:0.0,
-      mouseRepulsion:true, 
-      repulsionStrength:2, 
-      twinkleIntensity:0.3,
-      rotationSpeed:0.1, 
-      autoCenterRepulsion:0, 
-      transparent:true
-    }, o);
+    function mountGalaxy(container, o = {}) {
+      const d = Object.assign({
+        focal: [0.5, 0.5],
+        rotation: [1.0, 0.0],
+        starSpeed: 0.5,
+        density: 1,
+        hueShift: 140,
+        disableAnimation: false,
+        speed: 1.0,
+        mouseInteraction: true,
+        glowIntensity: 0.3,
+        saturation: 0.0,
+        mouseRepulsion: true,
+        repulsionStrength: 2,
+        twinkleIntensity: 0.3,
+        rotationSpeed: 0.1,
+        autoCenterRepulsion: 0,
+        transparent: true
+      }, o);
 
-    const renderer = new Renderer({ alpha:d.transparent, premultipliedAlpha:false });
-    const gl = renderer.gl;
-    if (d.transparent){ 
-      gl.enable(gl.BLEND); 
-      gl.blendFunc(gl.SRC_ALPHA, 
-      gl.ONE_MINUS_SRC_ALPHA); 
-      gl.clearColor(0,0,0,0); 
-    }
-    else gl.clearColor(0,0,0,1);
-
-    container.appendChild(gl.canvas);
-
-    const geometry = new Triangle(gl);
-    const program = new Program(gl, {
-      vertex: vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uResolution: { value: new V3(1, 1, 1) },
-        uFocal: { value: new Float32Array(d.focal) },
-        uRotation: { value: new Float32Array(d.rotation) },
-        uStarSpeed: { value: d.starSpeed },
-        uDensity: { value: d.density },
-        uHueShift: { value: d.hueShift },
-        uSpeed: { value: d.speed },
-        uMouse: { value: new Float32Array([0.5,0.5]) },
-        uGlowIntensity: { value: d.glowIntensity },
-        uSaturation: { value: d.saturation },
-        uMouseRepulsion: { value: d.mouseRepulsion },
-        uTwinkleIntensity: { value: d.twinkleIntensity },
-        uRotationSpeed: { value: d.rotationSpeed },
-        uRepulsionStrength: { value: d.repulsionStrength },
-        uMouseActiveFactor: { value: 0.0 },
-        uAutoCenterRepulsion: { value: d.autoCenterRepulsion },
-        uTransparent: { value: d.transparent }
+      const renderer = new Renderer({ alpha: d.transparent, premultipliedAlpha: false });
+      const gl = renderer.gl;
+      if (d.transparent) {
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,
+          gl.ONE_MINUS_SRC_ALPHA);
+        gl.clearColor(0, 0, 0, 0);
       }
+      else gl.clearColor(0, 0, 0, 1);
+
+      container.appendChild(gl.canvas);
+
+      const geometry = new Triangle(gl);
+      const program = new Program(gl, {
+        vertex: vertexShader,
+        fragment: fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uResolution: { value: new V3(1, 1, 1) },
+          uFocal: { value: new Float32Array(d.focal) },
+          uRotation: { value: new Float32Array(d.rotation) },
+          uStarSpeed: { value: d.starSpeed },
+          uDensity: { value: d.density },
+          uHueShift: { value: d.hueShift },
+          uSpeed: { value: d.speed },
+          uMouse: { value: new Float32Array([0.5, 0.5]) },
+          uGlowIntensity: { value: d.glowIntensity },
+          uSaturation: { value: d.saturation },
+          uMouseRepulsion: { value: d.mouseRepulsion },
+          uTwinkleIntensity: { value: d.twinkleIntensity },
+          uRotationSpeed: { value: d.rotationSpeed },
+          uRepulsionStrength: { value: d.repulsionStrength },
+          uMouseActiveFactor: { value: 0.0 },
+          uAutoCenterRepulsion: { value: d.autoCenterRepulsion },
+          uTransparent: { value: d.transparent }
+        }
+      });
+      const mesh = new Mesh(gl, { geometry, program });
+
+      const target = { x: 0.5, y: 0.5, a: 0.0 };
+      const smooth = { x: 0.5, y: 0.5, a: 0.0 };
+
+      function resize() {
+        const r = container.getBoundingClientRect();
+        renderer.setSize(r.width, r.height);       // без *devicePixelRatio
+        program.uniforms.uResolution.value = new V3(
+          gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height
+        );
+      }
+      const ro = new ResizeObserver(resize); ro.observe(container);
+      window.addEventListener('resize', resize, { passive: true });
+      resize();
+
+      function onMove(e) {
+        const r = container.getBoundingClientRect();
+        target.x = (e.clientX - r.left) / r.width;
+        target.y = 1 - (e.clientY - r.top) / r.height;
+        target.a = 1.0;
+      }
+      function onLeave() { target.a = 0.0; }
+      if (d.mouseInteraction) {
+        window.addEventListener('pointermove', onMove, { passive: true });
+        window.addEventListener('pointerleave', onLeave, { passive: true });
+      }
+
+      let raf;
+      function tick(t) {
+        raf = requestAnimationFrame(tick);
+        if (!d.disableAnimation) {
+          program.uniforms.uTime.value = t * 0.001;
+          program.uniforms.uStarSpeed.value = (t * 0.001 * d.starSpeed) / 10.0;
+        }
+        const k = 0.05;
+        smooth.x += (target.x - smooth.x) * k;
+        smooth.y += (target.y - smooth.y) * k;
+        smooth.a += (target.a - smooth.a) * k;
+        program.uniforms.uMouse.value[0] = smooth.x;
+        program.uniforms.uMouse.value[1] = smooth.y;
+        program.uniforms.uMouseActiveFactor.value = smooth.a;
+        renderer.render({ scene: mesh });
+      }
+      tick();
+
+      return () => {
+        cancelAnimationFrame(raf);
+        ro.disconnect();
+        window.removeEventListener('resize', resize);
+        if (d.mouseInteraction) { container.removeEventListener('mousemove', onMove); container.removeEventListener('mouseleave', onLeave); }
+        container.contains(gl.canvas) && container.removeChild(gl.canvas);
+        gl.getExtension('WEBGL_lose_context')?.loseContext();
+      };
+    }
+
+    const root = document.getElementById('galaxy-root');
+    if (root) mountGalaxy(root, {
+      mouseRepulsion: true,
+      mouseInteraction: true,
+      density: 0.7,
+      glowIntensity: 0.8,
+      saturation: 1.0,
+      hueShift: 140,
+      twinkleIntensity: 0.3,
+      rotationSpeed: 0.3,
+      repulsionStrength: 4,
+      starSpeed: 0.9,
+      speed: 1.4,
+      transparent: true
     });
-    const mesh = new Mesh(gl, { geometry, program });
-
-    const target = { x:0.5, y:0.5, a:0.0 };
-    const smooth = { x:0.5, y:0.5, a:0.0 };
-
-    function resize(){
-      const r = container.getBoundingClientRect();
-      renderer.setSize(r.width, r.height);       // без *devicePixelRatio
-      program.uniforms.uResolution.value = new V3(
-        gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height
-      );
-    }
-    const ro = new ResizeObserver(resize); ro.observe(container);
-    window.addEventListener('resize', resize, { passive:true });
-    resize();
-
-    function onMove(e){
-      const r = container.getBoundingClientRect();
-      target.x = (e.clientX - r.left) / r.width;
-      target.y = 1 - (e.clientY - r.top) / r.height;
-      target.a = 1.0;
-    }
-    function onLeave(){ target.a = 0.0; }
-    if (d.mouseInteraction){
-      window.addEventListener('pointermove', onMove, { passive: true });
-      window.addEventListener('pointerleave', onLeave, { passive: true });
-    }
-
-    let raf;
-    function tick(t){
-      raf = requestAnimationFrame(tick);
-      if (!d.disableAnimation){
-        program.uniforms.uTime.value = t*0.001;
-        program.uniforms.uStarSpeed.value = (t*0.001*d.starSpeed)/10.0;
-      }
-      const k = 0.05;
-      smooth.x += (target.x - smooth.x)*k;
-      smooth.y += (target.y - smooth.y)*k;
-      smooth.a += (target.a - smooth.a)*k;
-      program.uniforms.uMouse.value[0] = smooth.x;
-      program.uniforms.uMouse.value[1] = smooth.y;
-      program.uniforms.uMouseActiveFactor.value = smooth.a;
-      renderer.render({ scene: mesh });
-    }
-    tick();
-
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      window.removeEventListener('resize', resize);
-      if (d.mouseInteraction){ container.removeEventListener('mousemove', onMove); container.removeEventListener('mouseleave', onLeave); }
-      container.contains(gl.canvas) && container.removeChild(gl.canvas);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
-    };
-  }
-
-  const root = document.getElementById('galaxy-root');
-  if (root) mountGalaxy(root, {
-    mouseRepulsion: true,
-    mouseInteraction: true,
-    density: 0.7,        
-    glowIntensity: 0.8,
-    saturation: 1.0,     
-    hueShift: 140,      
-    twinkleIntensity: 0.3, 
-    rotationSpeed: 0.3,  
-    repulsionStrength: 4,
-    starSpeed: 0.9,    
-    speed: 1.4,
-    transparent: true
-  });
-</script>
+  </script>
 
 
 
@@ -556,12 +560,12 @@
           </svg>
         </button>
         <h2 class="rq-title" id="rqTitle">Напишите нам</h2>
-  
+
         <form class="rq-form" method="post" action="{% url 'req_submit' %}">
           {% csrf_token %}
           <input type="hidden" name="hp" value="">
           <input type="hidden" name="ts" value="{{ now_ts|default:0 }}">
-  
+
           <div class="rq-row rq-row--3">
             <label class="rq-field">
               <span>Ваше имя*</span>
@@ -576,13 +580,13 @@
               <input type="email" name="email">
             </label>
           </div>
-  
+
           <label class="rq-field rq-field--area">
             <span>Сообщение</span>
             <textarea name="message" rows="4"></textarea>
           </label>
-  
-  
+
+
           <label class="rq-field rq-field--file">
             <input type="file" name="file" id="rqFile" hidden>
             <span class="rq-file-label" id="rqFileLabel" onclick="document.getElementById('rqFile').click()">
@@ -590,7 +594,7 @@
               Прикрепить файл
             </span>
           </label>
-  
+
           <script>
             document.getElementById('rqFile').addEventListener('change', function () {
               const label = document.getElementById('rqFileLabel');
@@ -601,8 +605,8 @@
               }
             });
           </script>
-  
-  
+
+
           <div class="rq-bottom">
             <label class="rq-check">
               <input type="checkbox" required>
@@ -670,7 +674,7 @@
           </svg>
         </button>
         <h2 class="rq-title" id="ctTitle">Контакты</h2>
-  
+
         <div class="ct-grid">
           <div class="ct-col">
             <div class="ct-item">
@@ -686,7 +690,7 @@
               <div class="ct-val"><a href="mailto:info@multidekor.ru">info@multidekor.ru</a></div>
             </div>
           </div>
-  
+
           <div class="ct-col">
             <div class="ct-item">
               <span class="ct-label">Время работы:</span>
@@ -707,57 +711,68 @@
 
 
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const pfPanel = document.getElementById('pfPanel');
-    const pfUnder = document.getElementById('pfUnderlay');
-    const rqModal = document.getElementById('rqModal');
-    const rqUnder  = document.getElementById('rqUnderlay');
-    const ctModal = document.getElementById('ctModal');
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const pfPanel = document.getElementById('pfPanel');
+      const pfUnder = document.getElementById('pfUnderlay');
+      const rqModal = document.getElementById('rqModal');
+      const rqUnder = document.getElementById('rqUnderlay');
+      const ctModal = document.getElementById('ctModal');
 
-    const pfShow = () => { pfUnder.classList.add('show'); pfPanel.getBoundingClientRect(); pfPanel.classList.add('show'); };
-    const pfHide = () => { pfPanel.classList.remove('show'); pfUnder.classList.remove('show'); };
+      const pfShow = () => {
+        pfUnder.classList.add('show');
+        pfPanel.getBoundingClientRect();
+        pfPanel.classList.add('show');
+        document.documentElement.classList.add('rq-lock');
+      };
 
-    const rqShow = () => { rqUnder.hidden = false; rqModal.hidden = false; rqModal.getBoundingClientRect(); rqUnder.classList.add('show'); rqModal.classList.add('show'); document.documentElement.classList.add('rq-lock'); };
-    const rqHide = () => { rqModal.classList.remove('show'); rqUnder.classList.remove('show'); rqModal.addEventListener('transitionend', () => { rqModal.hidden = true; rqUnder.hidden = true; }, { once:true }); document.documentElement.classList.remove('rq-lock'); };
+      const pfHide = () => {
+        pfPanel.classList.remove('show');
+        pfUnder.classList.remove('show');
+        document.documentElement.classList.remove('rq-lock');
+      };
 
-    const ctShow = () => { rqUnder.hidden = false; ctModal.hidden = false; ctModal.getBoundingClientRect(); rqUnder.classList.add('show'); ctModal.classList.add('show'); document.documentElement.classList.add('rq-lock'); };
-    const ctHide = () => { ctModal.classList.remove('show'); rqUnder.classList.remove('show'); ctModal.addEventListener('transitionend', () => { ctModal.hidden = true; rqUnder.hidden = true; }, { once:true }); document.documentElement.classList.remove('rq-lock'); };
 
-    document.querySelectorAll('.js-pf-open').forEach(el => el.addEventListener('click', e => {
-      e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow();
-    }));
+      const rqShow = () => { rqUnder.hidden = false; rqModal.hidden = false; rqModal.getBoundingClientRect(); rqUnder.classList.add('show'); rqModal.classList.add('show'); document.documentElement.classList.add('rq-lock'); };
+      const rqHide = () => { rqModal.classList.remove('show'); rqUnder.classList.remove('show'); rqModal.addEventListener('transitionend', () => { rqModal.hidden = true; rqUnder.hidden = true; }, { once: true }); document.documentElement.classList.remove('rq-lock'); };
 
-    document.querySelectorAll('.js-rq-open').forEach(el => el.addEventListener('click', e => {
-      e.preventDefault(); rqShow();
-    }));
+      const ctShow = () => { rqUnder.hidden = false; ctModal.hidden = false; ctModal.getBoundingClientRect(); rqUnder.classList.add('show'); ctModal.classList.add('show'); document.documentElement.classList.add('rq-lock'); };
+      const ctHide = () => { ctModal.classList.remove('show'); rqUnder.classList.remove('show'); ctModal.addEventListener('transitionend', () => { ctModal.hidden = true; rqUnder.hidden = true; }, { once: true }); document.documentElement.classList.remove('rq-lock'); };
 
-    document.getElementById('rqClose')?.addEventListener('click', rqHide);
-    rqUnder?.addEventListener('click', () => {
-      if (ctModal.classList.contains('show')) ctHide();
-      if (rqModal.classList.contains('show')) rqHide();
-    });
+      document.querySelectorAll('.js-pf-open').forEach(el => el.addEventListener('click', e => {
+        e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow();
+      }));
 
-    document.querySelectorAll('.js-ct-open').forEach(el => el.addEventListener('click', e => {
-      e.preventDefault(); ctShow();
-    }));
-    document.getElementById('ctClose')?.addEventListener('click', ctHide);
+      document.querySelectorAll('.js-rq-open').forEach(el => el.addEventListener('click', e => {
+        e.preventDefault(); rqShow();
+      }));
 
-    // бургер/конверт в обоих хедерах
-    document.querySelectorAll('.js-burger').forEach(b => b.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); }));
-    document.querySelectorAll('.js-mail').forEach(b => b.addEventListener('click', e => { e.preventDefault(); ctShow(); }));
+      document.getElementById('rqClose')?.addEventListener('click', rqHide);
+      rqUnder?.addEventListener('click', () => {
+        if (ctModal.classList.contains('show')) ctHide();
+        if (rqModal.classList.contains('show')) rqHide();
+      });
 
-    // защита от клика внутри карточек модалок
-    document.querySelectorAll('.rq-modal .rq-card').forEach(card => {
-      card.addEventListener('click', e => e.stopPropagation());
-      card.parentElement?.parentElement?.addEventListener('click', e => {
-        const sec = e.currentTarget; 
-        if (sec.id === 'rqModal') rqHide();
-        if (sec.id === 'ctModal') ctHide();
+      document.querySelectorAll('.js-ct-open').forEach(el => el.addEventListener('click', e => {
+        e.preventDefault(); ctShow();
+      }));
+      document.getElementById('ctClose')?.addEventListener('click', ctHide);
+
+      // бургер/конверт в обоих хедерах
+      document.querySelectorAll('.js-burger').forEach(b => b.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); }));
+      document.querySelectorAll('.js-mail').forEach(b => b.addEventListener('click', e => { e.preventDefault(); ctShow(); }));
+
+      // защита от клика внутри карточек модалок
+      document.querySelectorAll('.rq-modal .rq-card').forEach(card => {
+        card.addEventListener('click', e => e.stopPropagation());
+        card.parentElement?.parentElement?.addEventListener('click', e => {
+          const sec = e.currentTarget;
+          if (sec.id === 'rqModal') rqHide();
+          if (sec.id === 'ctModal') ctHide();
+        });
       });
     });
-  });
-</script>
+  </script>
 
 
 
@@ -1029,7 +1044,7 @@
       const norm360 = v => ((v % 360) + 360) % 360;
       const angleTo = (el, x, y) => {
         const r = el.getBoundingClientRect();
-        const cx = r.left + r.width/2, cy = r.top + r.height/2;
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
         let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
         if (deg < 0) deg += 360;
         return (deg + 90) % 360;
@@ -1039,7 +1054,7 @@
         let raf = 0, last = 0, vis = 0, target = 0, frozen = false;
         const link = btn.closest('.btn-link');
 
-        function step(ts){
+        function step(ts) {
           const dt = (ts - (last || ts)) / 1000; last = ts;
           const d = ((target - vis + 540) % 360) - 180;
           vis = norm360(vis + d * Math.min(1, dt * 12));
@@ -1052,12 +1067,12 @@
         btn.addEventListener('mouseenter', () => {
           frozen = true;
           if (raf) { cancelAnimationFrame(raf); raf = 0; }
-        }, {passive:true});
+        }, { passive: true });
 
         btn.addEventListener('mouseleave', () => {
           frozen = false;
           if (!raf) raf = requestAnimationFrame(step);
-        }, {passive:true});
+        }, { passive: true });
 
         btn.addEventListener('mousemove', e => {
           if (frozen) return;
@@ -1066,7 +1081,7 @@
           btn.style.setProperty('--y', (e.clientY - r.top) + 'px');
           target = angleTo(btn, e.clientX, e.clientY);
           if (!raf) raf = requestAnimationFrame(step);
-        }, {passive:true});
+        }, { passive: true });
 
         raf = requestAnimationFrame(step);
       });
