@@ -36,19 +36,7 @@
     will-change: backdrop-filter;
 }
 
-.ls-header::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: linear-gradient(to right,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-}
+
 
 
 
@@ -109,6 +97,180 @@
     opacity: 1;
     transform: translateY(-1px);
 }
+
+
+
+
+
+
+.ls-header--static {
+    position: absolute;
+    /* или relative, если фон */
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.ls-header--static .ls-header__inner {
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-static {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0 !important;
+    /* чтобы ничто не сдвигало */
+    z-index: 2;
+}
+
+.header-static img {
+    height: 32px;
+}
+
+.ls-header--static .ls-header__inner::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(to right,
+            rgba(200, 5, 112, 0) 0%,
+            rgba(200, 5, 112, 1) 50%,
+            rgba(200, 5, 112, 0) 100%);
+    pointer-events: none;
+    animation: headerPulse 2.2s ease-in-out infinite;
+    will-change: opacity, transform;
+}
+
+/* Размытое свечение под линией — отдельный слой */
+.ls-header--static .ls-header__inner::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    /* чуть ниже, чтобы глоу не «толстил» линию */
+    height: 3px;
+    /* базовая ширина свечения */
+    background: linear-gradient(to right,
+            rgba(200, 5, 112, 0) 0%,
+            rgba(200, 5, 112, 1) 50%,
+            rgba(200, 5, 112, 0) 100%);
+    filter: blur(10px);
+    opacity: .35;
+    pointer-events: none;
+    animation: headerGlow 2.2s ease-in-out infinite;
+    will-change: opacity, transform, filter;
+}
+
+/* Пульс яркости у тонкой линии */
+@keyframes headerPulse {
+
+    0%,
+    100% {
+        opacity: .75;
+        transform: translateZ(0)
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateZ(0)
+    }
+}
+
+/* Пульс свечения: ярче + лёгкое «дыхание» по ширине */
+@keyframes headerGlow {
+
+    0%,
+    100% {
+        opacity: .30;
+        transform: scaleX(.98)
+    }
+
+    50% {
+        opacity: .75;
+        transform: scaleX(1.02)
+    }
+}
+
+.ls-header--static .ls-nav {
+    justify-content: center;
+    padding: 8px 0px;
+}
+
+/* базово — без анимации */
+.ls-header--fixed{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  transform: translateY(-100%);
+  z-index: 1100;
+}
+.ls-header--fixed.show{ transform: translateY(0); }
+
+/* анимация только на главной */
+.is-home .ls-header--fixed{
+  transition: transform .4s ease-in-out;
+}
+
+
+.ls-header--fixed::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.6) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+}
+
+.pdf-button-header {
+    display: inline-grid;
+    place-items: center;
+    border-radius: 10px;
+    color: var(--text);
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.pdf-button-header {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    text-decoration: none;
+    padding: 10px;
+    width: fit-content;
+}
+
+.logo-brand-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.logo-brand-container span {
+    text-align: left;
+}
+
+.logo-brand-container .ls-logo__ru {
+    font-size: var(--font-small);
+}
+
+
+.hidden {
+    display: none;
+}
+
+
+
 
 
 

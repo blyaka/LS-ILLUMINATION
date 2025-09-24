@@ -23,12 +23,50 @@
 
 </head>
 
-<body>
+<body class="{% if request.resolver_match.url_name == 'home' %}is-home{% endif %}">
 
 
   <!-- <canvas id="bgCanvasBase" class="bgCanvasBase" aria-hidden="true"></canvas> -->
 
-  <header class="ls-header">
+
+  {% if request.resolver_match.url_name == 'home' %}
+  <header class="ls-header ls-header--static">
+    <div class="ls-header__inner">
+
+      <a href="" class="pdf-button-header" id="pdfBtn">
+        <svg width="29" height="33">
+          <use xlink:href="{% static 'images/icons.svg' %}#icon-pdf"></use>
+        </svg>
+        Запросить каталог PDF
+      </a>
+
+      <a class="ls-logo header-static" href="{% url 'home' %}">
+        <img src="{% static 'images/logo.png' %}" alt="LS Illumination">
+        <div class="logo-brand-container">
+          <span class="ls-logo__brand">LS ILLUMINATION</span>
+          <span class="ls-logo__ru">СВЕТОВЫЕ РЕШЕНИЯ</span>
+        </div>
+      </a>
+
+      <a href="#!" class="btn-link js-rq-open">
+        <div class="btn-glow">
+          <div class="btn-border"></div>
+          <div class="btn-text"><p>Оставить заявку</p></div>
+        </div>
+      </a>
+    </div>
+
+    <nav class="ls-nav">
+      <a href="#!" class="ls-nav__btn js-pf-open">Портфолио</a>
+      <a href="#!" class="js-ct-open">Контакты</a>
+      <a href="{% url 'about' %}">О нас</a>
+    </nav>
+  </header>
+  {% endif %}
+
+
+
+  <header class="ls-header ls-header--fixed">
     <div class="ls-header__inner">
 
       <!-- ЛЕВО: бургер (мобилка) -->
@@ -46,8 +84,8 @@
       </a>
 
       <nav class="ls-nav">
-        <a href="#" class="ls-nav__btn" id="pfOpen" aria-controls="pfPanel" role="button">Портфолио</a>
-        <a href="#" id="ctOpen">Контакты</a>
+        <a href="#!" class="ls-nav__btn js-pf-open">Портфолио</a>
+        <a href="#!" class="js-ct-open">Контакты</a>
         <a href="{% url 'about' %}">О нас</a>
       </nav>
 
@@ -58,7 +96,7 @@
       </a> -->
 
 
-      <a href="#" id="rqOpen" class="btn-link">
+      <a href="#!" class="btn-link js-rq-open">
         <div class="btn-glow">
           <div class="btn-border"></div>
           <div class="btn-text"><p>Оставить заявку</p></div>
@@ -72,13 +110,34 @@
           <use xlink:href="{% static 'images/icons.svg' %}#icon-mail"></use>
         </svg>
       </button>
-
-
-
-
-
     </div>
   </header>
+
+
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const fixedHeader = document.querySelector('.ls-header--fixed');
+    const isHome = document.body.classList.contains('is-home');
+
+    if (isHome){
+      const reveal = () => {
+        if (window.scrollY > 1000) fixedHeader.classList.add('show');
+        else fixedHeader.classList.remove('show');
+      };
+      window.addEventListener('scroll', reveal, { passive:true });
+      reveal();
+    } else {
+      // не главная: сразу показываем, без transition
+      fixedHeader.classList.add('show');
+    }
+  });
+  </script>
+
+
+
+
+
       <script>
         document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('hdrMenu')?.addEventListener('click', e => {
@@ -127,7 +186,7 @@
     <a class="footer-comp-name" href="">© LS illumination, 2009-2025</a>
     <a class="by" href="">
       <p>by</p>
-      <span>
+      <span class="by-span">
         <svg width="21" height="18" viewBox="0 0 21 18">
           <use xlink:href="{% static 'images/icons.svg' %}#icon-diamond"></use>
         </svg>
@@ -648,107 +707,58 @@
 
 
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const rqOpen = document.getElementById('rqOpen');
-      const rqModal = document.getElementById('rqModal');
-      const rqUnder = document.getElementById('rqUnderlay');
-      const rqClose = document.getElementById('rqClose');
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pfPanel = document.getElementById('pfPanel');
+    const pfUnder = document.getElementById('pfUnderlay');
+    const rqModal = document.getElementById('rqModal');
+    const rqUnder  = document.getElementById('rqUnderlay');
+    const ctModal = document.getElementById('ctModal');
 
-      const rqShow = () => {
-        rqUnder.hidden = false; rqModal.hidden = false;
-        rqModal.getBoundingClientRect();
-        rqUnder.classList.add('show');
-        rqModal.classList.add('show');
-        document.documentElement.classList.add('rq-lock');
-      };
-      const rqHide = () => {
-        rqUnder.classList.remove('show');
-        rqModal.classList.remove('show');
-        const done = () => {
-          rqUnder.hidden = true;
-          rqModal.hidden = true;
-          rqModal.removeEventListener('transitionend', done);
-        };
-        rqModal.addEventListener('transitionend', done);
-        document.documentElement.classList.remove('rq-lock');
-      };
+    const pfShow = () => { pfUnder.classList.add('show'); pfPanel.getBoundingClientRect(); pfPanel.classList.add('show'); };
+    const pfHide = () => { pfPanel.classList.remove('show'); pfUnder.classList.remove('show'); };
 
-      rqOpen?.addEventListener('click', e => { e.preventDefault(); rqShow(); });
-      rqClose?.addEventListener('click', rqHide);
-      rqUnder?.addEventListener('click', rqHide);
+    const rqShow = () => { rqUnder.hidden = false; rqModal.hidden = false; rqModal.getBoundingClientRect(); rqUnder.classList.add('show'); rqModal.classList.add('show'); document.documentElement.classList.add('rq-lock'); };
+    const rqHide = () => { rqModal.classList.remove('show'); rqUnder.classList.remove('show'); rqModal.addEventListener('transitionend', () => { rqModal.hidden = true; rqUnder.hidden = true; }, { once:true }); document.documentElement.classList.remove('rq-lock'); };
 
-      // --- Заявка ---
-      const rqCard = rqModal?.querySelector('.rq-card');
-      rqCard?.addEventListener('click', e => e.stopPropagation());      // клики внутри карточки не всплывают
-      rqModal?.addEventListener('click', e => {                          // клик по фону секции = закрыть
-        if (rqCard && !rqCard.contains(e.target)) rqHide();
-      });
+    const ctShow = () => { rqUnder.hidden = false; ctModal.hidden = false; ctModal.getBoundingClientRect(); rqUnder.classList.add('show'); ctModal.classList.add('show'); document.documentElement.classList.add('rq-lock'); };
+    const ctHide = () => { ctModal.classList.remove('show'); rqUnder.classList.remove('show'); ctModal.addEventListener('transitionend', () => { ctModal.hidden = true; rqUnder.hidden = true; }, { once:true }); document.documentElement.classList.remove('rq-lock'); };
 
-      document.addEventListener('keydown', e => e.key === 'Escape' && rqModal.classList.contains('show') && rqHide());
+    document.querySelectorAll('.js-pf-open').forEach(el => el.addEventListener('click', e => {
+      e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow();
+    }));
 
-      const pfOpen = document.getElementById('pfOpen');
-      const pfPanel = document.getElementById('pfPanel');
-      const pfUnder = document.getElementById('pfUnderlay');
+    document.querySelectorAll('.js-rq-open').forEach(el => el.addEventListener('click', e => {
+      e.preventDefault(); rqShow();
+    }));
 
-      const pfShow = () => { pfUnder.classList.add('show'); pfPanel.getBoundingClientRect(); pfPanel.classList.add('show'); };
-      const pfHide = () => { pfPanel.classList.remove('show'); pfUnder.classList.remove('show'); };
-
-      pfOpen?.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); });
-      pfUnder?.addEventListener('click', pfHide);
-      pfPanel?.addEventListener('click', e => e.stopPropagation()); // ← тоже стопим внутри
-      document.addEventListener('keydown', e => e.key === 'Escape' && pfHide());
-
-      const ctOpen = document.getElementById('ctOpen');
-      const ctModal = document.getElementById('ctModal');
-      const ctClose = document.getElementById('ctClose');
-      const under = document.getElementById('rqUnderlay');
-
-      const openCt = () => {
-        under.hidden = false; ctModal.hidden = false;
-        ctModal.getBoundingClientRect();
-        under.classList.add('show');
-        ctModal.classList.add('show');
-        document.documentElement.classList.add('rq-lock');
-      };
-      const closeCt = () => {
-        ctModal.classList.remove('show');
-        under.classList.remove('show');
-        const done = () => {
-          ctModal.hidden = true;
-          under.hidden = true;
-          ctModal.removeEventListener('transitionend', done);
-        };
-        ctModal.addEventListener('transitionend', done);
-        document.documentElement.classList.remove('rq-lock');
-      };
-
-      ctOpen?.addEventListener('click', e => { e.preventDefault(); openCt(); });
-      ctClose?.addEventListener('click', closeCt);
-      under?.addEventListener('click', () => {
-        if (ctModal.classList.contains('show')) closeCt();
-        if (rqModal.classList.contains('show')) rqHide();
-      });
-
-      // --- Контакты ---
-      const ctCard = ctModal?.querySelector('.rq-card');
-      ctCard?.addEventListener('click', e => e.stopPropagation());
-      ctModal?.addEventListener('click', e => {
-        if (ctCard && !ctCard.contains(e.target)) closeCt();
-      });
-
-      document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && ctModal.classList.contains('show')) closeCt();
-      });
-
-      const pdfBtn = document.getElementById('pdfBtn');
-      pdfBtn?.addEventListener('click', e => {
-        e.preventDefault();
-        rqShow();
-      });
-
+    document.getElementById('rqClose')?.addEventListener('click', rqHide);
+    rqUnder?.addEventListener('click', () => {
+      if (ctModal.classList.contains('show')) ctHide();
+      if (rqModal.classList.contains('show')) rqHide();
     });
-  </script>
+
+    document.querySelectorAll('.js-ct-open').forEach(el => el.addEventListener('click', e => {
+      e.preventDefault(); ctShow();
+    }));
+    document.getElementById('ctClose')?.addEventListener('click', ctHide);
+
+    // бургер/конверт в обоих хедерах
+    document.querySelectorAll('.js-burger').forEach(b => b.addEventListener('click', e => { e.preventDefault(); pfPanel.classList.contains('show') ? pfHide() : pfShow(); }));
+    document.querySelectorAll('.js-mail').forEach(b => b.addEventListener('click', e => { e.preventDefault(); ctShow(); }));
+
+    // защита от клика внутри карточек модалок
+    document.querySelectorAll('.rq-modal .rq-card').forEach(card => {
+      card.addEventListener('click', e => e.stopPropagation());
+      card.parentElement?.parentElement?.addEventListener('click', e => {
+        const sec = e.currentTarget; 
+        if (sec.id === 'rqModal') rqHide();
+        if (sec.id === 'ctModal') ctHide();
+      });
+    });
+  });
+</script>
+
 
 
 
@@ -1014,54 +1024,54 @@
 
 
   <!-- Новый скрипт кнопок -->
-<script>
-(() => {
-  const norm360 = v => ((v % 360) + 360) % 360;
-  const angleTo = (el, x, y) => {
-    const r = el.getBoundingClientRect();
-    const cx = r.left + r.width/2, cy = r.top + r.height/2;
-    let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
-    if (deg < 0) deg += 360;
-    return (deg + 90) % 360;
-  };
+  <script>
+    (() => {
+      const norm360 = v => ((v % 360) + 360) % 360;
+      const angleTo = (el, x, y) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width/2, cy = r.top + r.height/2;
+        let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+        if (deg < 0) deg += 360;
+        return (deg + 90) % 360;
+      };
 
-  document.querySelectorAll('.btn-glow').forEach(btn => {
-    let raf = 0, last = 0, vis = 0, target = 0, frozen = false;
-    const link = btn.closest('.btn-link');
+      document.querySelectorAll('.btn-glow').forEach(btn => {
+        let raf = 0, last = 0, vis = 0, target = 0, frozen = false;
+        const link = btn.closest('.btn-link');
 
-    function step(ts){
-      const dt = (ts - (last || ts)) / 1000; last = ts;
-      const d = ((target - vis + 540) % 360) - 180;
-      vis = norm360(vis + d * Math.min(1, dt * 12));
-      const v = vis + 'deg';
-      btn.style.setProperty('--base-angle', v);
-      if (link) link.style.setProperty('--base-angle', v);
-      if (!frozen) raf = requestAnimationFrame(step); else raf = 0;
-    }
+        function step(ts){
+          const dt = (ts - (last || ts)) / 1000; last = ts;
+          const d = ((target - vis + 540) % 360) - 180;
+          vis = norm360(vis + d * Math.min(1, dt * 12));
+          const v = vis + 'deg';
+          btn.style.setProperty('--base-angle', v);
+          if (link) link.style.setProperty('--base-angle', v);
+          if (!frozen) raf = requestAnimationFrame(step); else raf = 0;
+        }
 
-    btn.addEventListener('mouseenter', () => {
-      frozen = true;
-      if (raf) { cancelAnimationFrame(raf); raf = 0; }
-    }, {passive:true});
+        btn.addEventListener('mouseenter', () => {
+          frozen = true;
+          if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        }, {passive:true});
 
-    btn.addEventListener('mouseleave', () => {
-      frozen = false;
-      if (!raf) raf = requestAnimationFrame(step);
-    }, {passive:true});
+        btn.addEventListener('mouseleave', () => {
+          frozen = false;
+          if (!raf) raf = requestAnimationFrame(step);
+        }, {passive:true});
 
-    btn.addEventListener('mousemove', e => {
-      if (frozen) return;
-      const r = btn.getBoundingClientRect();
-      btn.style.setProperty('--x', (e.clientX - r.left) + 'px');
-      btn.style.setProperty('--y', (e.clientY - r.top) + 'px');
-      target = angleTo(btn, e.clientX, e.clientY);
-      if (!raf) raf = requestAnimationFrame(step);
-    }, {passive:true});
+        btn.addEventListener('mousemove', e => {
+          if (frozen) return;
+          const r = btn.getBoundingClientRect();
+          btn.style.setProperty('--x', (e.clientX - r.left) + 'px');
+          btn.style.setProperty('--y', (e.clientY - r.top) + 'px');
+          target = angleTo(btn, e.clientX, e.clientY);
+          if (!raf) raf = requestAnimationFrame(step);
+        }, {passive:true});
 
-    raf = requestAnimationFrame(step);
-  });
-})();
-</script>
+        raf = requestAnimationFrame(step);
+      });
+    })();
+  </script>
 
 
 

@@ -23,7 +23,7 @@
     align-items: center;
 }
 
-span {
+.by-span {
     display: grid;
     place-items: center;
 }
