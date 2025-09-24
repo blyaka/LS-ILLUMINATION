@@ -202,17 +202,22 @@
 }
 
 /* базово — без анимации */
-.ls-header--fixed{
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  transform: translateY(-100%);
-  z-index: 1100;
+.ls-header--fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    transform: translateY(-100%);
+    z-index: 1000;
 }
-.ls-header--fixed.show{ transform: translateY(0); }
+
+.ls-header--fixed.show {
+    transform: translateY(0);
+}
 
 /* анимация только на главной */
-.is-home .ls-header--fixed{
-  transition: transform .4s ease-in-out;
+.is-home .ls-header--fixed {
+    transition: transform .4s ease-in-out;
 }
 
 
