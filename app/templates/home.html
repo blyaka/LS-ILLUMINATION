@@ -877,7 +877,17 @@
 
     <div class="news-modal__body" id="nmBody"></div>
 
-    <button class="news-modal__btn" type="button" data-close>Закрыть</button>
+    <!-- <button class="news-modal__btn" type="button" data-close>
+      Закрыть
+    </button> -->
+
+    <a class="btn-link" href="#" data-close>
+      <div class="btn-glow">
+        <div class="btn-border"></div>
+        <div class="btn-text"><p>Закрыть</p></div>
+      </div>
+    </a>
+
   </div>
 </div>
 
@@ -1166,9 +1176,16 @@
     document.querySelector('.news-arrow--next')?.addEventListener('click', () => { i = (i + 1) % data.length; render(); });
 
     document.addEventListener('click', (e) => {
-      const a = e.target.closest('.news-btn');
-      if (a) { e.preventDefault(); openModal(i); }
-      if (e.target.hasAttribute('data-close')) closeModal();
+      const openBtn = e.target.closest('.news-btn');
+      if (openBtn && !openBtn.hasAttribute('data-close')) {
+        e.preventDefault();
+        openModal(i);
+      }
+
+      if (e.target.closest('[data-close]')) {
+        e.preventDefault();
+        closeModal();
+      }
     });
 
     document.addEventListener('keydown', (e) => {

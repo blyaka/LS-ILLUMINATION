@@ -237,6 +237,10 @@ button.btn-link:focus-visible{ outline:2px solid rgba(255,43,214,.6); outline-of
     width: 170px;
 }
 
+.news-modal__dialog .btn-glow {
+    width: fit-content;
+}
+
 
 
 /* @property --base-angle {
