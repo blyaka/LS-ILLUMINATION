@@ -9,7 +9,7 @@
 
 <script src="{% static 'vendor/hls/hls.min.js' %}"></script>
 
-<section class="ls-hero">
+<section class="ls-hero" data-nofly>
   {% if hero_video %}
   <div class="ls-hero__media-wrap">
     <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {%endif%} autoplay muted loop playsinline></video>
@@ -125,7 +125,7 @@
 
 
 <!-- РАЗДЕЛ ПОРТФОЛИО -->
-<section class="main">
+<section class="main" data-spawn="5">
     <h1> Портфолио </h1>
 
     <div class="grid">
@@ -202,7 +202,7 @@
 
 
 
-<section class="cw-videos" id="videos">
+<section class="cw-videos" id="videos" data-spawn="3">
   <h2 class="cw-videos__title">Видеогалерея</h2>
 
   <div class="cw-videos__marquee" id="videosMarquee" aria-label="Лента видео, автопрокрутка">
@@ -387,7 +387,7 @@
 
 
 
-<section class="cw-seq" id="seq">
+<section class="cw-seq" id="seq" data-nofly>
   <div class="cw-seq__sticky">
     <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
 
@@ -593,7 +593,7 @@
 
 {% for v in block_videos %}
 {% if forloop.counter|divisibleby:2 %}
-<section class="cw-split right">
+<section class="cw-split right" data-spawn="2">
   <aside class="cw-split__aside">
     <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
     <p class="cw-split__desc">{{ v.description|default:"" }}</p>
@@ -633,7 +633,7 @@
 
 
 {% else %}
-<section class="cw-split">
+<section class="cw-split" data-spawn="2">
   <div class="cw-split__media">
     <video class="cw-split__video" preload="none" muted loop playsinline
       poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
@@ -802,7 +802,7 @@
 
 
 
-<section class="cw-news" id="news">
+<section class="cw-news" id="news" data-spawn="2">
   <h2 class="cw-news__title">Новости</h2>
 
   <div class="news-wrap">
@@ -894,7 +894,7 @@
 
 
 
-<section class="cw-trust" id="trust">
+<section class="cw-trust" id="trust" data-spawn="2">
   <h2 class="cw-trust__title">Нам доверяют</h2>
 
   <div class="trust-view" id="trustView">
@@ -960,7 +960,7 @@
 
 
 
-<section class="cw-contacts" id="contacts" aria-label="Контакты">
+<section class="cw-contacts" id="contacts" aria-label="Контакты" data-nofly>
 
   <div class="cw-contacts__wrap">
     <!-- Левая колонка: форма -->

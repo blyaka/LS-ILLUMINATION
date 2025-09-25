@@ -25,8 +25,333 @@
 
 <body class="{% if request.resolver_match.url_name == 'home' %}is-home{% endif %}">
 
+  <canvas id="balls-bg" class="balls-bg" aria-hidden="true"></canvas>
 
-  <!-- <canvas id="bgCanvasBase" class="bgCanvasBase" aria-hidden="true"></canvas> -->
+
+  <!-- Скрипт. Вставь перед </body> в _base.html (после твоих модалок) -->
+  <script>
+  (() => {
+    const cv = document.getElementById('balls-bg');
+    if (!cv) return;
+    const ctx = cv.getContext('2d', { alpha: true });
+    let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+    const CFG = {
+      count: 5,
+      speedMin: 22,
+      speedMax: 48,
+      margin: 120,
+      avoidPad: 32,
+      colors: ['#5ecbff', '#fa2af6', '#8b5cf6'],
+      radii: [180, 220, 260, 160, 200],
+      jitter: 0.08,
+      defaultSpawn: 5,
+
+      plateauAlpha: 0.32,
+      innerStop: 0.14,
+      edgeStop: 0.14,
+      blurPx: 1.4,
+      blend: 'screen'
+    };
+
+    const state = {
+      worldW: 0, worldH: 0,
+      viewW: 0, viewH: 0,
+      scrollY: 0,
+      rects: [],       // no-fly
+      spawns: [],      // { id, rect:{x,y,w,h}, count }
+      blobs: [],
+    };
+
+    // --- utils ---
+    const rand=(a,b)=>a+Math.random()*(b-a);
+    const pick=a=>a[Math.floor(Math.random()*a.length)];
+    const clamp=(v,min,max)=>Math.max(min, Math.min(max, v));
+    const getSX=()=>window.pageXOffset || document.documentElement.scrollLeft || 0;
+    const getSY=()=>window.pageYOffset || document.documentElement.scrollTop  || 0;
+    const uid=(()=>{let i=0;return()=>`sp${++i}`;})();
+
+    // --- sizing ---
+    function resize() {
+      const de = document.documentElement, db = document.body;
+      state.viewW = window.innerWidth;
+      state.viewH = window.innerHeight;
+      state.worldW = de.clientWidth;
+      // базовый мир = текущий scrollHeight
+      state.worldH = Math.max(de.scrollHeight, db?.scrollHeight || 0, de.clientHeight);
+
+      const w = Math.round(state.viewW * DPR);
+      const h = Math.round(state.viewH * DPR);
+      if (cv.width !== w || cv.height !== h) {
+        cv.width = w; cv.height = h;
+        cv.style.width = state.viewW + 'px';
+        cv.style.height = state.viewH + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      }
+    }
+
+    function rectOfEl(el, pad=0){
+      const r = el.getBoundingClientRect();
+      const sx = getSX(), sy = getSY();
+      return { x: Math.max(0, r.left + sx) - pad,
+              y: Math.max(0, r.top  + sy) - pad,
+              w: r.width + pad*2,
+              h: r.height + pad*2 };
+    }
+
+    function collect(){
+      // no-fly: поддерживаем и data-no-fly на всякий
+      const nf = new Set([
+        ...document.querySelectorAll('[data-nofly],[data-no-fly]'),
+        ...API.extraNoFly.flatMap(s => Array.from(document.querySelectorAll(s)))
+      ]);
+      state.rects = Array.from(nf).map(el => rectOfEl(el, CFG.avoidPad));
+
+      // spawn: поддерживаем и data-spwn
+      const spNodes = Array.from(document.querySelectorAll('[data-spawn],[data-spwn]'));
+      state.spawns = spNodes.map(el => {
+        if (!el.__spawnId) el.__spawnId = uid();
+        const raw = el.getAttribute('data-spawn') ?? el.getAttribute('data-spwn');
+        const count = parseInt(raw ?? CFG.defaultSpawn, 10) || CFG.defaultSpawn;
+        return { id: el.__spawnId, rect: rectOfEl(el, 0), count };
+      });
+
+      // расширяем мир до низа всех спавн-зон, чтобы апдейт не «упирал» их в границу
+      if (state.spawns.length){
+        const maxR = Math.max(...CFG.radii);
+        const bottom = Math.max(...state.spawns.map(s => s.rect.y + s.rect.h));
+        state.worldH = Math.max(state.worldH, bottom + CFG.margin + maxR + 1);
+      }
+    }
+
+    // --- collision ---
+    function circleRectOverlap(b, R, rc){
+      const cx = clamp(b.x, rc.x, rc.x + rc.w);
+      const cy = clamp(b.y, rc.y, rc.y + rc.h);
+      const dx = b.x - cx, dy = b.y - cy;
+      const dist2 = dx*dx + dy*dy;
+      return dist2 < R*R ? { hit:true, dx, dy, dist: Math.sqrt(dist2) } : { hit:false };
+    }
+    function overlapsNoFly(x,y,rad){
+      for (const rc of state.rects){
+        if (y + rad < rc.y || y - rad > rc.y + rc.h) continue;
+        if (circleRectOverlap({x,y}, rad, rc).hit) return true;
+      }
+      return false;
+    }
+    function steerAway(b, info){
+      const nx = info.dist>0 ? info.dx/info.dist : (Math.random()*2-1);
+      const ny = info.dist>0 ? info.dy/info.dist : (Math.random()*2-1);
+      const push = (b.r - info.dist) + 1;
+      b.x += nx * push; b.y += ny * push;
+      const vDotN = b.vx*nx + b.vy*ny;
+      b.vx -= 2*vDotN*nx; b.vy -= 2*vDotN*ny;
+      b.vx *= 0.96; b.vy *= 0.96;
+    }
+
+    // --- spawn ---
+    function placeInsideRect(r, rad){
+      // x: внутри секции с учётом margin, y: строго внутри секции БЕЗ клампа к worldH
+      const M = CFG.margin;
+      const x = rand(Math.max(M+rad, r.x+rad), Math.min(state.worldW-M-rad, r.x + r.w - rad));
+      const y = rand(r.y+rad, r.y + r.h - rad);
+      return {x,y};
+    }
+    function makeBlobAt(x,y,rad,spawnId=null){
+      const s = rand(CFG.speedMin, CFG.speedMax);
+      const a = rand(0, Math.PI*2);
+      return { r:rad, x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, c: pick(CFG.colors), spawnId };
+    }
+    function ensureBlobs(){
+      if (state.spawns.length){
+        // доселяем недостающее по каждой секции
+        const have = new Map();
+        for (const b of state.blobs) if (b.spawnId) have.set(b.spawnId, (have.get(b.spawnId)||0)+1);
+        for (const sp of state.spawns){
+          const need = Math.max(0, sp.count - (have.get(sp.id)||0));
+          for (let i=0;i<need;i++){
+            const r = CFG.radii[(state.blobs.length + i) % CFG.radii.length];
+            let placed = false, tries=50;
+            while (tries-- > 0 && !placed){
+              const p = placeInsideRect(sp.rect, r);
+              if (!overlapsNoFly(p.x,p.y,r)){
+                state.blobs.push(makeBlobAt(p.x,p.y,r, sp.id));
+                placed = true;
+              }
+            }
+            if (!placed){
+              // крайний случай: глобально, но вне no-fly
+              let x = rand(CFG.margin + r, state.worldW - CFG.margin - r);
+              let y = rand(CFG.margin + r, state.worldH - CFG.margin - r);
+              let t=50; while (overlapsNoFly(x,y,r) && --t>0){
+                x = rand(CFG.margin + r, state.worldW - CFG.margin - r);
+                y = rand(CFG.margin + r, state.worldH - CFG.margin - r);
+              }
+              state.blobs.push(makeBlobAt(x,y,r, sp.id));
+            }
+          }
+        }
+        return;
+      }
+      // фолбэк без spawn-зон
+      while (state.blobs.length < CFG.count){
+        const r = CFG.radii[state.blobs.length % CFG.radii.length];
+        let x = rand(CFG.margin + r, state.worldW - CFG.margin - r);
+        let y = rand(CFG.margin + r, state.worldH - CFG.margin - r);
+        let t=40; while (overlapsNoFly(x,y,r) && --t>0){
+          x = rand(CFG.margin + r, state.worldW - CFG.margin - r);
+          y = rand(CFG.margin + r, state.worldH - CFG.margin - r);
+        }
+        state.blobs.push(makeBlobAt(x,y,r));
+      }
+      while (state.blobs.length > CFG.count) state.blobs.pop();
+    }
+
+    // --- update/paint ---
+    function update(dt){
+      const M = CFG.margin;
+      for (const b of state.blobs){
+        const ang = Math.atan2(b.vy, b.vx) + (Math.random()*2-1)*CFG.jitter*dt;
+        const spd = Math.hypot(b.vx, b.vy);
+        const tgt = clamp(spd, CFG.speedMin, CFG.speedMax);
+        b.vx = Math.cos(ang)*tgt;
+        b.vy = Math.sin(ang)*tgt;
+
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+
+        if (b.x < M + b.r){ b.x = M + b.r; b.vx = Math.abs(b.vx); }
+        if (b.x > state.worldW - M - b.r){ b.x = state.worldW - M - b.r; b.vx = -Math.abs(b.vx); }
+        if (b.y < M + b.r){ b.y = M + b.r; b.vy = Math.abs(b.vy); }
+        if (b.y > state.worldH - M - b.r){ b.y = state.worldH - M - b.r; b.vy = -Math.abs(b.vy); }
+
+        for (const rc of state.rects){
+          if (b.y + b.r < rc.y - 1) continue;
+          if (b.y - b.r > rc.y + rc.h + 1) continue;
+          const hit = circleRectOverlap(b, b.r, rc);
+          if (hit.hit) steerAway(b, hit);
+          else {
+            const ex = { x: rc.x - b.r, y: rc.y - b.r, w: rc.w + 2*b.r, h: rc.h + 2*b.r };
+            if (b.x > ex.x && b.x < ex.x + ex.w && b.y > ex.y && b.y < ex.y + ex.h){
+              const cx = clamp(b.x, rc.x, rc.x + rc.w);
+              const cy = clamp(b.y, rc.y, rc.y + rc.h);
+              const dx = b.x - cx, dy = b.y - cy;
+              const d = Math.hypot(dx, dy) + 0.0001;
+              b.vx += (dx/d) * 20 * dt;
+              b.vy += (dy/d) * 20 * dt;
+            }
+          }
+        }
+      }
+    }
+
+    function hexA(hex, a){
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      const r = parseInt(m[1],16), g = parseInt(m[2],16), b = parseInt(m[3],16);
+      return `rgba(${r},${g},${b},${a})`;
+    }
+
+function paint(){
+  ctx.clearRect(0, 0, state.viewW, state.viewH);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  const want = CFG.blend || 'screen';
+  ctx.globalCompositeOperation = want;
+  if (ctx.globalCompositeOperation !== want) ctx.globalCompositeOperation = 'lighter';
+
+  const top = state.scrollY = (window.scrollY || document.documentElement.scrollTop || 0);
+  const bottom = top + state.viewH;
+
+  const a = CFG.plateauAlpha ?? 0.32;
+  const innerK = Math.max(0.06, Math.min(0.4, CFG.innerStop ?? 0.14));
+  const edge = Math.max(0.8, Math.min(0.98, CFG.edgeStop ?? 0.94));
+
+  for (const b of state.blobs){
+    if (b.y + b.r < top || b.y - b.r > bottom) continue;
+
+    const sy = b.y - top;
+
+    // чуть “перо” за границу, чтобы не было видимого края
+    const rOut = b.r * 1.06;
+    const rIn  = rOut * innerK;
+
+    if (CFG.blurPx > 0) ctx.filter = `blur(${CFG.blurPx}px)`;
+
+    const g = ctx.createRadialGradient(b.x, sy, rIn, b.x, sy, rOut);
+    g.addColorStop(0.00, hexA(b.c, a));         // ровная заливка
+    g.addColorStop(0.55, hexA(b.c, a));         // держим плотность
+    g.addColorStop(edge, hexA(b.c, a * 0.35));  // мягкий спад к краю
+    g.addColorStop(1.00, hexA(b.c, 0.00));      // полное растворение
+
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(b.x, sy, rOut, 0, Math.PI*2);       // рисуем по rOut → перышко выходит за круг
+    ctx.fill();
+
+    if (CFG.blurPx > 0) ctx.filter = 'none';
+  }
+
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+
+
+    let last=0;
+    function loop(ts){
+      requestAnimationFrame(loop);
+      const dt = last ? Math.min(0.05, (ts-last)/1000) : 0; last = ts;
+      update(dt); paint();
+    }
+
+    // --- API + observers ---
+    const API = {
+      extraNoFly: [],
+      setNoFly(arr){ API.extraNoFly = Array.isArray(arr) ? arr : []; collect(); ensureBlobs(); },
+      refresh(){ resize(); collect(); ensureBlobs(); }
+    };
+    window.BallsBG = API;
+
+    const deb=(fn,ms)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+
+    const ro = new ResizeObserver(deb(() => { resize(); collect(); ensureBlobs(); }, 60));
+    ro.observe(document.documentElement);
+    window.addEventListener('resize', deb(()=>{ resize(); collect(); ensureBlobs(); }, 80), { passive:true });
+
+    const mo = new MutationObserver(deb((muts)=>{
+      let need=false, needTopUp=false;
+      for (const m of muts){
+        if (m.type==='attributes'){
+          if (['data-spawn','data-spwn','data-nofly','data-no-fly','class','style','hidden'].includes(m.attributeName)){
+            need = true; needTopUp = needTopUp || m.attributeName.startsWith('data-sp');
+          }
+        } else if (m.type==='childList'){
+          if ([...m.addedNodes].some(n=>n.nodeType===1 && (n.hasAttribute?.('data-spawn') || n.hasAttribute?.('data-spwn') || n.querySelector?.('[data-spawn],[data-spwn]')))) {
+            need = true; needTopUp = true;
+          }
+          if ([...m.addedNodes, ...m.removedNodes].some(n=>n.nodeType===1 && (n.hasAttribute?.('data-nofly') || n.hasAttribute?.('data-no-fly') || n.querySelector?.('[data-nofly],[data-no-fly]')))) {
+            need = true;
+          }
+        }
+      }
+      if (need){ collect(); if (needTopUp) ensureBlobs(); }
+    }, 80));
+    mo.observe(document.body, { attributes:true, subtree:true, childList:true, attributeFilter:['class','style','hidden','data-spawn','data-spwn','data-nofly','data-no-fly'] });
+
+    // --- warm start: три прохода, чтобы дождаться лэйзи-ресурсов и корректно расширить мир ---
+    function warm(){
+      resize(); collect(); ensureBlobs();
+      requestAnimationFrame(()=>{ resize(); collect(); ensureBlobs(); });
+      setTimeout(()=>{ resize(); collect(); ensureBlobs(); }, 220);
+    }
+    if (document.readyState === 'complete') warm();
+    else window.addEventListener('load', warm, { once:true });
+
+    paint();
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(loop);
+  })();
+  </script>
+
 
 
   {% if request.resolver_match.url_name == 'home' %}
@@ -132,7 +457,6 @@
         window.addEventListener('scroll', reveal, { passive: true });
         reveal();
       } else {
-        // не главная: сразу показываем, без transition
         fixedHeader.classList.add('show');
       }
     });
@@ -525,7 +849,6 @@
     </div>
   </div>
 
-
   <script>
     (() => {
       const banner = document.getElementById('cookieBanner');
@@ -777,120 +1100,8 @@
 
 
 
-  <!-- <script>
-(() => {
-  const root = document.getElementById('bg-bubbles');
-  if (!root) return;
-
-  const DESIRED = 5;                 // всегда 5
-  const MIN_D = 140, MAX_D = 240;    // диаметр
-  const SEP_PAD = 32;                // зазор между шарами
-  const MIN_V = 18,  MAX_V = 28;      // скорость (px/c)
-  const SEP_K = 0.015;               // мягкое «разъезжание»
-  const WANDER = 0.15;               // блуждание
-  const OFF_SPAWN = 120;             // насколько за краём спавним
-  const OFF_KILL  = 160;             // насколько далеко можно улететь до удаления
-
-  let W = innerWidth, H = innerHeight;
-  const rnd = (a,b)=>a+Math.random()*(b-a);
-  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const balls = [];
-
-  function makeEl(d){
-    const el = document.createElement('div');
-    el.className = 'bg-bubble is-born';
-    el.style.setProperty('--d', d+'px');
-    root.appendChild(el);
-    requestAnimationFrame(()=> el.classList.remove('is-born'));
-    return el;
-  }
-
-  function spawnOutside(){
-    const d = rnd(MIN_D, MAX_D), r = d/2;
-    const side = Math.floor(rnd(0,4)); 
-    let x,y;
-    if (side===0){ x = -OFF_SPAWN - r; y = rnd(-OFF_SPAWN, H+OFF_SPAWN); }
-    if (side===1){ x = W + OFF_SPAWN + r; y = rnd(-OFF_SPAWN, H+OFF_SPAWN); }
-    if (side===2){ x = rnd(-OFF_SPAWN, W+OFF_SPAWN); y = -OFF_SPAWN - r; }
-    if (side===3){ x = rnd(-OFF_SPAWN, W+OFF_SPAWN); y = H + OFF_SPAWN + r; }
-
-    const tx = rnd(r+SEP_PAD, W - r - SEP_PAD);
-    const ty = rnd(r+SEP_PAD, H - r - SEP_PAD);
-    let vx = tx - x, vy = ty - y;
-    const len = Math.hypot(vx,vy) || 1;
-    const spd = rnd(MIN_V, MAX_V);
-    vx = vx/len * spd; vy = vy/len * spd;
-
-    const el = makeEl(d);
-    const b = { el, r, x, y, vx, vy };
-    balls.push(b);
-  }
-
-  function ensureCount(){
-    while (balls.length < DESIRED) spawnOutside();
-  }
-
-  ensureCount();
-
-  let t0 = performance.now();
-  function tick(t1){
-    ensureCount();
-
-    const dt = (t1 - t0)/1000; t0 = t1;
-
-    for (let i=0;i<balls.length;i++){
-      const b = balls[i];
-
-      let ax=(Math.random()-0.5)*WANDER, ay=(Math.random()-0.5)*WANDER;
-
-      for (let j=i+1;j<balls.length;j++){
-        const c = balls[j];
-        const dx=b.x-c.x, dy=b.y-c.y;
-        const dist = Math.hypot(dx,dy) || 0.001;
-        const need = b.r + c.r + SEP_PAD;
-        if (dist < need){
-          const push = (need - dist) * SEP_K;
-          const nx = dx/dist, ny = dy/dist;
-          ax += nx*push; ay += ny*push;
-          c.vx -= nx*push; c.vy -= ny*push;
-        }
-      }
-
-      b.vx += ax; b.vy += ay;
-
-      const sp = Math.hypot(b.vx,b.vy);
-      const tgt = clamp(sp, MIN_V, MAX_V);
-      if (sp>0.001){ b.vx = b.vx/sp*tgt; b.vy = b.vy/sp*tgt; }
-
-      b.x += b.vx*dt; b.y += b.vy*dt;
-      b.el.style.transform = `translate3d(${b.x - b.r}px, ${b.y - b.r}px, 0)`;
-    }
-
-    for (let i=balls.length-1;i>=0;i--){
-      const b = balls[i];
-      if (
-        b.x + b.r < -OFF_KILL ||
-        b.x - b.r > W + OFF_KILL ||
-        b.y + b.r < -OFF_KILL ||
-        b.y - b.r > H + OFF_KILL
-      ){
-        b.el.remove();
-        balls.splice(i,1);
-      }
-    }
-
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-
-  addEventListener('resize', () => { W = innerWidth; H = innerHeight; });
-})();
-</script> -->
-
-
-
   <!-- Скрипт шариков -->
-  <script>
+  <!-- <script>
     (() => {
       const cv = document.getElementById('bgCanvasBase');
       if (!cv) return;
@@ -991,7 +1202,7 @@
 
       start();
     })();
-  </script>
+  </script> -->
 
 
 

@@ -167,7 +167,12 @@ body {
     }
 } */
 
-
+.balls-bg{
+  position: fixed; /* рендерим во вьюпорт, но считаем мир = height страницы */
+  inset: 0;
+  z-index: 0;         /* под контентом */
+  pointer-events: none;
+}
 
 
 
