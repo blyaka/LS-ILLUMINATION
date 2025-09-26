@@ -32,7 +32,7 @@
     z-index: -1;
 }
 
-.ls-hero__content {
+/* .ls-hero__content {
     position: absolute;
     inset: 0;
     place-items: center;
@@ -54,7 +54,89 @@
     font-size: clamp(1rem, 1.2vw + .8rem, 1.5rem);
     opacity: .9;
     text-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+} */
+
+
+
+
+.ls-hero__content2 {
+    position: absolute;
+    inset: 0;
+    left: 232px;
+    top: 430px;
 }
+
+.txt {
+    position: absolute;
+    display: inline-block;
+    font: 600 96px/1 Montserrat, system-ui, sans-serif;
+    letter-spacing: 0
+}
+
+.txt2 {
+    position: absolute;
+    top: 80px;
+    display: inline-block;
+    font: 600 96px/1 Montserrat, system-ui, sans-serif;
+    letter-spacing: 0
+}
+
+.txt3 {
+    position: absolute;
+    top: 210px;
+    display: inline-block;
+    font: 500 36px/1 Montserrat, system-ui, sans-serif;
+    letter-spacing: 0;
+    right: 232px;
+}
+
+.txt--fill {
+    background: radial-gradient(45% 65% at 50% 50%, #fff 0%, #FFDEA8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.txt--fill2 {
+    background: linear-gradient(180deg, #FFFFFF 40.87%, rgba(255, 255, 255, 0.7) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.txt--fill3 {
+    background: linear-gradient(180deg, #FFFFFF 51.85%, rgba(255, 255, 255, 0.7) 73.28%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+
+}
+
+.txt--glow {
+    color: transparent;
+    text-shadow:
+        0 0 8px rgba(255, 136, 0, .8),
+        0 0 16px rgba(255, 136, 0, .7),
+        0 0 28px rgba(255, 170, 60, .55),
+        0 0 44px rgba(255, 210, 140, .35);
+    filter: blur(.2px);
+    transform: translateZ(0);
+}
+
+.txt--glow2 {
+    color: transparent;
+    text-shadow: 0px 0px 0px 0px rgba(255, 28, 232, 1);
+    filter: blur(.2px);
+    transform: translateZ(0);
+}
+
+
+
+
+
 
 .ls-hero__stats {
     position: absolute;

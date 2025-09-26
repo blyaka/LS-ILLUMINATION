@@ -12,7 +12,8 @@
 <section class="ls-hero" data-nofly>
   {% if hero_video %}
   <div class="ls-hero__media-wrap">
-    <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}" {%endif%} autoplay muted loop playsinline></video>
+    <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}"
+      {%endif%} autoplay muted loop playsinline></video>
   </div>
 
   <script>
@@ -40,9 +41,18 @@
   <div class="ls-hero__overlay-top"></div>
   <div class="ls-hero__overlay-bottom"></div>
 
-  <div class="ls-hero__content">
+  <!-- <div class="ls-hero__content">
     <h1 class="ls-hero__title">Москва</h1>
     <p class="ls-hero__subtitle">Новогоднее оформление всей России</p>
+  </div> -->
+
+  <div class="ls-hero__content2">
+    <span class="txt txt--glow">Москва</span>
+    <span class="txt txt--fill">Москва</span>
+    <span class="txt2 txt--glow2">и все города России</span>
+    <span class="txt2 txt--fill2">и все города России</span>
+
+    <span class="txt3 txt--fill3">Засияют вместе с нами</span>
   </div>
 
   <div class="ls-hero__stats">
@@ -66,22 +76,22 @@
     </svg>
   </button>
 
-  <a href="" class="pdf-button" id="pdfBtn">
+  <!-- <a href="" class="pdf-button" id="pdfBtn">
       <svg width="29" height="33">
         <use xlink:href="{% static 'images/icons.svg' %}#icon-pdf"></use>
       </svg>
     Запросить каталог PDF
-  </a>
+  </a> -->
 </section>
 
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const el = document.querySelector('.ls-hero__stats');
-    if(!el) return;
+    if (!el) return;
 
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting){
+      if (e.isIntersecting) {
         el.classList.add('is-inview');
         io.disconnect();
       }
@@ -126,26 +136,26 @@
 
 <!-- РАЗДЕЛ ПОРТФОЛИО -->
 <section class="main" data-spawn="5">
-    <h1> Портфолио </h1>
+  <h1> Портфолио </h1>
 
-    <div class="grid">
-      {% for cat in categories %}
-        <a class="card-link" href="{% url 'portfolio' slug=cat.slug %}">
-            <div class="card">
-                <div class="card-border"></div>
+  <div class="grid">
+    {% for cat in categories %}
+    <a class="card-link" href="{% url 'portfolio' slug=cat.slug %}">
+      <div class="card">
+        <div class="card-border"></div>
 
-                <div class="card-image">
-                  {% if cat.photo.url %}
-                  <img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />
-                  {% endif %}
-                </div>
-                <div class="card-text">
-                    <p>{{ cat.first_word }}<br>{{ cat.rest_words }}</p>
-                </div>
-            </div>
-        </a>
-      {% endfor %}
+        <div class="card-image">
+          {% if cat.photo.url %}
+          <img src="{{ cat.photo.url }}" alt="{{ cat.name }}" />
+          {% endif %}
         </div>
+        <div class="card-text">
+          <p>{{ cat.first_word }}<br>{{ cat.rest_words }}</p>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
 </section>
 
 
@@ -153,40 +163,40 @@
 <!-- Скрпиты карточек -->
 <script>
   (() => {
-      const norm360 = v => ((v % 360) + 360) % 360;
-      document.querySelectorAll('.card').forEach(card => {
-          let raf = 0, last = 0, vis = 0, target = 0, hover = false;
-          const link = card.closest('.card-link');
+    const norm360 = v => ((v % 360) + 360) % 360;
+    document.querySelectorAll('.card').forEach(card => {
+      let raf = 0, last = 0, vis = 0, target = 0, hover = false;
+      const link = card.closest('.card-link');
 
-          function angleTo(el, x, y) {
-              const r = el.getBoundingClientRect();
-              const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-              let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
-              if (deg < 0) deg += 360;
-              return (deg + 90) % 360;
-          }
+      function angleTo(el, x, y) {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        let deg = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+        if (deg < 0) deg += 360;
+        return (deg + 90) % 360;
+      }
 
-          function step(ts) {
-              const dt = (ts - (last || ts)) / 1000; last = ts;
-              const d = ((target - vis + 540) % 360) - 180;
-              vis = norm360(vis + d * Math.min(1, dt * 12));
-              const v = vis + 'deg';
-              card.style.setProperty('--base-angle', v);
-              if (link) link.style.setProperty('--base-angle', v);
-              if (hover) raf = requestAnimationFrame(step); else raf = 0;
-          }
+      function step(ts) {
+        const dt = (ts - (last || ts)) / 1000; last = ts;
+        const d = ((target - vis + 540) % 360) - 180;
+        vis = norm360(vis + d * Math.min(1, dt * 12));
+        const v = vis + 'deg';
+        card.style.setProperty('--base-angle', v);
+        if (link) link.style.setProperty('--base-angle', v);
+        if (hover) raf = requestAnimationFrame(step); else raf = 0;
+      }
 
-          card.addEventListener('mouseenter', () => { hover = true; if (!raf) raf = requestAnimationFrame(step); }, { passive: true });
-          card.addEventListener('mouseleave', () => { hover = false; }, { passive: true });
-          card.addEventListener('mousemove', e => {
-              const rect = card.getBoundingClientRect();
-              const x = e.clientX - rect.left, y = e.clientY - rect.top;
-              card.style.setProperty('--x', x + 'px');
-              card.style.setProperty('--y', y + 'px');
-              target = angleTo(card, e.clientX, e.clientY);
-              if (!raf) raf = requestAnimationFrame(step);
-          }, { passive: true });
-      });
+      card.addEventListener('mouseenter', () => { hover = true; if (!raf) raf = requestAnimationFrame(step); }, { passive: true });
+      card.addEventListener('mouseleave', () => { hover = false; }, { passive: true });
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        card.style.setProperty('--x', x + 'px');
+        card.style.setProperty('--y', y + 'px');
+        target = angleTo(card, e.clientX, e.clientY);
+        if (!raf) raf = requestAnimationFrame(step);
+      }, { passive: true });
+    });
   })();
 </script>
 
@@ -208,14 +218,12 @@
   <div class="cw-videos__marquee" id="videosMarquee" aria-label="Лента видео, автопрокрутка">
     <div class="cw-videos__track">
       {% for v in more_videos %}
-      <button class="v-card" type="button" {% if v.m3u8_url %}
-        data-src="{{ v.m3u8_url }}"
+      <button class="v-card" type="button" {% if v.m3u8_url %} data-src="{{ v.m3u8_url }}"
         data-title="{{ v.name|default:'Видео' }}"
-        data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
-        {% else %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
+        data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
         <div class="v-card__thumb">
           <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
-               alt="{{ v.name|default:'Видео' }}" loading="lazy" />
+            alt="{{ v.name|default:'Видео' }}" loading="lazy" />
           <span class="v-card__play" aria-hidden="true"></span>
         </div>
         <span class="v-card__title">{{ v.name|default:"Видео" }}</span>
@@ -223,14 +231,12 @@
       {% endfor %}
 
       {% for v in more_videos %}
-      <button class="v-card" type="button" {% if v.m3u8_url %}
-        data-src="{{ v.m3u8_url }}"
+      <button class="v-card" type="button" {% if v.m3u8_url %} data-src="{{ v.m3u8_url }}"
         data-title="{{ v.name|default:'Видео' }}"
-        data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
-        {% else %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
+        data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}" {% else %} disabled aria-disabled="true" title="Видео ещё не готово" {% endif %}>
         <div class="v-card__thumb">
           <img src="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}"
-               alt="{{ v.name|default:'Видео' }}" loading="lazy" />
+            alt="{{ v.name|default:'Видео' }}" loading="lazy" />
           <span class="v-card__play" aria-hidden="true"></span>
         </div>
         <span class="v-card__title">{{ v.name|default:"Видео" }}</span>
@@ -531,7 +537,7 @@
 
     function updateOverlay(p) {
       const topA = 1 - smooth(0.00, 0.08, p);  // виден только в самом начале
-      const botA =       smooth(0.92, 1.00, p); // виден только в самом конце
+      const botA = smooth(0.92, 1.00, p); // виден только в самом конце
       if (fTop) fTop.style.opacity = topA.toFixed(3);
       if (fBot) fBot.style.opacity = botA.toFixed(3);
 
@@ -548,7 +554,7 @@
         return;
       }
 
-      const hideStart = smooth(0.48, 0.60, p) > 0.5;
+      const hideStart = smooth(0.18, 0.28, p) > 0.5;
       [k1, t1, d1].forEach(el => el.classList.toggle('show', !hideStart));
 
       const showFinal = smooth(0.58, 0.70, p) > 0.5;
@@ -602,13 +608,13 @@
 
 
 
-    <a class="btn-link v-open cw-split__btn" 
-      data-src="{{ v.m3u8_url }}" 
-      data-title="{{ v.name|default:'Видео' }}"
+    <a class="btn-link v-open cw-split__btn" data-src="{{ v.m3u8_url }}" data-title="{{ v.name|default:'Видео' }}"
       data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
       <div class="btn-glow">
         <div class="btn-border"></div>
-        <div class="btn-text"><p>Смотреть полностью</p></div>
+        <div class="btn-text">
+          <p>Смотреть полностью</p>
+        </div>
       </div>
     </a>
 
@@ -617,7 +623,9 @@
     <a class="btn-link v-open cw-split__btn" disabled>
       <div class="btn-glow">
         <div class="btn-border"></div>
-        <div class="btn-text"><p>Обрабатывается ...</p></div>
+        <div class="btn-text">
+          <p>Обрабатывается ...</p>
+        </div>
       </div>
     </a>
     {% endif %}
@@ -645,13 +653,13 @@
     {% if v.m3u8_url %}
 
 
-    <a class="btn-link v-open cw-split__btn" 
-      data-src="{{ v.m3u8_url }}" 
-      data-title="{{ v.name|default:'Видео' }}"
+    <a class="btn-link v-open cw-split__btn" data-src="{{ v.m3u8_url }}" data-title="{{ v.name|default:'Видео' }}"
       data-poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/portfolio.jpg' %}{% endif %}">
       <div class="btn-glow">
         <div class="btn-border"></div>
-        <div class="btn-text"><p>Смотреть полностью</p></div>
+        <div class="btn-text">
+          <p>Смотреть полностью</p>
+        </div>
       </div>
     </a>
 
@@ -660,7 +668,9 @@
     <a class="btn-link v-open cw-split__btn" disabled>
       <div class="btn-glow">
         <div class="btn-border"></div>
-        <div class="btn-text"><p>Обрабатывается ...</p></div>
+        <div class="btn-text">
+          <p>Обрабатывается ...</p>
+        </div>
       </div>
     </a>
     {% endif %}
@@ -690,7 +700,7 @@
       v.muted = true; v.loop = true; v.playsInline = true;
 
       if (!s.againBound) {
-        v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(() => {}); });
+        v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(() => { }); });
         s.againBound = true;
       }
 
@@ -705,16 +715,16 @@
         }
         st.set(v, s);
       }
-      try { await v.play(); } catch {}
+      try { await v.play(); } catch { }
     }
 
-    function pause(v) { try { v.pause(); } catch {} }
+    function pause(v) { try { v.pause(); } catch { } }
 
     function detach(v) {
       const s = st.get(v);
       if (!s || !s.attached) return;
       pause(v);
-      if (s.hls) { try { s.hls.destroy(); } catch {} }
+      if (s.hls) { try { s.hls.destroy(); } catch { } }
       v.removeAttribute('src'); v.load();
       s.attached = false; s.hls = null;
       st.set(v, s);
@@ -783,7 +793,7 @@
       }
     }, { root: null, rootMargin: NEAR_MARGIN, threshold: 0 });
 
-    vids.forEach(v => { st.set(v, { attached:false, hls:null, againBound:false }); io.observe(v); });
+    vids.forEach(v => { st.set(v, { attached: false, hls: null, againBound: false }); io.observe(v); });
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) return;
@@ -826,10 +836,12 @@
         </p>
 
         <a class="btn-link news-btn" href="#" id="newsLink">
-        <div class="btn-glow">
-          <div class="btn-border"></div>
-          <div class="btn-text"><p>Читать далее</p></div>
-        </div>
+          <div class="btn-glow">
+            <div class="btn-border"></div>
+            <div class="btn-text">
+              <p>Читать далее</p>
+            </div>
+          </div>
         </a>
 
       </aside>
@@ -884,7 +896,9 @@
     <a class="btn-link" href="#" data-close>
       <div class="btn-glow">
         <div class="btn-border"></div>
-        <div class="btn-text"><p>Закрыть</p></div>
+        <div class="btn-text">
+          <p>Закрыть</p>
+        </div>
       </div>
     </a>
 
@@ -1000,7 +1014,9 @@
         <button class="btn-link ct-btn" type="submit">
           <div class="btn-glow">
             <div class="btn-border"></div>
-            <div class="btn-text"><p>Оставить заявку</p></div>
+            <div class="btn-text">
+              <p>Оставить заявку</p>
+            </div>
           </div>
         </button>
 
@@ -1107,7 +1123,7 @@
       </div>
     </aside>
   </div>
-  
+
 </section>
 
 
