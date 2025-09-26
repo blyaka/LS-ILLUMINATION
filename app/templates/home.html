@@ -55,6 +55,14 @@
     <span class="txt3 txt--fill3">Засияют вместе с нами</span>
   </div>
 
+  <script>
+    window.addEventListener('load', () => {
+      document.querySelectorAll('.txt, .txt2, .txt3').forEach(el => {
+        el.classList.add('show');
+      });
+    });
+  </script>
+
   <div class="ls-hero__stats">
     <div class="ls-hero__stat">
       <span>16</span><small>лет работы</small>
