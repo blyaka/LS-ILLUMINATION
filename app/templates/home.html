@@ -820,6 +820,7 @@
 
 
 
+
 <section class="cw-news" id="news" data-spawn="2">
   <h2 class="cw-news__title">Новости</h2>
 
@@ -881,6 +882,128 @@
   </script>
 
 </section>
+
+
+
+<script>
+(() => {
+  const data = JSON.parse(document.getElementById('newsData')?.textContent || '[]');
+  if (!data.length) return;
+
+  let i = 0, busy = false;
+
+  const root    = document.querySelector('.cw-news');
+  const main    = root.querySelector('.news-main');                 // центральная карточка (её и катаем)
+  const leftImg = root.querySelector('.news-side--left img');       // картинка слева
+  const rightImg= root.querySelector('.news-side--right img');      // картинка справа
+
+  const img  = root.querySelector('#newsImg');
+  const date = root.querySelector('#newsDate');
+  const title= root.querySelector('#newsTitle');
+  const desc = root.querySelector('#newsDesc');
+
+  const btnPrev = root.querySelector('.news-arrow--prev');
+  const btnNext = root.querySelector('.news-arrow--next');
+
+  // базовый сдвиг центра для крайних кадров (как у тебя в CSS)
+  const baseX = idx => idx === 0 ? -220 : (idx === data.length - 1 ? 220 : 0);
+
+  function fillCenter(n){
+    img.src = n.img; img.alt = (n.title||'').replace(/<[^>]+>/g,'');
+    date.textContent = n.date || '';
+    title.innerHTML = (n.title||'').replace(/\n/g,'<br>');
+    desc.textContent = n.desc || '';
+  }
+  function fillSides(idx){
+    leftImg && (leftImg.src  = idx > 0 ? data[idx-1].img : '');
+    rightImg && (rightImg.src = idx < data.length-1 ? data[idx+1].img : '');
+  }
+  function setFlags(){
+    root.classList.toggle('is-start', i===0);
+    root.classList.toggle('is-end',   i===data.length-1);
+    root.classList.toggle('no-prev',  i===0);
+    root.classList.toggle('no-next',  i===data.length-1);
+    if (btnPrev) btnPrev.disabled = (i===0);
+    if (btnNext) btnNext.disabled = (i===data.length-1);
+  }
+
+  function render(){
+    fillCenter(data[i]);
+    fillSides(i);
+    setFlags();
+  }
+
+  // dir = +1 (вперёд) или -1 (назад)
+  function go(dir){
+    if (busy) return;
+    if (dir === 1 && i >= data.length - 1) return;
+    if (dir === -1 && i <= 0) return;
+    busy = true;
+
+    const tDur = 'transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s';
+
+    // включаем фазовый класс, чтобы погасла противоположная стрелка и поехал «кусок»
+    root.classList.add(dir === 1 ? 'go-next' : 'go-prev');
+
+    // === Фаза A: центр уезжает и исчезает
+    const fromBase = baseX(i); // -220 / 0 / +220
+    main.style.transition = tDur;
+    main.style.transform  = `translateX(${fromBase + (dir === 1 ? -360 : 360)}px)`;
+    main.style.opacity    = '0';
+
+    const phaseAend = () => {
+      main.removeEventListener('transitionend', phaseAend);
+
+      // сдвигаем индекс и ПЕРЕД появлением обновляем контент/флаги/превью
+      i += dir;
+      render();
+
+      // === Фаза B: мгновенно ставим карточку за предел с другой стороны (без анимации)
+      const toBase = baseX(i);
+      main.style.transition = 'none';
+      main.style.transform  = `translateX(${toBase + (dir === 1 ? 360 : -360)}px)`;
+      main.style.opacity    = '0';
+      void main.offsetWidth; // форсим рефлоу
+
+      // === Фаза C: въезд на место и проявление
+      main.style.transition = tDur;
+      main.style.transform  = `translateX(${toBase}px)`;
+      main.style.opacity    = '1';
+
+      const phaseCend = () => {
+        main.removeEventListener('transitionend', phaseCend);
+        // снимаем фазовый класс шага (стрелка возвращается)
+        root.classList.remove('go-next','go-prev');
+        // чистим инлайны, чтобы дальше управлял CSS (is-start / is-end)
+        main.style.transition = '';
+        main.style.transform  = '';
+        main.style.opacity    = '';
+        busy = false;
+      };
+      main.addEventListener('transitionend', phaseCend, { once:true });
+    };
+
+    main.addEventListener('transitionend', phaseAend, { once:true });
+  }
+
+
+  btnNext?.addEventListener('click', () => go(1));
+  btnPrev?.addEventListener('click', () => go(-1));
+
+  // свайп по центру (по желанию)
+  (() => {
+    let sx=0, dx=0;
+    main.addEventListener('touchstart', e=>{ sx=e.touches[0].clientX; dx=0; }, {passive:true});
+    main.addEventListener('touchmove',  e=>{ dx=e.touches[0].clientX - sx; }, {passive:true});
+    main.addEventListener('touchend',   ()=>{ if(Math.abs(dx)>40) go(dx<0?1:-1); }, {passive:true});
+  })();
+
+  render(); // старт
+})();
+</script>
+
+
+
 
 <!-- Модалка новостей -->
 <div class="news-modal" id="newsModal" hidden>
@@ -1136,89 +1259,6 @@
 
 
 
-
-
-<script>
-  (() => {
-    const data = JSON.parse(document.getElementById('newsData').textContent);
-    let i = 0;
-
-    const img = document.getElementById('newsImg');
-    const dateEl = document.getElementById('newsDate');
-    const titleEl = document.getElementById('newsTitle');
-    const descEl = document.getElementById('newsDesc');
-    const prevImgEl = document.getElementById('newsPrevImg');
-    const nextImgEl = document.getElementById('newsNextImg');
-
-    const modal = document.getElementById('newsModal');
-    const nmTitle = document.getElementById('nmTitle');
-    const nmDate = document.getElementById('nmDate');
-    const nmImg = document.getElementById('nmImg');
-    const nmBody = document.getElementById('nmBody');
-
-    const render = async () => {
-      const cur = data[i];
-      const prev = data[(i - 1 + data.length) % data.length];
-      const next = data[(i + 1) % data.length];
-
-      const im = new Image();
-      im.decoding = 'async';
-      im.src = cur.img;
-      await im.decode().catch(() => { });
-      img.src = im.src;
-
-      dateEl.innerHTML = cur.date;
-      titleEl.innerHTML = (cur.title || '').replace(/\n/g, '<br>');
-      descEl.textContent = cur.desc || '';
-
-      if (prevImgEl) prevImgEl.src = prev.img;
-      if (nextImgEl) nextImgEl.src = next.img;
-    };
-
-
-    function openModal(idx) {
-      if (!modal) return;
-      const n = data[idx] || {};
-      nmTitle.innerHTML = (n.title || '').replace(/\n/g, '<br>');
-      nmDate.innerHTML = n.date || '';
-      nmImg.src = n.img || img.src;
-      nmImg.alt = (n.title || '').replace(/<[^>]+>/g, '').trim() || 'Новость';
-      nmBody.innerHTML = n.body && n.body.trim()
-        ? n.body
-        : (n.desc ? `<p>${n.desc}</p>` : '');
-
-      modal.hidden = false;
-      document.body.style.overflow = 'hidden';
-    }
-    function closeModal() {
-      if (!modal) return;
-      modal.hidden = true;
-      document.body.style.overflow = '';
-    }
-
-    document.querySelector('.news-arrow--prev')?.addEventListener('click', () => { i = (i - 1 + data.length) % data.length; render(); });
-    document.querySelector('.news-arrow--next')?.addEventListener('click', () => { i = (i + 1) % data.length; render(); });
-
-    document.addEventListener('click', (e) => {
-      const openBtn = e.target.closest('.news-btn');
-      if (openBtn && !openBtn.hasAttribute('data-close')) {
-        e.preventDefault();
-        openModal(i);
-      }
-
-      if (e.target.closest('[data-close]')) {
-        e.preventDefault();
-        closeModal();
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.hidden) closeModal();
-    });
-
-    render();
-  })();
-</script>
 
 
 

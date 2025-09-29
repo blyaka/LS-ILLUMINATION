@@ -139,6 +139,34 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Модалка новостей */
 .news-modal[hidden] {
     display: none
@@ -233,27 +261,126 @@
 
 
 
+/* базовые плавности */
+.news-main,
+.news-side {
+    transition: transform .6s cubic-bezier(.2, .7, .2, 1), opacity .6s;
+}
+
+/* старт: первая карточка смещена влево, правый превьюшник виден */
+.cw-news.is-start .news-main {
+    transform: translateX(-220px);
+}
+
+.cw-news.is-start .news-side--left {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* конец: последняя карточка смещена вправо, левый превьюшник виден */
+.cw-news.is-end .news-main {
+    transform: translateX(220px);
+}
+
+.cw-news.is-end .news-side--right {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* когда можем листать назад — показываем левый превью */
+.cw-news.can-prev .news-side--left {
+    opacity: .55;
+}
+
+/* когда нет следующей — гасим правый превью немного */
+.cw-news.no-next .news-side--right {
+    opacity: .2;
+}
+
+/* стрелки прячем по ситуации */
+.cw-news.no-prev .news-arrow--prev,
+.cw-news.no-next .news-arrow--next {
+    opacity: .25;
+    pointer-events: none;
+}
+
+/* анимации шага (поверх базового состояния) */
+.cw-news.go-next .news-main {
+    transform: translateX(-360px);
+    opacity: 0;
+}
+
+/* уезжаем влево */
+.cw-news.go-prev .news-main {
+    transform: translateX(260px);
+}
+
+/* уезжаем вправо */
+
+/* лёгкое движение превью при свайпе/клике */
+.cw-news.go-next .news-side--right {
+    transform: translateX(-10px) scale(1.2);
+}
+
+.cw-news.go-next .news-side--left {
+    transform: translateX(-40px) scale(0.80);
+}
+
+
+.cw-news.go-prev  .news-side--right {
+    transform: translateX(40px) scale(0.80);
+}
+.cw-news.go-prev .news-side--left {
+    transform: translateX(10px) scale(1.20);
+}
 
 
 
 
+/* конец ленты: прячем правую стрелку и правый превью */
+.cw-news.no-next .news-arrow--next {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none
+}
 
-@media (max-width:1100px) {
-    .news-wrap {
-        grid-template-columns: 70px 1fr 70px;
-        height: auto
-    }
+.cw-news.is-end .news-side--right {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(60px) scale(.9)
+}
 
-    .news-main {
-        grid-template-columns: 1fr;
-        gap: 18px
-    }
+/* начало ленты: прячем левую стрелку и левый превью (симметрия) */
+.cw-news.no-prev .news-arrow--prev {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none
+}
 
-    .news-side {
-        display: none
-    }
+.cw-news.is-start .news-side--left {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-60px) scale(.9)
+}
 
-    .news-title {
-        font-size: 26px
-    }
+
+/* стрелкам даём плавность */
+.news-arrow {
+    transition: opacity .25s ease
+}
+
+/* при движении вправо — левая стрелка гаснет */
+.cw-news.go-next .news-arrow--prev {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* при движении влево — правая стрелка гаснет */
+.cw-news.go-prev .news-arrow--next {
+    opacity: 0;
+    pointer-events: none;
 }
