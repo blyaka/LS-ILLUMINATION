@@ -25,6 +25,7 @@ body {
     font-family: Helvetica, sans-serif;
     font-family: var(--font-sans);
     background-color: var(--bg);
+    overflow-x: clip;
 }
 
 

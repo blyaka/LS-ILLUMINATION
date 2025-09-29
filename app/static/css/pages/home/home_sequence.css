@@ -96,9 +96,9 @@
 
 .seq-scheme {
     position: absolute;
-    right: 64px;
+    right: 324px;
     bottom: 0px;
-    width: 172px;
+    width: 271px;
     height: auto;
     opacity: 0;
     transform: translateY(16px);
@@ -108,9 +108,9 @@
 
 .seq-img {
     position: absolute;
-    right: 250px;
+    right: 64px;
     bottom: 22px;
-    width: 172px;
+    width: 258px;
     height: auto;
     opacity: 0;
     transform: translateY(16px);

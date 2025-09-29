@@ -49,8 +49,8 @@
   <div class="ls-hero__content2">
     <span class="txt txt--glow">Москва</span>
     <span class="txt txt--fill">Москва</span>
-    <span class="txt2 txt--glow2">и все города России</span>
-    <span class="txt2 txt--fill2">и все города России</span>
+    <span class="txt2 txt--glow2">и все города России!</span>
+    <span class="txt2 txt--fill2">и все города России!</span>
 
     <span class="txt3 txt--fill3">Засияют вместе с нами</span>
   </div>
@@ -109,34 +109,6 @@
   });
 </script>
 
-
-
-
-
-
-<!-- LIQUD GLASS -->
-<!-- <svg style="display: none">
-  <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
-    <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="1" result="turbulence" />
-
-    <feComponentTransfer in="turbulence" result="mapped">
-      <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
-      <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
-      <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
-    </feComponentTransfer>
-
-    <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
-
-    <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lighting-color="white"
-      result="specLight">
-      <fePointLight x="-200" y="-200" z="300" />
-    </feSpecularLighting>
-
-    <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
-
-    <feDisplacementMap in="SourceGraphic" in2="softMap" scale="75" xChannelSelector="R" yChannelSelector="G" />
-  </filter>
-</svg> -->
 
 
 
@@ -607,7 +579,7 @@
 
 {% for v in block_videos %}
 {% if forloop.counter|divisibleby:2 %}
-<section class="cw-split right" data-spawn="2">
+<section class="cw-split right">
   <aside class="cw-split__aside">
     <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
     <p class="cw-split__desc">{{ v.description|default:"" }}</p>
@@ -640,7 +612,7 @@
 
 
   </aside>
-  <div class="cw-split__media">
+  <div class="cw-split__media" data-nofly>
     <video class="cw-split__video" preload="none" muted loop playsinline
       poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
       data-src="{{ v.m3u8_url }}" data-kind="hls"></video>
@@ -649,7 +621,7 @@
 
 
 {% else %}
-<section class="cw-split" data-spawn="2">
+<section class="cw-split ">
   <div class="cw-split__media">
     <video class="cw-split__video" preload="none" muted loop playsinline
       poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
@@ -893,9 +865,9 @@
   let i = 0, busy = false;
 
   const root    = document.querySelector('.cw-news');
-  const main    = root.querySelector('.news-main');                 // центральная карточка (её и катаем)
-  const leftImg = root.querySelector('.news-side--left img');       // картинка слева
-  const rightImg= root.querySelector('.news-side--right img');      // картинка справа
+  const main    = root.querySelector('.news-main');
+  const leftImg = root.querySelector('.news-side--left img');
+  const rightImg= root.querySelector('.news-side--right img');
 
   const img  = root.querySelector('#newsImg');
   const date = root.querySelector('#newsDate');
@@ -905,7 +877,6 @@
   const btnPrev = root.querySelector('.news-arrow--prev');
   const btnNext = root.querySelector('.news-arrow--next');
 
-  // базовый сдвиг центра для крайних кадров (как у тебя в CSS)
   const baseX = idx => idx === 0 ? -220 : (idx === data.length - 1 ? 220 : 0);
 
   function fillCenter(n){
@@ -926,14 +897,12 @@
     if (btnPrev) btnPrev.disabled = (i===0);
     if (btnNext) btnNext.disabled = (i===data.length-1);
   }
-
   function render(){
     fillCenter(data[i]);
     fillSides(i);
     setFlags();
   }
 
-  // dir = +1 (вперёд) или -1 (назад)
   function go(dir){
     if (busy) return;
     if (dir === 1 && i >= data.length - 1) return;
@@ -941,12 +910,9 @@
     busy = true;
 
     const tDur = 'transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s';
-
-    // включаем фазовый класс, чтобы погасла противоположная стрелка и поехал «кусок»
     root.classList.add(dir === 1 ? 'go-next' : 'go-prev');
 
-    // === Фаза A: центр уезжает и исчезает
-    const fromBase = baseX(i); // -220 / 0 / +220
+    const fromBase = baseX(i);
     main.style.transition = tDur;
     main.style.transform  = `translateX(${fromBase + (dir === 1 ? -360 : 360)}px)`;
     main.style.opacity    = '0';
@@ -954,27 +920,22 @@
     const phaseAend = () => {
       main.removeEventListener('transitionend', phaseAend);
 
-      // сдвигаем индекс и ПЕРЕД появлением обновляем контент/флаги/превью
       i += dir;
       render();
 
-      // === Фаза B: мгновенно ставим карточку за предел с другой стороны (без анимации)
       const toBase = baseX(i);
       main.style.transition = 'none';
       main.style.transform  = `translateX(${toBase + (dir === 1 ? 360 : -360)}px)`;
       main.style.opacity    = '0';
-      void main.offsetWidth; // форсим рефлоу
+      void main.offsetWidth;
 
-      // === Фаза C: въезд на место и проявление
       main.style.transition = tDur;
       main.style.transform  = `translateX(${toBase}px)`;
       main.style.opacity    = '1';
 
       const phaseCend = () => {
         main.removeEventListener('transitionend', phaseCend);
-        // снимаем фазовый класс шага (стрелка возвращается)
         root.classList.remove('go-next','go-prev');
-        // чистим инлайны, чтобы дальше управлял CSS (is-start / is-end)
         main.style.transition = '';
         main.style.transform  = '';
         main.style.opacity    = '';
@@ -982,15 +943,13 @@
       };
       main.addEventListener('transitionend', phaseCend, { once:true });
     };
-
     main.addEventListener('transitionend', phaseAend, { once:true });
   }
-
 
   btnNext?.addEventListener('click', () => go(1));
   btnPrev?.addEventListener('click', () => go(-1));
 
-  // свайп по центру (по желанию)
+  // свайп
   (() => {
     let sx=0, dx=0;
     main.addEventListener('touchstart', e=>{ sx=e.touches[0].clientX; dx=0; }, {passive:true});
@@ -999,8 +958,61 @@
   })();
 
   render(); // старт
+
+  // === модалка новости — делегирование и ленивый поиск ===
+  function openNewsModal() {
+    const modal   = document.getElementById('newsModal');
+    if (!modal) return; // модалка ещё не распарсилась? (на редкость) — тогда нечего открывать
+
+    const n       = data[i] || {};
+    const nmTitle = modal.querySelector('#nmTitle');
+    const nmDate  = modal.querySelector('#nmDate');
+    const nmImg   = modal.querySelector('#nmImg');
+    const nmBody  = modal.querySelector('#nmBody');
+
+    if (nmTitle) nmTitle.innerHTML = (n.title || '').replace(/\n/g,'<br>');
+    if (nmDate)  nmDate.textContent = n.date || '';
+    if (nmImg)  { nmImg.src = n.img || ''; nmImg.alt = (n.title||'').replace(/<[^>]+>/g,'').trim() || 'Новость'; }
+    if (nmBody)  nmBody.innerHTML = n.body?.trim() ? n.body : (n.desc ? `<p>${n.desc}</p>` : '');
+
+    modal.hidden = false;
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  function closeNewsModal() {
+    const modal = document.getElementById('newsModal');
+    if (!modal) return;
+    modal.hidden = true;
+    document.documentElement.style.overflow = '';
+  }
+
+  // ОДИН слушатель на документ: кнопка «Читать далее», заголовок и картинка — всё открывает модалку
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#newsLink, .news-title, .news-main__media img')) {
+      e.preventDefault();
+      openNewsModal();
+      return;
+    }
+    // Закрытие по клику на backdrop, крестик и любые элементы с data-close внутри модалки
+    if (e.target.closest('#newsModal [data-close], #newsModal .news-modal__backdrop')) {
+      e.preventDefault();
+      closeNewsModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('newsModal');
+      if (modal && !modal.hidden) closeNewsModal();
+    }
+  });
+
 })();
 </script>
+
+
+
+
 
 
 
@@ -1012,7 +1024,11 @@
     <button class="news-modal__close" type="button" data-close aria-label="Закрыть">×</button>
 
     <h3 class="news-modal__title" id="nmTitle"></h3>
-    <div class="news-modal__date" id="nmDate"></div>
+    <div class="modal-date-container">
+      <p>Санкт-Петербург</p>
+      <p>•</p>
+      <div class="news-modal__date" id="nmDate"></div>
+    </div>
 
     <figure class="news-modal__media">
       <img id="nmImg" src="" alt="">

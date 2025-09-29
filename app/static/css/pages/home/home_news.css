@@ -216,14 +216,17 @@
     margin: 0 32px 8px 0;
 }
 
-.news-modal__date {
-    display: inline-block;
+.modal-date-container {
+    display: flex;
+    flex-direction: row;
     color: var(--muted);
     font-size: var(--font-small);
     letter-spacing: .02em;
-    padding: 8px 14px;
     margin: 24px 0 16px;
+    gap: 5px;
 }
+
+
 
 .news-modal__media {
     margin: 24px 0 48px;
