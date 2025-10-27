@@ -11,6 +11,7 @@
     --cookie-color: #FB19C3;
     --bubble-color: #560E61;
     --grad: linear-gradient(90deg, #FB19C3 0.01%, #FF45F3 50.01%, #602BFF 100%);
+    --border-color: rgba(255, 255, 255, 0.1);
 
     --radius: 25px;
     --radius2: 20px;

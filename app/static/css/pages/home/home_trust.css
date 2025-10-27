@@ -9,6 +9,7 @@
     font-size: var(--font-h1);
     text-align: left;
     font-weight: var(--font-weight-light);
+    position: relative;
 }
 
 .trust-view {
@@ -95,4 +96,15 @@
     object-fit: contain;
     filter: brightness(0) invert(1);
     display: block;
+}
+
+
+
+
+
+@media (max-width: 767px) {
+    .cw-trust__title {
+        color: #fff;
+        margin: 0 20px 100px;
+    }
 }

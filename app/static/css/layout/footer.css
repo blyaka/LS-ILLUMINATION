@@ -69,7 +69,7 @@
     }
 
     .by {
-        position: absolute;
+        position: absolute !important;
         bottom: 43px;
         right: 40px;
     }

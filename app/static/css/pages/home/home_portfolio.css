@@ -1,4 +1,3 @@
-
 @property --base-angle {
     syntax: "<angle>";
     inherits: true;
@@ -273,7 +272,7 @@ h1 {
     overflow: hidden;
     box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.75);
-        /* inset 0.4px 0.4px 0 rgba(255, 255, 255, .2),
+    /* inset 0.4px 0.4px 0 rgba(255, 255, 255, .2),
         inset -0.4px -0.4px 0 rgb(255, 255, 255) */
     transition: transform 0.3s ease-in-out;
 }
@@ -298,3 +297,28 @@ h1 {
 
 
 
+@media (max-width: 767px) {
+    .main {
+        padding: 50px 20px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .card-link::before {
+        content: none;
+    }
+
+    .card-link::after {
+        content: none;
+    }
+
+    .card::after {
+        content: none;
+    }
+
+    .card-image {
+        aspect-ratio: 10/11;
+    }
+}

@@ -219,3 +219,23 @@
 .v-modal__close:hover {
     background: rgba(255, 255, 255, .16);
 }
+
+
+
+@media (max-width: 767px) {
+    .cw-videos__title {
+        padding: 24px 20px 56px;
+    }
+
+    .cw-videos__track {
+        gap: 160px;
+    }
+
+    .v-card__thumb {
+        width: 80dvw;
+    }
+
+    .v-card__title {
+        font-size: 1.5rem;
+    }
+}
