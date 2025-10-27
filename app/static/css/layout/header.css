@@ -901,7 +901,7 @@ html.rq-lock body {
 .mmenu__wrap {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, #07121f 0%, #0a0f1a 35%, #0b0f19 100%);
+    background: var(--bg);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -924,6 +924,7 @@ html.rq-lock body {
     margin: 0 auto 0 0;
     font-weight: 600;
     font-size: 18px;
+    display: none;
 }
 
 .mmenu__close {
@@ -948,20 +949,22 @@ html.rq-lock body {
 .mmenu__list {
     display: flex;
     flex-direction: column;
-    padding: 8px 6px;
+    padding: 30px 20px;
+    gap: 10px;
 }
 
 .mmenu__item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    /* width: 100%; */
     padding: 14px 16px;
     background: transparent;
     border: 0;
     color: #fff;
-    font-size: 16px;
+    font-size: var(--font-h3);
     text-align: left;
+    text-decoration: none;
 }
 
 .mmenu__item:not(:last-child) {
@@ -1006,14 +1009,14 @@ html.rq-lock body {
 }
 
 .mmenu__cat img {
-    width: 44px;
+    width: 137px;
     height: auto;
     flex: 0 0 44px;
     object-fit: contain;
 }
 
 .mmenu__cat span {
-    font-size: 14px;
+    font-size: var(--font-main);
     line-height: 1.3;
 }
 
