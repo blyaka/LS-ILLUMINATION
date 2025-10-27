@@ -26,7 +26,6 @@
 <body class="{% if request.resolver_match.url_name == 'home' %}is-home{% endif %}">
 
   <canvas id="balls-bg" class="balls-bg" aria-hidden="true"></canvas>
-1
 
   <script>
   (() => {
@@ -440,6 +439,116 @@ function paint(){
       </button>
     </div>
   </header>
+
+
+
+  
+  <!-- === MOBILE FULLSCREEN MENU === -->
+<section id="mmenu" class="mmenu" role="dialog" aria-modal="true" hidden>
+  <div class="mmenu__wrap" data-mm-root>
+    <!-- Шапка -->
+    <div class="mmenu__head">
+      <button class="mmenu__close" id="mmClose" aria-label="Закрыть">✕</button>
+      <h3 class="mmenu__title" id="mmTitle">Меню</h3>
+    </div>
+
+    <!-- Панель: Главная -->
+    <div class="mmenu__panel mmenu__panel--active" id="mmMain" data-panel="main">
+      <nav class="mmenu__list">
+        <button class="mmenu__item" data-goto="pf">
+          <span>Портфолио</span><i class="mmenu__chev">›</i>
+        </button>
+        <a class="mmenu__item" href="{% url 'about' %}">
+          <span>О нас</span><i class="mmenu__chev">›</i>
+        </a>
+        <button class="mmenu__item" data-goto="ct">
+          <span>Контакты</span><i class="mmenu__chev">›</i>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Панель: Портфолио -->
+    <div class="mmenu__panel" id="mmPf" data-panel="pf" hidden>
+      <div class="mmenu__subhead">
+        <button class="mmenu__back" data-back>‹</button>
+        <h4>Портфолио</h4>
+      </div>
+      <div class="mmenu__cats">
+        {% for cat in categories %}
+        <a class="mmenu__cat" href="{% url 'portfolio' slug=cat.slug %}">
+          {% if cat.icon.url %}<img src="{{ cat.icon.url }}" alt="{{ cat.name }}">{% endif %}
+          <span>{{ cat.name }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Панель: Контакты -->
+    <div class="mmenu__panel" id="mmCt" data-panel="ct" hidden>
+      <div class="mmenu__subhead">
+        <button class="mmenu__back" data-back>‹</button>
+        <h4>Контакты</h4>
+      </div>
+      <div class="mmenu__contacts">
+        <div class="ct-row"><span>📞</span><a href="tel:+78126420365">+7 (812) 642-03-65</a></div>
+        <div class="ct-row"><span>✉️</span><a href="mailto:info@multidekor.ru">info@multidekor.ru</a></div>
+        <div class="ct-row"><span>📍</span><p>г. Санкт-Петербург, улица Ломоносова, 28</p></div>
+        <div class="ct-row"><span>🕘</span><p>Пн–Пт 10:00–18:00 • Сб–Вс выходные</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (() => {
+    const root = document.getElementById('mmenu');
+    const title = document.getElementById('mmTitle');
+    const main = document.getElementById('mmMain');
+    const pf = document.getElementById('mmPf');
+    const ct = document.getElementById('mmCt');
+    const closeBtn = document.getElementById('mmClose');
+
+    const open = () => { root.hidden = false; requestAnimationFrame(()=>root.classList.add('show')); document.documentElement.classList.add('rq-lock'); focusTrap(); };
+    const close = () => { root.classList.remove('show'); root.addEventListener('transitionend', ()=>{ root.hidden = true; }, {once:true}); document.documentElement.classList.remove('rq-lock'); };
+
+    function show(panel){
+      [main,pf,ct].forEach(p=>{ p.classList.remove('mmenu__panel--active'); p.hidden = true; });
+      if(panel==='pf'){ title.textContent='Портфолио'; pf.hidden=false; pf.classList.add('mmenu__panel--active'); }
+      else if(panel==='ct'){ title.textContent='Контакты'; ct.hidden=false; ct.classList.add('mmenu__panel--active'); }
+      else { title.textContent='Меню'; main.hidden=false; main.classList.add('mmenu__panel--active'); }
+    }
+
+    // открыть по бургеру из шапки
+    document.getElementById('hdrMenu')?.addEventListener('click', (e)=>{ e.preventDefault(); show('main'); open(); });
+
+    // «Портфолио»/«Контакты»
+    root.addEventListener('click', (e)=>{
+      const b = e.target.closest('[data-goto]');
+      if(b){ show(b.getAttribute('data-goto')); }
+      if(e.target.matches('[data-back]')) show('main');
+      if(e.target===root) close();
+    });
+    closeBtn.addEventListener('click', close);
+
+    // проста фокус-ловушка
+    function focusTrap(){
+      const fEls = root.querySelectorAll('button, a, input, [tabindex]:not([tabindex="-1"])');
+      if(!fEls.length) return;
+      const first = fEls[0], last = fEls[fEls.length-1];
+      root.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape') { close(); }
+        if(e.key === 'Tab'){
+          if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+          else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+      });
+      first.focus({preventScroll:true});
+    }
+  })();
+</script>
+
+
+
 
 
 
