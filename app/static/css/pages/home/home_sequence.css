@@ -194,12 +194,39 @@
 
     .seq-copy {
         left: 16px;
-        top: 24vh;
+        top: 400px;
         max-width: 80vw;
+    }
+
+    .seq-copy--final {
+        top: 100px;
     }
 
     .seq-scheme {
         right: 16px;
         width: min(240px, 44vw);
+    }
+
+    .seq-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 0 0 20px 20px;
+    }
+
+    .seq-kicker {
+        margin-left: 20px;
+    }
+
+    .seq-desc {
+        margin-left: 20px;
+    }
+
+    .seq-desc2 {
+        margin-right: unset;
+    }
+
+    .seq-scheme,
+    .seq-img {
+        opacity: 0 !important;
     }
 }

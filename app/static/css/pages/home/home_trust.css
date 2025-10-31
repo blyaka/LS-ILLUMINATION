@@ -107,4 +107,8 @@
         color: #fff;
         margin: 0 20px 100px;
     }
+
+    .trust-track {
+        gap: 20px;
+    }
 }
