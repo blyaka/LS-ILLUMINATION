@@ -136,25 +136,25 @@
 .txt,
 .txt2,
 .txt3 {
-  opacity: 0;
-  transform: translateY(-40px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-  display: inline-block;
+    opacity: 0;
+    transform: translateY(-40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    display: inline-block;
 }
 
 .txt.show,
 .txt2.show,
 .txt3.show {
-  opacity: 1;
-  transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .txt2 {
-  transition-delay: 0.3s;
+    transition-delay: 0.3s;
 }
 
 .txt3 {
-  transition-delay: 0.6s;
+    transition-delay: 0.6s;
 }
 
 
@@ -300,6 +300,7 @@
     .ls-hero__stats {
         bottom: 28px;
         gap: 28px;
+        width: 100%;
     }
 
     .ls-hero__pp {
@@ -308,5 +309,26 @@
         width: 42px;
         height: 42px;
         border-radius: 10px;
+        display: none;
     }
+
+    .ls-hero__content2 {
+        left: 20px;
+        top: 230px;
+    }
+
+    .txt {
+        font-size: 64px;
+    }
+
+    .txt2 {
+        font-size: 48px;
+    }
+
+    .txt3 {
+        font-size: 36px;
+        right: 20;
+        text-align: right;
+    }
+
 }
