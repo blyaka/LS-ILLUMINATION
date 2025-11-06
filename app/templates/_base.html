@@ -249,49 +249,49 @@
         return `rgba(${r},${g},${b},${a})`;
       }
 
-  function paint(){
-    ctx.clearRect(0, 0, state.viewW, state.viewH);
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+      function paint(){
+        ctx.clearRect(0, 0, state.viewW, state.viewH);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
 
-    const want = CFG.blend || 'screen';
-    ctx.globalCompositeOperation = want;
-    if (ctx.globalCompositeOperation !== want) ctx.globalCompositeOperation = 'lighter';
+        const want = CFG.blend || 'screen';
+        ctx.globalCompositeOperation = want;
+        if (ctx.globalCompositeOperation !== want) ctx.globalCompositeOperation = 'lighter';
 
-    const top = state.scrollY = (window.scrollY || document.documentElement.scrollTop || 0);
-    const bottom = top + state.viewH;
+        const top = state.scrollY = (window.scrollY || document.documentElement.scrollTop || 0);
+        const bottom = top + state.viewH;
 
-    const a = CFG.plateauAlpha ?? 0.32;
-    const innerK = Math.max(0.06, Math.min(0.4, CFG.innerStop ?? 0.14));
-    const edge = Math.max(0.8, Math.min(0.98, CFG.edgeStop ?? 0.94));
+        const a = CFG.plateauAlpha ?? 0.32;
+        const innerK = Math.max(0.06, Math.min(0.4, CFG.innerStop ?? 0.14));
+        const edge = Math.max(0.8, Math.min(0.98, CFG.edgeStop ?? 0.94));
 
-    for (const b of state.blobs){
-      if (b.y + b.r < top || b.y - b.r > bottom) continue;
+        for (const b of state.blobs){
+          if (b.y + b.r < top || b.y - b.r > bottom) continue;
 
-      const sy = b.y - top;
+          const sy = b.y - top;
 
-      // чуть “перо” за границу, чтобы не было видимого края
-      const rOut = b.r * 1.06;
-      const rIn  = rOut * innerK;
+          // чуть “перо” за границу, чтобы не было видимого края
+          const rOut = b.r * 1.06;
+          const rIn  = rOut * innerK;
 
-      if (CFG.blurPx > 0) ctx.filter = `blur(${CFG.blurPx}px)`;
+          if (CFG.blurPx > 0) ctx.filter = `blur(${CFG.blurPx}px)`;
 
-      const g = ctx.createRadialGradient(b.x, sy, rIn, b.x, sy, rOut);
-      g.addColorStop(0.00, hexA(b.c, a));         // ровная заливка
-      g.addColorStop(0.55, hexA(b.c, a));         // держим плотность
-      g.addColorStop(edge, hexA(b.c, a * 0.35));  // мягкий спад к краю
-      g.addColorStop(1.00, hexA(b.c, 0.00));      // полное растворение
+          const g = ctx.createRadialGradient(b.x, sy, rIn, b.x, sy, rOut);
+          g.addColorStop(0.00, hexA(b.c, a));         // ровная заливка
+          g.addColorStop(0.55, hexA(b.c, a));         // держим плотность
+          g.addColorStop(edge, hexA(b.c, a * 0.35));  // мягкий спад к краю
+          g.addColorStop(1.00, hexA(b.c, 0.00));      // полное растворение
 
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(b.x, sy, rOut, 0, Math.PI*2);       // рисуем по rOut → перышко выходит за круг
-      ctx.fill();
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(b.x, sy, rOut, 0, Math.PI*2);       // рисуем по rOut → перышко выходит за круг
+          ctx.fill();
 
-      if (CFG.blurPx > 0) ctx.filter = 'none';
-    }
+          if (CFG.blurPx > 0) ctx.filter = 'none';
+        }
 
-    ctx.globalCompositeOperation = 'source-over';
-  }
+        ctx.globalCompositeOperation = 'source-over';
+      }
 
 
 
@@ -357,12 +357,20 @@
   <header class="ls-header ls-header--static">
     <div class="ls-header__inner">
 
-      <a href="#!" class="pdf-button-header js-rq-open" id="pdfBtn">
+    <div class="pdf-dropdown">
+      <a href="#!" class="pdf-button-header" id="pdfBtn">
         <svg width="29" height="33">
           <use xlink:href="{% static 'images/icons.svg' %}#icon-pdf"></use>
         </svg>
-        Запросить каталог PDF
+        Запросить PDF
       </a>
+
+      <div class="pdf-dropdown-menu">
+        <a href="#!" class="js-rq-open">Запросить каталог</a>
+        <a href="{% static 'files/pricelist.pdf' %}" download>Скачать прайс-лист</a>
+      </div>
+    </div>
+
 
       <a class="ls-logo header-static" href="{% url 'home' %}">
         <img src="{% static 'images/logo.png' %}" alt="LS Illumination">
