@@ -254,18 +254,18 @@
     border-radius: 10px;
     color: var(--text);
     cursor: pointer;
+    z-index: 1000;
     backdrop-filter: blur(10px);
+    position: relative;
     -webkit-backdrop-filter: blur(10px);
     transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
 }
 
 
 .pdf-dropdown:hover .pdf-button-header,
-.pdf-dropdown:focus-within .pdf-button-header{
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  /* если нужно — можно ещё чуть затемнить фон без blur */
-  /* background: rgba(20,0,30,0.85); */
+.pdf-dropdown:focus-within .pdf-button-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .pdf-dropdown-menu {
@@ -280,6 +280,8 @@
     flex-direction: column;
     gap: 10px;
     opacity: 0;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     pointer-events: none;
     transform: translateY(-0px);
     transition: opacity 0.25s ease, transform 0.25s ease;

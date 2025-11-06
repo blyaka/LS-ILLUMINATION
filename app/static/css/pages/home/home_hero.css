@@ -295,10 +295,78 @@
 
 
 
+.mobile-pdf {
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 1px solid #F52EE8;
+    border-radius: 32px;
+    width: 80%;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(245, 46, 232, 0.35), 0 0 45px rgba(245, 46, 232, 0.15);
+}
+
+/* внутренняя пелена */
+.mobile-pdf::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+            rgba(255, 0, 255, 0.2) 0%,
+            rgba(255, 0, 255, 0.1) 50%,
+            rgba(0, 0, 0, 0.4) 100%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* внешнее розовое свечение */
+.mobile-pdf::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 40px 20px rgba(245, 46, 232, 0.2);
+    z-index: -1;
+}
+
+/* контент поверх эффектов */
+.mobile-pdf * {
+    position: relative;
+    z-index: 1;
+}
+
+.mobile-pdf svg {
+  filter: drop-shadow(0 0 0px #ffbaf0)
+          brightness(0) saturate(100%) invert(75%) sepia(30%) saturate(5000%) hue-rotate(290deg) brightness(110%) contrast(105%);
+}
+
+.mobile-pdf a {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--font-main);
+    background: linear-gradient(90deg, #FF9CE6 0.01%, #FF9CF8 50.01%, #B59CFF 100%),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-pdf a:hover {
+    color: #ff9cf8;
+}
+
+
 
 @media (max-width: 768px) {
     .ls-hero__stats {
-        bottom: 28px;
+        bottom: 200px;
         gap: 28px;
         width: 100%;
     }
