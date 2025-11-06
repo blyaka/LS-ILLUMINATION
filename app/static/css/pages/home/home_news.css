@@ -402,7 +402,7 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        gap: unset;
+        gap: 50px;
     }
 
     .news-side {
@@ -441,7 +441,7 @@
     }
 
     .news-main__aside {
-        width: 70%;
+        /* width: 70%; */
     }
 
     .news-date {
@@ -473,6 +473,13 @@
 
     .cw-news.go-prev .news-side--left {
         transform: translateX(0px) scale(1.10);
+    }
+
+
+    .news-modal__dialog {
+        height: 100%;
+        width: 100%;
+        padding: 20px;
     }
 
 }

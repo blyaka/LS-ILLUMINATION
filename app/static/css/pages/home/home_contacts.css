@@ -206,17 +206,38 @@
         backdrop-filter: blur(10px);
     }
 
+    .ct-form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ct-form p {}
+
     .cw-contacts__wrap {
         grid-template-columns: 1fr;
     }
 
     .ct-grid-last {
         grid-template-columns: 1fr;
+        width: -webkit-fill-available;
+    }
+
+    .ct-title {
+        font-size: var(--font-h1);
+        border-bottom: unset
+    }
+
+    .ct-sub {
+        display: none;
+        margin: 0 0 26px;
     }
 
     .ct-btn {
         grid-column: 1 / -1;
         justify-self: stretch;
         text-align: center;
+        width: unset !important;
     }
 }

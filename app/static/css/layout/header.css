@@ -1076,7 +1076,7 @@ html.rq-lock body {
         transition: none !important;
     }
 
-    .btn-link {
+    .ls-header__inner .btn-link {
         display: none !important;
     }
 

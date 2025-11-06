@@ -194,7 +194,7 @@
 
     .seq-copy {
         left: 16px;
-        top: 400px;
+        top: 100px;
         max-width: 80vw;
     }
 
@@ -218,10 +218,12 @@
     }
 
     .seq-desc {
+        display: none;
         margin-left: 20px;
     }
 
     .seq-desc2 {
+        display: none;
         margin-right: unset;
     }
 
