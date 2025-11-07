@@ -481,6 +481,7 @@
       <div class="mmenu__subhead">
         <button class="mmenu__back" data-back>‹</button>
         <h4>Портфолио</h4>
+        <p></p>
       </div>
       <div class="mmenu__cats">
         {% for cat in categories %}
@@ -499,10 +500,47 @@
         <h4>Контакты</h4>
       </div>
       <div class="mmenu__contacts">
-        <div class="ct-row"><span>📞</span><a href="tel:+78126420365">+7 (812) 642-03-65</a></div>
-        <div class="ct-row"><span>✉️</span><a href="mailto:info@multidekor.ru">info@multidekor.ru</a></div>
-        <div class="ct-row"><span>📍</span><p>г. Санкт-Петербург, улица Ломоносова, 28</p></div>
-        <div class="ct-row"><span>🕘</span><p>Пн–Пт 10:00–18:00 • Сб–Вс выходные</p></div>
+        <ul class="ct-list">
+          <li>
+            <span class="ct-ico" aria-hidden="true">
+              <svg width="28" height="28">
+                <use xlink:href="{% static 'images/icons.svg' %}#icon-phone"></use>
+              </svg>
+            </span>
+            <a href="tel:+78126420365">+7 (812) 642-03-65</a>
+          </li>
+          <li>
+            <span class="ct-ico" aria-hidden="true">
+              <svg width="28" height="26">
+                <use xlink:href="{% static 'images/icons.svg' %}#icon-mail"></use>
+              </svg>
+            </span>
+            <a href="mailto:info@multidekor.ru">info@multidekor.ru</a>
+          </li>
+          <li>
+            <span class="ct-ico" aria-hidden="true">
+              <svg width="27" height="32">
+                <use xlink:href="{% static 'images/icons.svg' %}#icon-location"></use>
+              </svg>
+            </span>
+            г. Санкт-Петербург, улица Ломоносова, 28
+          </li>
+        </ul>
+
+        <div class="hours-container">
+          <p>Время работы:</p>
+
+          <div class="ct-hours">
+            <div class="ct-hours__ico" aria-hidden="true">
+              <svg width="28" height="28">
+                <use xlink:href="{% static 'images/icons.svg' %}#icon-time"></use>
+              </svg>
+            </div>
+            <div class="ct-hours__text">
+              <div>Пн-Пт с 10:00 до 18:00</div>
+              <div class="muted">Сб-Вс — выходные дни</div>
+            </div>
+        </div>
       </div>
     </div>
   </div>

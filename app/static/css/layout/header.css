@@ -1003,6 +1003,44 @@ html.rq-lock body {
     overflow: auto;
 }
 
+.mmenu__panel::before {
+    content: "";
+    position: absolute;
+    left: 68%;
+    top: 47%;
+    width: 210%;
+    height: 83%;
+    transform: translate(-50%, -66%) rotate(204deg);
+    background: url(/static/images/contacts-waves.png) center / cover no-repeat;
+    opacity: 0.8;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: -1;
+    -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 79%, transparent 100%);
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+.mmenu__panel::after {
+    content: "";
+    position: absolute;
+    left: 52%;
+    top: 56%;
+    width: 178%;
+    height: 83%;
+    transform: translate(-51%, -24%) rotate(335deg);
+    background: url(/static/images/contacts-waves.png) center / cover no-repeat;
+    opacity: 0.8;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: -1;
+    -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 79%, transparent 100%);
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
 .mmenu__panel--active {
     display: block;
 }
@@ -1041,15 +1079,25 @@ html.rq-lock body {
 .mmenu__subhead {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     padding: 12px 12px 4px;
+    position: relative;
+}
+
+.mmenu__subhead h4 {
+    font-size: var(--font-h3);
+    font-weight: 100;
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
 }
 
 .mmenu__back {
     background: none;
     border: 0;
     color: #fff;
-    font-size: 22px;
+    font-size: 36px;
     padding: 6px;
 }
 
@@ -1082,10 +1130,79 @@ html.rq-lock body {
 }
 
 .mmenu__contacts {
-    padding: 10px 16px 28px;
+    padding: 28px 40px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+
+.ct-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 18px;
+}
+
+.ct-list li {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: center;
+    gap: 20px;
+    font-size: clamp(1rem, .9rem + .4vw, 1.25rem);
+    margin: 0;
+}
+
+.ct-list a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.ct-list a:hover {
+    border-bottom-color: rgba(255, 255, 255, .6);
+}
+
+.ct-ico {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+}
+
+
+.hours-container {
+    font-family: Helvetica, sans-serif;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, .18);
+}
+
+.hours-container p {
+    margin-left: 52px;
+}
+
+.ct-hours {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 20px;
+    padding-top: 16px;
+}
+
+.ct-hours__ico {
+    display: grid;
+    place-items: center;
+}
+
+
+.ct-hours__text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.ct-hours__text .muted {
+    opacity: .8;
 }
 
 .mmenu__contacts .ct-row {
