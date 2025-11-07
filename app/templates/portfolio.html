@@ -1,10 +1,10 @@
-{% extends '_base.html' %}
-{% load static %}
-{% load categories_tags %}
+{% extends '_base.html' %} 
+{% load static %} 
+{% load categories_tags %} 
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/pages/portfolio.css' %}" />
-{% endblock %}
+{% endblock %} 
 
 {% block content %}
 <div class="page-container">
@@ -17,80 +17,85 @@
     <h1>{{ category.name }}</h1>
   </div>
 
-
-  {% if use_grouped %}
-  {% for sub in subcategories %}
-  {% with cases=sub.cases.all %}
-  {% if cases %}
+  {% if use_grouped %} {% for sub in subcategories %} 
+  {% with cases=sub.cases.all %} {% if cases %}
   <section class="portfolio-section">
     <h2 class="subcategory-title">{{ sub.name }}</h2>
     <div class="portfolio-grid">
       {% for case in cases %}
       <a class="card" href="#">
         <div class="card_photo">
-          <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+          <img src="{{ case.photo.url }}" alt="{{ case.name }}" />
         </div>
       </a>
       {% endfor %}
     </div>
   </section>
-  {% endif %}
-  {% endwith %}
-  {% endfor %}
-
-  {% if direct_cases %}
+  {% endif %} {% endwith %} {% endfor %} {% if direct_cases %}
   <section class="portfolio-section">
     <h2 class="subcategory-title">Без подкатегории</h2>
     <div class="portfolio-grid">
       {% for case in direct_cases %}
       <a class="card" href="#">
         <div class="card_photo">
-          <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+          <img src="{{ case.photo.url }}" alt="{{ case.name }}" />
         </div>
       </a>
       {% endfor %}
     </div>
   </section>
-  {% endif %}
-  {% else %}
+  {% endif %} {% else %}
   <div class="portfolio-grid">
     {% for case in direct_cases %}
     <a class="card" href="#">
       <div class="card_photo">
-        <img src="{{ case.photo.url }}" alt="{{ case.name }}">
+        <img src="{{ case.photo.url }}" alt="{{ case.name }}" />
       </div>
     </a>
     {% empty %}
     <p>Здесь пока нет кейсов.</p>
     {% endfor %}
   </div>
-  {% endif %}
-
-  {% next_category categories category as next_cat %}
-  {% if next_cat %}
+  {% endif %} {% next_category categories category as next_cat %} {% if next_cat%}
   <div class="next-btn-container">
     <a href="{% url 'portfolio' slug=next_cat.slug %}" class="next-btn">
-      <p>Следующая категория ></p>
+      <p>Следующая категория</p>
+      <svg
+        viewBox="0 0 33 58"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+      </svg>
     </a>
   </div>
   {% endif %}
-
 </div>
 
-{# Модалка — без изменений #}
 <div class="image-modal" id="imageModal" hidden>
   <div class="image-modal__overlay" id="modalOverlay"></div>
   <button class="image-modal__close" id="modalClose">×</button>
   <div class="image-modal__content">
     <div class="image-modal__nav">
       <button class="image-modal__prev" id="modalPrev">
-        <svg width="33" height="58" fill="none">
+        <svg
+          viewBox="0 0 33 58"
+          aria-hidden="true"
+          focusable="false"
+          preserveAspectRatio="xMidYMid meet"
+        >
           <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
         </svg>
       </button>
-      <img id="modalImg" src="" alt="Large image">
+      <img id="modalImg" src="" alt="Large image" />
       <button class="image-modal__next" id="modalNext">
-        <svg width="33" height="58" fill="none">
+        <svg
+          viewBox="0 0 33 58"
+          aria-hidden="true"
+          focusable="false"
+          preserveAspectRatio="xMidYMid meet"
+        >
           <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
         </svg>
       </button>
@@ -100,16 +105,19 @@
 
 <script>
   (() => {
-    const modal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImg');
-    const modalClose = document.getElementById('modalClose');
-    const modalPrev = document.getElementById('modalPrev');
-    const modalNext = document.getElementById('modalNext');
-    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImg");
+    const modalClose = document.getElementById("modalClose");
+    const modalPrev = document.getElementById("modalPrev");
+    const modalNext = document.getElementById("modalNext");
+    const modalOverlay = document.getElementById("modalOverlay");
 
-    const cards = Array.from(document.querySelectorAll('.portfolio-grid .card'));
-    const images = cards.map(c => c.querySelector('.card_photo img'));
-    let i = 0, openFlag = false;
+    const cards = Array.from(
+      document.querySelectorAll(".portfolio-grid .card")
+    );
+    const images = cards.map((c) => c.querySelector(".card_photo img"));
+    let i = 0,
+      openFlag = false;
 
     function setImage(idx) {
       i = (idx + images.length) % images.length;
@@ -118,14 +126,22 @@
       const pre = new Image();
       pre.onload = () => {
         modalImg.src = src;
-        modalImg.alt = images[i].alt || 'Фото';
-        requestAnimationFrame(() => { modalImg.style.opacity = 1; });
+        modalImg.alt = images[i].alt || "Фото";
+        requestAnimationFrame(() => {
+          modalImg.style.opacity = 1;
+        });
       };
       pre.src = src;
       const next = images[(i + 1) % images.length]?.src;
       const prev = images[(i - 1 + images.length) % images.length]?.src;
-      if (next) { const n = new Image(); n.src = next; }
-      if (prev) { const p = new Image(); p.src = prev; }
+      if (next) {
+        const n = new Image();
+        n.src = next;
+      }
+      if (prev) {
+        const p = new Image();
+        p.src = prev;
+      }
     }
 
     function openModal(idx) {
@@ -133,30 +149,46 @@
       setImage(idx);
       modal.hidden = false;
       modal.style.opacity = 1;
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     }
     function closeModal() {
       openFlag = false;
       modal.style.opacity = 0;
       modal.hidden = true;
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
-    function next() { setImage(i + 1); }
-    function prev() { setImage(i - 1); }
+    function next() {
+      setImage(i + 1);
+    }
+    function prev() {
+      setImage(i - 1);
+    }
 
     cards.forEach((card, idx) => {
-      card.addEventListener('click', (e) => { e.preventDefault(); openModal(idx); });
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+        openModal(idx);
+      });
     });
-    modalClose.addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', closeModal);
-    modalNext.addEventListener('click', next);
-    modalPrev.addEventListener('click', prev);
+    modalClose.addEventListener("click", closeModal);
+    modalOverlay.addEventListener("click", closeModal);
+    modalNext.addEventListener("click", next);
+    modalPrev.addEventListener("click", prev);
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener("keydown", (e) => {
       if (!openFlag) return;
-      if (e.key === 'Escape') { e.preventDefault(); closeModal(); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeModal();
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        next();
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prev();
+      }
     });
   })();
 </script>
