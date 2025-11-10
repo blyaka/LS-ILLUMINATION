@@ -231,6 +231,15 @@
         gap: 160px;
     }
 
+    .cw-videos__marquee {
+        touch-action: pan-y;
+    }
+
+    .cw-videos__marquee.is-grabbing,
+    .cw-videos__marquee .is-grabbing {
+        cursor: grabbing;
+    }
+
     .v-card__thumb {
         width: 80dvw;
     }

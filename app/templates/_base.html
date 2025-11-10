@@ -465,13 +465,39 @@
     <div class="mmenu__panel mmenu__panel--active" id="mmMain" data-panel="main">
       <nav class="mmenu__list">
         <button class="mmenu__item" data-goto="pf">
-          <span>Портфолио</span><i class="mmenu__chev">›</i>
+          <span>Портфолио</span>
+          <svg
+            viewBox="0 0 33 58"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+          </svg>
         </button>
+
         <a class="mmenu__item" href="{% url 'about' %}">
-          <span>О нас</span><i class="mmenu__chev">›</i>
+          <span>О нас</span>
+          <svg
+            viewBox="0 0 33 58"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+          </svg>
         </a>
+
         <button class="mmenu__item" data-goto="ct">
-          <span>Контакты</span><i class="mmenu__chev">›</i>
+          <span>Контакты</span>
+          <svg
+            viewBox="0 0 33 58"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+          </svg>
         </button>
       </nav>
     </div>
@@ -479,7 +505,16 @@
     <!-- Панель: Портфолио -->
     <div class="mmenu__panel" id="mmPf" data-panel="pf" hidden>
       <div class="mmenu__subhead">
-        <button class="mmenu__back" data-back>‹</button>
+        <button class="mmenu__back" data-back>
+          <svg
+            viewBox="0 0 33 58"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+          </svg>
+        </button>
         <h4>Портфолио</h4>
         <p></p>
       </div>
@@ -496,7 +531,16 @@
     <!-- Панель: Контакты -->
     <div class="mmenu__panel" id="mmCt" data-panel="ct" hidden>
       <div class="mmenu__subhead">
-        <button class="mmenu__back" data-back>‹</button>
+        <button class="mmenu__back" data-back>
+          <svg
+            viewBox="0 0 33 58"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <use xlink:href="{% static 'images/icons.svg' %}#icon-arrow"></use>
+          </svg>
+        </button>
         <h4>Контакты</h4>
       </div>
       <div class="mmenu__contacts">

@@ -1070,7 +1070,10 @@ html.rq-lock body {
     border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
 
-.mmenu__chev {
+.mmenu__item svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
     font-style: normal;
     opacity: .8;
     transform: translateX(2px);
@@ -1099,6 +1102,16 @@ html.rq-lock body {
     color: #fff;
     font-size: 36px;
     padding: 6px;
+}
+
+.mmenu__back svg {
+    width: 24px;
+    height: 23px;
+    fill: none;
+    font-style: normal;
+    opacity: .8;
+    transform: rotate(180deg);
+    pointer-events: none;
 }
 
 .mmenu__cats {

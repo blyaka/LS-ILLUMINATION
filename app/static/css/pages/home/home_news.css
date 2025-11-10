@@ -5,6 +5,7 @@
 }
 
 .cw-news__title {
+    font-family: var(--font-sans-bold);
     color: #fff;
     text-align: center;
     font-size: var(--font-h1);

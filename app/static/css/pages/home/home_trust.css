@@ -4,6 +4,7 @@
 }
 
 .cw-trust__title {
+    font-family: var(--font-sans-bold);
     color: #fff;
     margin: 0 237px 100px;
     font-size: var(--font-h1);
@@ -103,9 +104,21 @@
 
 
 @media (max-width: 767px) {
+
+    .trust-view {
+        touch-action: pan-y;
+        cursor: grab;
+    }
+
+    .trust-view.is-grabbing {
+        cursor: grabbing;
+    }
+
     .cw-trust__title {
         color: #fff;
         margin: 0 20px 100px;
+        font-size: 2.35rem;
+        text-align: center;
     }
 
     .trust-track {

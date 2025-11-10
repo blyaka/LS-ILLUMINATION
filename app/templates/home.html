@@ -248,17 +248,97 @@
 
 <script>
   (function () {
-    const marquee = document.getElementById('videosMarquee');
-    if (!marquee) return;
-    const track = marquee.querySelector('.cw-videos__track');
+    const view  = document.getElementById('videosMarquee');
+    if (!view) return;
+    const track = view.querySelector('.cw-videos__track');
     if (!track) return;
 
+    // ——— мобильный режим: свой rAF + drag ———
+    const isMobile = window.matchMedia('(pointer:coarse)').matches;
+    if (isMobile) {
+      // отключаем CSS-анимацию
+      track.style.animation = 'none';
+
+      // ширина половины контента (лента у тебя уже продублирована в шаблоне)
+      const totalWidth = track.scrollWidth / 2;
+
+      let SPEED = 0.8;     // авто-скорость на мобилке
+      let offset = 0;
+      let raf = 0;
+
+      function wrap(o){
+        while (o <= -totalWidth) o += totalWidth;
+        while (o > 0) o -= totalWidth;
+        return o;
+      }
+
+      function frame() {
+        offset -= SPEED;
+        if (offset <= -totalWidth) offset += totalWidth;
+        track.style.transform = `translate3d(${offset}px,0,0)`;
+        raf = requestAnimationFrame(frame);
+      }
+      function start(){ if (!raf) raf = requestAnimationFrame(frame); }
+      function stop(){ if (raf) cancelAnimationFrame(raf); raf = 0; }
+
+      // автозапуск только в зоне видимости
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) e.isIntersecting ? start() : stop();
+      }, { root: null, rootMargin: '120px' });
+      io.observe(view);
+
+      // drag
+      view.style.touchAction = 'pan-y';
+      let dragging = false, startX = 0, startOffset = 0;
+
+      view.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        startX = e.clientX;
+        startOffset = offset;
+        stop();
+        SPEED = 0;
+        view.setPointerCapture?.(e.pointerId);
+        view.classList.add('is-grabbing');
+      });
+
+      view.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - startX;
+        offset = wrap(startOffset + dx);
+        track.style.transform = `translate3d(${offset}px,0,0)`;
+      });
+
+      function endDrag(e){
+        if (!dragging) return;
+        dragging = false;
+        view.classList.remove('is-grabbing');
+        SPEED = 0.8;
+        start();
+        view.releasePointerCapture?.(e.pointerId);
+      }
+      view.addEventListener('pointerup', endDrag);
+      view.addEventListener('pointercancel', endDrag);
+      view.addEventListener('lostpointercapture', endDrag);
+
+      // пауза, когда открыта модалка видео
+      const modal = document.getElementById('vModal');
+      if (modal) {
+        const mo = new MutationObserver(() => {
+          const open = !modal.hasAttribute('hidden');
+          if (open) stop(); else start();
+        });
+        mo.observe(modal, { attributes: true, attributeFilter: ['hidden'] });
+        window.addEventListener('video-player:close', () => start());
+      }
+
+      return; // десктопный код ниже нам не нужен
+    }
+
+    // ——— десктопный режим: твой прежний контроль playbackRate ———
     const anims = track.getAnimations ? track.getAnimations() : [];
     const anim = anims && anims[0] ? anims[0] : null;
 
-    let targetRate = 1;
-    let rate = 1;
-
+    let targetRate = 1, rate = 1;
     function tick() {
       rate += (targetRate - rate) * 0.08;
       if (anim && typeof anim.playbackRate === 'number') {
@@ -270,17 +350,20 @@
     }
     requestAnimationFrame(tick);
 
-    marquee.addEventListener('mouseenter', () => { targetRate = 0; }, { passive: true });
-    marquee.addEventListener('mouseleave', () => { targetRate = 1; }, { passive: true });
+    view.addEventListener('mouseenter', () => { targetRate = 0; }, { passive: true });
+    view.addEventListener('mouseleave', () => { targetRate = 1; }, { passive: true });
 
     const modal = document.getElementById('vModal');
-    const observer = new MutationObserver(() => {
-      const isOpen = !modal.hasAttribute('hidden');
-      targetRate = isOpen ? 0 : 1;
-    });
-    observer.observe(modal, { attributes: true, attributeFilter: ['hidden'] });
+    if (modal) {
+      const observer = new MutationObserver(() => {
+        const isOpen = !modal.hasAttribute('hidden');
+        targetRate = isOpen ? 0 : 1;
+      });
+      observer.observe(modal, { attributes: true, attributeFilter: ['hidden'] });
+    }
   })();
 </script>
+
 
 <script>
   (() => {
@@ -1084,48 +1167,86 @@
 
 <script>
   (() => {
-    const view = document.getElementById('trustView');
+    const view  = document.getElementById('trustView');
     const track = document.getElementById('trustTrack');
     if (!view || !track) return;
+
+    // дублируем элементы для бесконечной ленты
+    track.innerHTML += track.innerHTML;
+    const totalWidth = track.scrollWidth / 2;
 
     let SPEED = 1;
     let offset = 0;
     let raf = 0;
 
-    track.innerHTML += track.innerHTML;
-    const totalWidth = track.scrollWidth / 2;
-
     function frame() {
       offset -= SPEED;
-      if (offset <= -totalWidth) offset = 0;
+      if (offset <= -totalWidth) offset += totalWidth;
       track.style.transform = `translate3d(${offset}px,0,0)`;
       raf = requestAnimationFrame(frame);
     }
+    function start(){ if (!raf) raf = requestAnimationFrame(frame); }
+    function stop(){ if (raf) cancelAnimationFrame(raf); raf = 0; }
 
-    function start() {
-      if (raf) return;
-      raf = requestAnimationFrame(frame);
-    }
-
-    function stop() {
-      cancelAnimationFrame(raf);
-      raf = 0;
-    }
-
+    // автозапуск только когда блок в зоне видимости
     const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) start();
-        else stop();
-      }
+      for (const e of entries) e.isIntersecting ? start() : stop();
     }, { root: null, rootMargin: '100px' });
     io.observe(view);
 
-    view.addEventListener('mouseenter', () => SPEED = 0);
-    view.addEventListener('mouseleave', () => SPEED = 1);
+    // hover пауза только на десктопе
+    const desktop = window.matchMedia('(pointer:fine)').matches;
+    if (desktop) {
+      view.addEventListener('mouseenter', () => SPEED = 0, { passive: true });
+      view.addEventListener('mouseleave', () => SPEED = 1, { passive: true });
+    }
 
+    // ====== ТАЧ/DRAG только на мобильных ======
+    const mobile = window.matchMedia('(pointer:coarse)').matches;
+    if (!mobile) return; // дальше не идём если не тач
+
+    view.style.touchAction = 'pan-y';
+    let dragging = false;
+    let startX = 0;
+    let startOffset = 0;
+
+    function wrap(o){
+      while (o <= -totalWidth) o += totalWidth;
+      while (o > 0) o -= totalWidth;
+      return o;
+    }
+
+    view.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      startX = e.clientX;
+      startOffset = offset;
+      SPEED = 0;
+      stop();
+      view.setPointerCapture?.(e.pointerId);
+      view.classList.add('is-grabbing');
+    });
+
+    view.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      offset = wrap(startOffset + dx);
+      track.style.transform = `translate3d(${offset}px,0,0)`;
+    });
+
+    function endDrag(e){
+      if (!dragging) return;
+      dragging = false;
+      view.classList.remove('is-grabbing');
+      SPEED = 1;
+      start();
+      view.releasePointerCapture?.(e.pointerId);
+    }
+    view.addEventListener('pointerup', endDrag);
+    view.addEventListener('pointercancel', endDrag);
+    view.addEventListener('lostpointercapture', endDrag);
   })();
-
 </script>
+
 
 
 
