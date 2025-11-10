@@ -9,7 +9,7 @@
 
 <script src="{% static 'vendor/hls/hls.min.js' %}"></script>
 
-<section class="ls-hero" data-nofly>
+<section class="ls-hero section-defer" data-nofly>
   {% if hero_video %}
   <div class="ls-hero__media-wrap">
     <video id="heroVideo" class="ls-hero__media" {% if hero_video.poster %}poster="{{ hero_video.poster.url }}"
@@ -124,7 +124,7 @@
 
 
 <!-- РАЗДЕЛ ПОРТФОЛИО -->
-<section class="main" data-spawn="5">
+<section class="main section-defer" data-spawn="5">
   <h1> Портфолио </h1>
 
   <div class="grid">
@@ -201,7 +201,7 @@
 
 
 
-<section class="cw-videos" id="videos" data-spawn="3">
+<section class="cw-videos section-defer" id="videos" data-spawn="3">
   <h2 class="cw-videos__title">Видеогалерея</h2>
 
   <div class="cw-videos__marquee" id="videosMarquee" aria-label="Лента видео, автопрокрутка">
@@ -465,7 +465,7 @@
 
 
 
-<section class="cw-seq" id="seq" data-nofly>
+<section class="cw-seq section-defer" id="seq" data-nofly>
   <div class="cw-seq__sticky">
     <canvas id="seqCanvas" aria-label="Scroll sequence"></canvas>
 
@@ -671,7 +671,7 @@
 
 {% for v in block_videos %}
 {% if forloop.counter|divisibleby:2 %}
-<section class="cw-split right">
+<section class="cw-split right section-defer">
   <aside class="cw-split__aside">
     <h2 class="cw-split__title">{{ v.name|default:"Видео" }}</h2>
     <p class="cw-split__desc">{{ v.description|default:"" }}</p>
@@ -713,7 +713,7 @@
 
 
 {% else %}
-<section class="cw-split ">
+<section class="cw-split section-defer">
   <div class="cw-split__media">
     <video class="cw-split__video" preload="none" muted loop playsinline
       poster="{% if v.poster %}{{ v.poster.url }}{% else %}{% static 'images/hero-bg.png' %}{% endif %}"
@@ -885,7 +885,7 @@
 
 
 
-<section class="cw-news" id="news" data-spawn="2">
+<section class="cw-news section-defer" id="news" data-spawn="2">
   <h2 class="cw-news__title">Новости</h2>
 
   <div class="news-wrap">
@@ -1147,7 +1147,7 @@
 
 
 
-<section class="cw-trust" id="trust" data-spawn="2">
+<section class="cw-trust section-defer" id="trust" data-spawn="2">
   <h2 class="cw-trust__title">Нам доверяют</h2>
 
   <div class="trust-view" id="trustView">
@@ -1251,7 +1251,7 @@
 
 
 
-<section class="cw-contacts" id="contacts" aria-label="Контакты" data-nofly>
+<section class="cw-contacts section-defer" id="contacts" aria-label="Контакты" data-nofly>
 
   <div class="cw-contacts__wrap">
     <!-- Левая колонка: форма -->

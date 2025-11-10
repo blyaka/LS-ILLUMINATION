@@ -30,6 +30,9 @@ body {
 
 
 
+.section-defer { content-visibility: auto; contain-intrinsic-size: 800px 1200px; }
+.section-defer--short { contain-intrinsic-size: 500px 600px; }
+
 
 
 .cookie-banner {
