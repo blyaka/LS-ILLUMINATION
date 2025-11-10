@@ -197,9 +197,13 @@
         padding: 96px 20px 256px;
     }
 
+    .ct-sub-title {
+        display: none;
+    }
+
     .ct-form,
     .ct-info {
-        padding: 40px;
+        padding: 40px 25px;
         border-radius: 50px;
         border: 1px solid var(--border-color);
         background-color: rgba(0, 0, 0, 0.01);
@@ -239,5 +243,11 @@
         justify-self: stretch;
         text-align: center;
         width: unset !important;
+    }
+
+    .ct-field input, .ct-area textarea {
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid var(--border-color);
     }
 }

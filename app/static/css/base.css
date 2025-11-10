@@ -28,6 +28,12 @@ body {
     overflow-x: clip;
 }
 
+body.rq-lock {
+  overflow: hidden;
+  height: 100%;
+  touch-action: none;
+}
+
 
 
 .section-defer { content-visibility: auto; contain-intrinsic-size: 800px 1200px; }

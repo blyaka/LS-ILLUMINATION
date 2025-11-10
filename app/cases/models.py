@@ -1,13 +1,34 @@
 from django.db import models
 from django.db.models import Q
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
+
+def validate_webm(f):
+    if not f.name.lower().endswith('.webm'):
+        raise ValidationError('Разрешены только WEBM файлы.')
+
+effects = models.FileField(
+    'Эффекты (WEBM)',
+    upload_to='portfolio/effects/',
+    blank=True,
+    validators=[validate_webm],
+)
 
 class Category(models.Model):
     slug = models.SlugField('Слаг', max_length=120, unique=True)
     name = models.CharField('Название', max_length=120)
     photo = models.ImageField('Фото', upload_to='portfolio/icons/', blank=True)
-    icon = models.ImageField('Иконка', upload_to='portfolio/icons/', blank=True)
+    icon = models.FileField(
+        'Иконка (изображение или WEBM)',
+        upload_to='portfolio/icons/',
+        blank=True,
+    )
+    effects = models.FileField(
+        'Эффекты (WEBM)',
+        upload_to='portfolio/effects/',
+        blank=True,
+    )
     order = models.PositiveIntegerField('Порядок', default=0, db_index=True)
 
     class Meta:

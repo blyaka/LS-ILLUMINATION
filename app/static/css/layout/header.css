@@ -438,11 +438,51 @@
 }
 
 .pf-card img {
-    width: 220px;
-    height: 220px;
+    width: 180px;
+    height: 180px;
     object-fit: contain;
     display: block;
 }
+
+/* единая точка правды на размер иконки */
+.pf-icon {
+    --pf-icon-size: 180px;
+    position: relative;
+    width: var(--pf-icon-size);
+    height: var(--pf-icon-size);
+}
+
+.pf-icon__img,
+.pf-icon__fx {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* чтобы и webm, и img заполняли как раньше */
+    display: block;
+}
+
+/* эффект сверху, скрыт по умолчанию */
+.pf-icon__fx {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    /* плавное появление/исчезание */
+    pointer-events: none;
+    filter: brightness(1.1);
+    /* немного ярче для вау-эффекта */
+}
+
+/* при ховере — показ эффекта */
+.pf-card.is-hovered .pf-icon__fx {
+    opacity: 1;
+}
+
+/* если хочешь: когда иконка — это тоже видео, можно слегка приглушать фон */
+.pf-card:hover .pf-icon__img:is(video) {
+    opacity: .9;
+}
+
 
 .pf-card span {
     max-width: 220px;
