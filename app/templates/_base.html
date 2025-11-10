@@ -1553,6 +1553,22 @@
 
 
 
+  <!-- OPTIMIZATION -->
+  <script>
+    // один наблюдатель на всё
+    const whenVisible = (el, fn, options={root:null,rootMargin:'200px 0px',threshold:0.1}) => {
+      const io = new IntersectionObserver(([e], obs) => {
+        if (e.isIntersecting) { obs.unobserve(e.target); fn(el); }
+      }, options);
+      io.observe(el);
+    };
+
+    // ленивый модульный импорт (если разобьёшь скрипты на файлы)
+    const lazyInit = (selector, init) => {
+      document.querySelectorAll(selector).forEach(el => whenVisible(el, () => init(el)));
+    };
+  </script>
+
 
 
 </body>
