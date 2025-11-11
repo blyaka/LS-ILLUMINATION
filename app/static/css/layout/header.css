@@ -1378,4 +1378,108 @@ html.rq-lock body {
         line-height: 1;
         text-transform: lowercase;
     }
+
+
+
+
+    .rq-modal {
+        padding: 0px;
+    }
+
+    .rq-wrap {
+        position: relative;
+        border-radius: unset;
+        --radius: unset;
+        isolation: unset;
+        height: -webkit-fill-available;
+    }
+
+
+
+    .rq-card {
+        border-radius: unset;
+        width: -webkit-fill-available;
+        height: -webkit-fill-available;
+        max-width: unset;
+    }
+
+    .rq-card::before {
+        content: "";
+        position: absolute;
+        left: 68%;
+        top: 47%;
+        width: 210%;
+        height: 83%;
+        transform: translate(-29%, -26%) rotate(204deg);
+        background: url(/static/images/contacts-waves.png) center / cover no-repeat;
+        opacity: 0.8;
+        mix-blend-mode: screen;
+        pointer-events: none;
+        z-index: -1;
+        -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+        mask-image: radial-gradient(closest-side, #000 79%, transparent 100%);
+        backface-visibility: hidden;
+        will-change: transform;
+
+        inset: unset;
+        border-radius: unset;
+        padding: unset;
+        mask-composite: unset;
+        -webkit-mask: unset;
+
+    }
+
+    .rq-card::after {
+        content: "";
+        position: absolute;
+        left: 43%;
+        top: 74%;
+        width: 210%;
+        height: 101%;
+        transform: translate(-58%, -25%) rotate(343deg);
+        background: url(/static/images/contacts-waves.png) center / cover no-repeat;
+        opacity: 0.8;
+        mix-blend-mode: screen;
+        pointer-events: none;
+        z-index: -1;
+        -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent 100%);
+        mask-image: radial-gradient(closest-side, #000 79%, transparent 100%);
+        backface-visibility: hidden;
+        will-change: transform;
+    }
+
+    .rq-close {
+        top: 20px;
+        right: 20px;
+        background: none;
+    }
+
+    .rq-close::before,
+    .rq-close::after {
+        content: none;
+    }
+
+    .rq-field input,
+    .rq-field textarea {
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+    }
+
+
+
+    .rq-row--3 {
+        grid-template-columns: var(--grid1-1);
+    }
+
+    .rq-bottom {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    /* .rq-card::before {
+        content: none;
+    } */
+
+    .rq-wrap::after {
+        content: none;
+    }
 }
