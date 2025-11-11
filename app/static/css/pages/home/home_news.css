@@ -442,7 +442,7 @@
     }
 
     .news-main__aside {
-        /* width: 70%; */
+        width: 100%;
     }
 
     .news-date {
