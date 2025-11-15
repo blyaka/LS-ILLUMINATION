@@ -1052,7 +1052,6 @@ html.rq-lock body {
     height: 83%;
     transform: translate(-50%, -66%) rotate(204deg);
     background: url(/static/images/contacts-waves.png) center / cover no-repeat;
-    opacity: 0.8;
     mix-blend-mode: screen;
     pointer-events: none;
     z-index: -1;
@@ -1071,7 +1070,6 @@ html.rq-lock body {
     height: 83%;
     transform: translate(-51%, -24%) rotate(335deg);
     background: url(/static/images/contacts-waves.png) center / cover no-repeat;
-    opacity: 0.8;
     mix-blend-mode: screen;
     pointer-events: none;
     z-index: -1;
@@ -1412,7 +1410,6 @@ html.rq-lock body {
         height: 83%;
         transform: translate(-29%, -26%) rotate(204deg);
         background: url(/static/images/contacts-waves.png) center / cover no-repeat;
-        opacity: 0.8;
         mix-blend-mode: screen;
         pointer-events: none;
         z-index: -1;
@@ -1438,7 +1435,6 @@ html.rq-lock body {
         height: 101%;
         transform: translate(-58%, -25%) rotate(343deg);
         background: url(/static/images/contacts-waves.png) center / cover no-repeat;
-        opacity: 0.8;
         mix-blend-mode: screen;
         pointer-events: none;
         z-index: -1;
