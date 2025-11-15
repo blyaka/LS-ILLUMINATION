@@ -3,6 +3,7 @@
 }
 
 .about-hero-text {
+    font-family: Helvetica, sans-serif;
     position: relative;
     text-align: center;
     padding: 80px 20px 60px;
@@ -11,6 +12,7 @@
 }
 
 .about-hero h1 {
+    font-family: Helvetica, sans-serif;
     font-size: var(--font-h1);
     font-weight: 300;
     color: var(--text);
@@ -29,6 +31,7 @@
 }
 
 .about-title {
+    font-family: Helvetica, sans-serif;
     font-size: 3.5rem;
     font-weight: 700;
     margin-bottom: 18px;
@@ -36,6 +39,7 @@
 }
 
 .about-sub {
+    font-family: Helvetica, sans-serif;
     font-size: 1.1rem;
     color: var(--text);
     font-weight: 200;
@@ -44,6 +48,7 @@
 
 
 .about-block {
+    font-family: Helvetica, sans-serif;
     display: flex;
     flex-direction: column;
     margin: 24px auto;
@@ -59,6 +64,7 @@
 }
 
 .about-block h1 {
+    font-family: Helvetica, sans-serif;
     font-size: var(--font-h1);
     font-weight: var(--font-weight-light);
     margin-bottom: 24px;
@@ -89,7 +95,7 @@ li {
 
 @media (max-width: 767px) {
     .about-title {
-        font-size: 2rem;
+        font-size: 29px;
     }
 
     .about-sub {
@@ -102,6 +108,7 @@ li {
 
     .about-block h1 {
         text-align: center;
+        line-height: 1;
     }
 
     .about-block-image {
